@@ -6,6 +6,18 @@ import {ContainerNode} from './ContainerNode';
  * Base class for all nodes.
  */
 export abstract class Node {
+	/**
+	 * The default formatting options for stringification.
+	 */
+	public static get defaultStringificationParams(): IStringificationParams {
+		return {
+			attrParen: '"',
+			indentChar: '\t',
+			newlineChar: '\n'
+		};
+	}
+	
+	
 	public namespacePrefix: string;
 	
 	
@@ -52,11 +64,9 @@ export abstract class Node {
 	
 	
 	public toFormattedString(stringificationParams?: IStringificationParams): string {
-		stringificationParams = stringificationParams || {
-			indentChar: '\t',
-			newlineChar: '\n',
-			attrParen: '"'
-		};
+		if (typeof stringificationParams === 'object' && stringificationParams !== null) {
+			stringificationParams = Node.mergeObjects(Node.defaultStringificationParams, stringificationParams);
+		}
 		return this.stringify(stringificationParams);
 	}
 	
@@ -129,6 +139,14 @@ export abstract class Node {
 			attrString += ` ${attrName}="${this.attrList[attrName]}"`;
 		}
 		return attrString;
+	}
+	
+	
+	private static mergeObjects<TObject>(baseObject: TObject, overlayObject: TObject): TObject {
+		for (let key in overlayObject) {
+			(<any>baseObject)[key] = (<any>overlayObject)[key];
+		}
+		return baseObject;
 	}
 	
 	

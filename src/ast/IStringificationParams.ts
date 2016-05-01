@@ -1,5 +1,5 @@
 export interface IStringificationParams {
-	indentChar: string;
-	newlineChar: string;
-	attrParen: string;
+	indentChar?: string;
+	newlineChar?: string;
+	attrParen?: string;
 }
