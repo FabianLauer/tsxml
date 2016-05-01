@@ -1,0 +1,710 @@
+import * as ast from '../ast';
+import {SyntaxErrorCode} from './SyntaxErrorCode';
+import {SyntaxError} from './SyntaxError';
+
+/**
+ * Parsers create a syntax tree from an XML string. Use the static methods `parse*()` instead of using `new Parser()`.
+ */
+export class Parser {
+	/**
+	 * Creates a new parser object. Use the static methods `parse*()` instead of instantiating manually.
+	 */
+	constructor(private stringToParse: string) { }
+	
+	
+	/**
+	 * Parses an XML string and returns the parser object that parsed the string.
+	 * @see Parser.parseStringToAst(...)
+	 */
+	public static async parseString(stringToParse: string): Promise<Parser> {
+		const parser = new Parser(stringToParse);
+		parser.parseComplete();
+		return parser;
+	}
+	
+	
+	/**
+	 * Parses an XML string and returns a syntax tree.
+	 * @see Parser.parseString(...)
+	 */
+	public static async parseStringToAst(stringToParse: string): Promise<ast.DocumentNode> {
+		return (await Parser.parseString(stringToParse)).getAst();
+	}
+	
+	
+	/**
+	 * Returns the syntax tree object the parser creates.
+	 */
+	public getAst(): ast.DocumentNode {
+		return this.ast;
+	}
+	
+	
+	public parseComplete(): void {
+		// don't do anything if the source string is empty
+		if (this.stringToParse.length < 1) {
+			return;
+		}
+		while (!this.isAtEndOfInput()) {
+			this.parseFromCurrentToken();
+		}
+	}
+	
+	
+	protected getCurrentLine(): number {
+		return this.getTokenMatrix()[this.getCurrentTokenIndex()].line;
+	}
+	
+	
+	protected getCurrentColumn(): number {
+		return this.getTokenMatrix()[this.getCurrentTokenIndex()].column;
+	}
+	
+	
+	protected getCurrentTokenIndex(): number {
+		return this.currentTokenIndex;
+	}
+	
+	
+	protected isAtEndOfInput(): boolean {
+		return this.getCurrentTokenIndex() >= this.stringToParse.length;
+	}
+	
+	
+	protected getTokenAtIndex(index: number): string {
+		return this.stringToParse[index];
+	}
+	
+	
+	protected getCurrentToken(): string {
+		return this.getTokenAtIndex(this.getCurrentTokenIndex());
+	}
+	
+	
+	protected getTokenRange(startIndex: number, endIndex: number): string {
+		return this.stringToParse.slice(startIndex, endIndex);
+	}
+	
+	
+	protected getTokenRangeStartingAt(startIndex: number, length: number): string {
+		return this.stringToParse.slice(startIndex, startIndex + length);
+	}
+	
+	
+	protected getNextToken(): string {
+		return this.getTokenAtIndex(this.getCurrentTokenIndex() + 1);
+	}
+	
+	
+	protected getPreviousToken(): string {
+		return this.getTokenAtIndex(this.getCurrentTokenIndex() - 1);
+	}
+	
+	
+	protected findFirstOccurenceOfTokenAfterIndex(token: string, startIndex: number): number {
+		return this.stringToParse.indexOf(token[0], startIndex);
+	}
+	
+	
+	protected doesTokenOccurBeforeNextOccurenceOfOtherToken(token: string, otherToken: string, startIndex: number): boolean {
+		return this.findFirstOccurenceOfTokenAfterIndex(token, startIndex) < this.findFirstOccurenceOfTokenAfterIndex(otherToken, startIndex);
+	}
+	
+	
+	protected getCurrentContainerNode(): ast.ContainerNode<any> {
+		return this.currentContainerNode;
+	}
+	
+	
+	protected createSyntaxError(errorCode: SyntaxErrorCode, line: number, column: number, message: string): SyntaxError {
+		return new SyntaxError(errorCode, line, column, this.stringToParse, message);
+	}
+	
+	
+	protected createSyntaxErrorAtCurrentToken(errorCode: SyntaxErrorCode, message: string): SyntaxError {
+		return this.createSyntaxError(errorCode, this.getCurrentLine(), this.getCurrentColumn(), message);
+	}
+	
+	
+	protected createUnexpectedTokenSyntaxErrorAtCurrentToken(message?: string): SyntaxError {
+		message = message || `token can not be parsed`;
+		return this.createSyntaxErrorAtCurrentToken(SyntaxErrorCode.UnexpectedToken, message)
+	}
+	
+	
+	protected raiseError(error: Error): void {
+		throw error;
+	}
+	
+	
+	protected static isAlphabeticToken(token: string): boolean {
+		return /[a-z]/i.test(token[0]);
+	}
+	
+	
+	protected static isNumericToken(token: string): boolean {
+		return /[0-9]/i.test(token[0]);
+	}
+	
+	
+	protected static isWhitespaceToken(token: string): boolean {
+		token = token[0];
+		return token === ' ' || token === '\t' || token === '\r' || token === '\n';
+	}
+	
+	
+	protected static isTokenLegalInTagNameOrTagNameNamespacePrefix(token: string): boolean {
+		return Parser.isAlphabeticToken(token) ||
+			   Parser.isNumericToken(token) ||
+			   token[0] === '-' ||
+			   token[0] === '_';
+	}
+	
+	
+	protected static isTokenLegalInAttributeNameOrAttributeNameNameNamespacePrefix(token: string): boolean {
+		return Parser.isAlphabeticToken(token) ||
+			   Parser.isNumericToken(token) ||
+			   token[0] === '-' ||
+			   token[0] === '_';
+	}
+	
+	
+	protected moveByNumberOfTokens(numberOfTokens: number): void {
+		this.currentTokenIndex += numberOfTokens;
+	}
+	
+	
+	protected goBackByNumberOfTokens(numberOfTokens: number): void {
+		this.moveByNumberOfTokens(0 - Math.abs(numberOfTokens));
+	}
+	
+	
+	protected goBackToPreviousToken(): void {
+		this.goBackByNumberOfTokens(1)
+	}
+	
+	
+	protected advanceByNumberOfTokens(numberOfTokens: number): void {
+		this.moveByNumberOfTokens(Math.abs(numberOfTokens));
+	}
+	
+	
+	protected advanceToNextToken(): void {
+		this.advanceByNumberOfTokens(1);
+	}
+	
+	
+	protected parseFromCurrentToken(): void {
+		if (this.isAtEndOfInput()) {
+			return;
+		}
+		switch (true) {
+			default:
+				this.parseIntoNewTextNode();
+				break;
+			case typeof this.getCurrentToken() !== 'string':
+			case Parser.isWhitespaceToken(this.getCurrentToken()) || this.getCurrentToken() === '\r' || this.getCurrentToken() === '\n':
+				this.advanceToNextToken();
+				break;
+			case this.getCurrentToken() === '<':
+				this.parseFromBeginningOfTag();
+				break;
+		}
+	}
+	
+	
+	/**
+	 * Creates a new text node, appends it to the ast and parses all upcoming text into it. Stops parsing at the first character that can not be
+	 * considered text anymore. 
+	 */
+	protected parseIntoNewTextNode(): void {
+		const textNode = new ast.TextNode();
+		textNode.content = '';
+		this.getCurrentContainerNode().appendChild(textNode);
+		// skip all whitespace
+		while (Parser.isWhitespaceToken(this.getCurrentToken())) {
+			this.advanceToNextToken();
+		}
+		while (!this.isAtEndOfInput()) {
+			if (this.getCurrentToken() === '<'/* && !this.doesTokenOccurBeforeNextOccurenceOfOtherToken('<', '>', this.getCurrentTokenIndex()) */) {
+				break;
+			}
+			textNode.content += this.getCurrentToken();
+			this.advanceToNextToken();
+		}
+	}
+	
+	
+	protected parseFromBeginningOfTag(): void {
+		// Find out if we're dealing with a "normal" node here or with a MDO (markup declaration opener), PI (processing instruction) or comment.
+		// We will not know whether the node is self closing, or if it has child nodes or text content, but
+		// we know just enough to delegate the node to a more dedicated parsing method depending on what the
+		// node actually is.
+		switch (true) {
+			default:
+				this.raiseError(this.createUnexpectedTokenSyntaxErrorAtCurrentToken(`expected exclamation mark, question mark or alphabetic tag name`));
+				break;
+			// The node is a normal tag if it starts with an alphabetic token, such as:
+			//     <foo ...
+			//      ^
+			// or:
+			//     <a alpha="1" />
+			//      ^
+			case Parser.isTokenLegalInTagNameOrTagNameNamespacePrefix(this.getNextToken()):
+				this.parseFromBeginningOfNormalNode();
+				break;
+			// The node is a close tag if it starts with an open angle bracket followed by a slash, such as:
+			//     </foo>
+			//     ^^
+			// or:
+			//     </ foo>
+			//     ^^
+			case this.getTokenRangeStartingAt(this.getCurrentTokenIndex(), 2) === '</':
+				this.parseFromBeginningOfCloseTag();
+				break;
+			// If the node's tag name starts with an exclamation mark, the node is either a, CDATA section, MDO or a comment:
+			//     <![CDATA[ ...
+			//      ^
+			// or:
+			//     <!DOCTYPE ...
+			//      ^
+			// or:
+			//     <!-- ...
+			//      ^
+			case this.getNextToken() === '!':
+				// Look ahead at the next character(s) to decide whether the node is a CDATA section, MDO or a comment.
+				switch (true) {
+					default:
+						this.raiseError(this.createUnexpectedTokenSyntaxErrorAtCurrentToken(`expected declaration opener or comment node`));
+						break;
+					// There's a CDATA opener coming up
+					//     <![CDATA[ ...
+					//       ^^^^^^^
+					case this.getTokenRangeStartingAt(this.getCurrentTokenIndex() + 2, 7) === '[CDATA[':
+						this.parseFromBeginningOfCDataSectionNode();
+						break;
+					// There's an alphabetic token following the exclamation mark, so it's an MDO node:
+					//     <!DOCTYPE ...
+					//       ^
+					case Parser.isAlphabeticToken(this.getTokenAtIndex(this.getCurrentTokenIndex() + 2)):
+						this.parseFromBeginningOfDeclarationOpenerNode();
+						break;
+					// If there's a double hyphen following the exclamation mark, it's always a comment:
+					//     <!-- ...
+					//       ^^
+					case this.getTokenRangeStartingAt(this.getCurrentTokenIndex() + 2, 2) === '--':
+						this.parseFromBeginningOfCommentNode();
+						break;
+				}
+				break;
+			// If the node's tag name starts with a question mark, the node is a PI:
+			//     <?svg ...
+			//      ^
+			case this.getNextToken() === '?':
+				this.parseFromBeginningOfProcessingInstructionNode();
+				break;
+		}
+	}
+	
+	
+	protected parseFromBeginningOfNormalNode(): void {
+		// Validate that we actually have a "normal" node:
+		if (!Parser.isTokenLegalInTagNameOrTagNameNamespacePrefix(this.getNextToken())) {
+			this.raiseError(this.createUnexpectedTokenSyntaxErrorAtCurrentToken(`expected beginning of tag name, got '${this.getNextToken()}'`));
+		}
+		const node = new ast.ContainerNode();
+		this.getCurrentContainerNode().appendChild(node);
+		// Skip over the node opener:
+		//     <alpha ...
+		//     ^      we're here
+		this.advanceToNextToken();
+		//     <alpha
+		//      ^      we're here
+		this.parseCompleteOpeningTagInto(node, true, false);
+		return;
+	}
+	
+	
+	protected parseFromBeginningOfCloseTag(): void {
+		// Validate that we actually have a close tag:
+		if (this.getTokenRangeStartingAt(this.getCurrentTokenIndex(), 2) !== '</') {
+			this.raiseError(this.createUnexpectedTokenSyntaxErrorAtCurrentToken(`expected beginning of close tag (</...), got '${this.getTokenRangeStartingAt(this.getCurrentTokenIndex(), 2)}'`));
+		}
+		// Skip over the tag opener:
+		//     </alpha ...
+		//     ^      we're here
+		this.advanceByNumberOfTokens(2);
+		//     </alpha
+		//       ^      we're here
+		while (Parser.isWhitespaceToken(this.getCurrentToken())) {
+			this.advanceToNextToken();
+		}
+		while (Parser.isTokenLegalInTagNameOrTagNameNamespacePrefix(this.getCurrentToken())) {
+			this.advanceToNextToken();
+		}
+		while (Parser.isWhitespaceToken(this.getCurrentToken())) {
+			this.advanceToNextToken();
+		}
+		if (this.getCurrentToken() !== '>') {
+			this.raiseError(this.createUnexpectedTokenSyntaxErrorAtCurrentToken(`expected end of close tag, got '${this.getCurrentToken()}'`));
+		}
+		this.advanceToNextToken();
+		this.currentContainerNode = this.currentContainerNode.parentNode;
+		return;
+	}
+	
+	
+	protected parseFromBeginningOfDeclarationOpenerNode(): void {
+		// Validate that we actually have an MDO node:
+		if (this.getTokenRangeStartingAt(this.getCurrentTokenIndex(), 2) !== '<!') {
+			this.raiseError(this.createUnexpectedTokenSyntaxErrorAtCurrentToken('expected beginning of declaration opener (<!)'));
+		}
+		// We know this is actually an MDO node, so create the tree member and append it
+		const mdoNode = new ast.DeclarationOpenerNode();
+		this.getCurrentContainerNode().appendChild(mdoNode);
+		// Skip over the MDO opener:
+		//     <!DOCTYPE ...
+		//     ^      we're here
+		this.advanceByNumberOfTokens(2);
+		//     <!DOCTYPE
+		//       ^      we're here
+		this.parseCompleteOpeningTagInto(mdoNode, false, true);
+		return;
+	}
+	
+	
+	protected parseFromBeginningOfProcessingInstructionNode(): void {
+		// Validate that we actually have a PI node:
+		if (this.getTokenRangeStartingAt(this.getCurrentTokenIndex(), 2) !== '<?') {
+			this.raiseError(this.createUnexpectedTokenSyntaxErrorAtCurrentToken('expected beginning of processing instruction (<?)'));
+		}
+		// We know this is actually a PI node, so create the tree member and append it
+		const piNode = new ast.ProcessingInstructionNode();
+		this.getCurrentContainerNode().appendChild(piNode);
+		// Skip over the PI opener:
+		//     <?svg ...
+		//     ^      we're here
+		this.advanceByNumberOfTokens(2);
+		//     <?svg
+		//       ^      we're here
+		this.parseCompleteOpeningTagInto(piNode, false, false);
+		return;
+	}
+	
+	
+	/**
+	 * Parses a CDATA section.
+	 * @see https://www.w3.org/TR/xml/#sec-cdata-sect
+	 */
+	protected parseFromBeginningOfCDataSectionNode(): void {
+		// Validate that we actually have a CDATA section node:
+		if (this.getTokenRangeStartingAt(this.getCurrentTokenIndex(), 9) !== '<![CDATA[') {
+			this.raiseError(this.createUnexpectedTokenSyntaxErrorAtCurrentToken('expected beginning of CDATA section (<![CDATA[)'));
+		}
+		// We know this is actually a CDATA section node, so create the tree member and append to its content as long as it isn't closed by ']]>'.
+		const cdataNode = new ast.CDataSectionNode();
+		this.getCurrentContainerNode().appendChild(cdataNode);
+		// Skip over the CDATA opener:
+		//     <![CDATA[
+		//     ^      we're here
+		this.advanceByNumberOfTokens(9);
+		//     <![CDATA[
+		//             ^      we're here
+		// Start appending to the content:
+		cdataNode.content = '';
+		while (this.getTokenRangeStartingAt(this.getCurrentTokenIndex(), 3) !== ']]>') {
+			cdataNode.content += this.getCurrentToken();
+			this.advanceToNextToken();
+		}
+		// Skip to after the end of the comment node:
+		//     <![CDATA[...]]>
+		//                ^      we're here
+		this.advanceByNumberOfTokens(3);
+		//     <![CDATA[...]]>
+		//                    ^      we're now here
+		return;
+	}
+	
+	
+	protected parseFromBeginningOfCommentNode(): void {
+		// Validate that we actually have a comment node:
+		if (this.getTokenRangeStartingAt(this.getCurrentTokenIndex(), 4) !== '<!--') {
+			this.raiseError(this.createUnexpectedTokenSyntaxErrorAtCurrentToken('expected beginning of comment (<!--)'));
+		}
+		// We know this is actually a comment node, so create the tree member and append to its content as long as the comment
+		// node is not closed by `-->`.
+		const commentNode = new ast.CommentNode();
+		this.getCurrentContainerNode().appendChild(commentNode);
+		// Skip over the comment opener:
+		//     <!--
+		//     ^      we're here
+		this.advanceByNumberOfTokens(4);
+		//     <!--
+		//         ^      we're here
+		// Start appending to the comment's content:
+		commentNode.content = '';
+		while (this.getTokenRangeStartingAt(this.getCurrentTokenIndex(), 3) !== '-->') {
+			commentNode.content += this.getCurrentToken();
+			this.advanceToNextToken();
+		}
+		// Skip to after the end of the comment node:
+		//     <!-- some comment text, maybe with line breaks -->
+		//                                                   ^      we're here
+		this.advanceByNumberOfTokens(4);
+		//     <!-- some comment text, maybe with line breaks -->
+		//                                                       ^      we're now here
+		return;
+	}
+	
+	
+	protected parseCompleteOpeningTagInto(node: ast.Node, allowDescendingIntoNewNode: boolean, allowSystemLiterals: boolean): void {
+		// we could now be in any of the following constructs:
+		//     <alpha ...
+		//      ^
+		// or:
+		//     <!DOCTYPE ...
+		//       ^
+		// or:
+		//     <?svg ...
+		//       ^
+		this.parseTagNameInto(node);
+		if (this.getCurrentToken() !== '?' && this.getCurrentToken() !== '>') {
+			this.parseAttributeListInto(node, allowSystemLiterals);
+		}
+		// skip all whitespace
+		while (Parser.isWhitespaceToken(this.getCurrentToken())) {
+			this.advanceToNextToken();
+		}
+		switch (true) {
+			default:
+				this.raiseError(this.createUnexpectedTokenSyntaxErrorAtCurrentToken(`expected end of opening tag`));
+				break;
+			case this.getTokenRangeStartingAt(this.getCurrentTokenIndex(), 2) === '/>':
+				this.advanceByNumberOfTokens(2);
+				return;
+			case this.getCurrentToken() === '?':
+				this.advanceToNextToken();
+				// FALL THROUGH
+			case this.getCurrentToken() === '>':
+				if (allowDescendingIntoNewNode) {
+					this.currentContainerNode = <ast.ContainerNode<any>>node;
+				}
+				this.advanceToNextToken();
+				break;
+		}
+	}
+	
+	
+	/**
+	 * Parses a tag name into an AST node. Supports namespace prefixes.
+	 * @param node The AST node to parse the tag name into.
+	 */
+	protected parseTagNameInto(node: ast.Node): void {
+		// this will be set to `true` as soon as the first colon was seen
+		var colonSeen = false,
+			nameStash = '';
+		// we could now be in any of the following constructs:
+		//     <alpha ...
+		//      ^
+		//     <alpha:beta ...
+		//      ^
+		// or:
+		//     <!DOCTYPE ...
+		//       ^
+		// or:
+		//     <?svg ...
+		//       ^
+		while (Parser.isTokenLegalInTagNameOrTagNameNamespacePrefix(this.getCurrentToken()) || this.getCurrentToken() === ':') {
+			if (this.getCurrentToken() === ':') {
+				if (colonSeen) {
+					this.raiseError(this.createSyntaxErrorAtCurrentToken(SyntaxErrorCode.IllegalNamespacePrefix, 'illegal multiple namespace prefix (multiple colons in tag name)'));
+				}
+				colonSeen = true;
+				node.namespacePrefix = node.namespacePrefix || '';
+				node.namespacePrefix += nameStash;
+				nameStash = '';
+				this.advanceToNextToken();
+				if (!Parser.isAlphabeticToken(this.getCurrentToken())) {
+					this.raiseError(this.createSyntaxErrorAtCurrentToken(SyntaxErrorCode.MissingTagNameAfterNamespacePrefix, 'namespace prefix must be followed by a tag name'));
+					return;
+				}
+			}
+			nameStash += this.getCurrentToken();
+			this.advanceToNextToken();
+		}
+		node.tagName = nameStash;
+	}
+	
+	
+	protected parseAttributeListInto(node: ast.Node, allowSystemLiterals: boolean): void {
+		// We are now at the first token after the opening tag name, which could be either whitespace, the end of the opening tag or
+		// the start of a system literal:
+		//     <alpha fibo="nacci"...
+		//           ^
+		// or:
+		//     <alpha>
+		//           ^
+		// or:
+		//     <alpha />
+		//           ^
+		// or:
+		//     <alpha/>
+		//           ^
+		// or:
+		//     <alpha"FOO"/>
+		//           ^
+		if (!Parser.isWhitespaceToken(this.getCurrentToken()) && this.getCurrentToken() !== '/' && this.getCurrentToken() !== '>') {
+			if (!(allowSystemLiterals && (this.getCurrentToken() !== '"' || this.getCurrentToken() !== '\''))) {
+				this.raiseError(this.createUnexpectedTokenSyntaxErrorAtCurrentToken('expected whitespace or end of opening tag'));
+			}
+		}
+		// skip all whitespace
+		while (Parser.isWhitespaceToken(this.getCurrentToken())) {
+			this.advanceToNextToken();
+		}
+		// if there's no alphabetic token here, there are no attributes to be parsed
+		if (!Parser.isAlphabeticToken(this.getCurrentToken()) &&
+			!(allowSystemLiterals && (this.getCurrentToken() !== '"' || this.getCurrentToken() !== '\'')))
+		{
+			return;
+		}
+		let i = 0;
+		// advance until there are no attributes and literals to be parsed
+		while (this.getCurrentToken() !== '/' && this.getCurrentToken() !== '>' && i++ < 10) {
+			if (this.getCurrentToken() === '"' || this.getCurrentToken() === '\'') {
+				if (!allowSystemLiterals) {
+					this.raiseError(this.createUnexpectedTokenSyntaxErrorAtCurrentToken('system literal not allowed on this node'));
+				}
+				(<ast.DeclarationOpenerNode>node).systemLiterals.push(this.parseLiteral());
+			} else {
+				let attrInfo = this.parseAttribute();
+				node.setAttribute(attrInfo.name, attrInfo.value);
+				// skip all whitespace
+				while (Parser.isWhitespaceToken(this.getCurrentToken())) {
+					this.advanceToNextToken();
+				}
+			}
+		}
+	}
+	
+	
+	protected parseLiteral(): string {
+		var value = '';
+		// skip all whitespace
+		while (Parser.isWhitespaceToken(this.getCurrentToken())) {
+			this.advanceToNextToken();
+		}
+		const valueQuoteCharacter = this.getCurrentToken();
+		while (!this.isAtEndOfInput()) {
+			this.advanceToNextToken();
+			if (this.getCurrentToken() === valueQuoteCharacter && this.getPreviousToken() !== '\\') {
+				this.advanceToNextToken();
+				break;
+			}
+			if (this.getCurrentToken() === '\\' && this.getNextToken() === valueQuoteCharacter) {
+				continue;
+			}
+			value += this.getCurrentToken();
+		}
+		return value;
+	}
+	
+	
+	protected parseAttribute() {
+		var name = '',
+			value: string,
+			valueQuoteCharacter: string,
+			colonSeen = false,
+			getAttrInfo = () => ({ name, value });
+		// skip all whitespace
+		while (Parser.isWhitespaceToken(this.getCurrentToken())) {
+			this.advanceToNextToken();
+		}
+		// advance as long as we're in the attribute's name
+		while (Parser.isTokenLegalInAttributeNameOrAttributeNameNameNamespacePrefix(this.getCurrentToken()) || this.getCurrentToken() === ':') {
+			if (this.getCurrentToken() === ':') {
+				if (colonSeen) {
+					this.raiseError(this.createSyntaxErrorAtCurrentToken(SyntaxErrorCode.IllegalNamespacePrefix, 'illegal multiple namespace prefix (multiple colons in tag name)'));
+				}
+				colonSeen = true;
+				if (!Parser.isAlphabeticToken(this.getNextToken())) {
+					this.raiseError(this.createSyntaxErrorAtCurrentToken(SyntaxErrorCode.MissingTagNameAfterNamespacePrefix, 'namespace prefix must be followed by a tag name'));
+					return;
+				}
+			}
+			name += this.getCurrentToken();
+			this.advanceToNextToken();
+		}
+		// skip all whitespace after the attribute name
+		while (Parser.isWhitespaceToken(this.getCurrentToken())) {
+			this.advanceToNextToken();
+		}
+		// if there's no equal sign here, the attribute is empty:
+		if (this.getCurrentToken() !== '=') {
+			return getAttrInfo();
+		}
+		this.advanceToNextToken();
+		if (Parser.isWhitespaceToken(this.getCurrentToken()) || this.getCurrentToken() === '"' || this.getCurrentToken() === '\'') {
+			// skip all whitespace after the equal sign
+			while (Parser.isWhitespaceToken(this.getCurrentToken())) {
+				this.advanceToNextToken();
+			}
+			if (this.getCurrentToken() === '"' || this.getCurrentToken() === '\'') {
+				valueQuoteCharacter = this.getCurrentToken();
+			} else {
+				return getAttrInfo();
+			}
+		} else {
+			
+		}
+		value = '';
+		while (!this.isAtEndOfInput()) {
+			this.advanceToNextToken();
+			if (this.getCurrentToken() === valueQuoteCharacter && this.getPreviousToken() !== '\\') {
+				this.advanceToNextToken();
+				break;
+			}
+			if (this.getCurrentToken() === '\\' && this.getNextToken() === valueQuoteCharacter) {
+				continue;
+			}
+			value += this.getCurrentToken();
+		}
+		return getAttrInfo();
+	}
+	
+	
+	private getTokenMatrix() {
+		if (typeof this.tokenMatrix !== 'object' || this.tokenMatrix === null) {
+			this.createTokenMatrix();
+		}
+		return this.tokenMatrix;
+	}
+	
+	
+	private createTokenMatrix(): void {
+		var line = 1,
+			column = 0;
+		this.tokenMatrix = new Array(this.stringToParse.length);
+		for (let i = 0; i < this.stringToParse.length; i++) {
+			column += 1;
+			const currentToken = this.stringToParse[i];
+			this.tokenMatrix[i] = { line, column };
+			if (currentToken === '\n') {
+				line += 1;
+				column = 0;
+			}
+		}
+	}
+	
+	
+	private ast = new ast.DocumentNode();
+	
+	
+	private tokenMatrix: { [tokenIndex: number]: { line: number, column: number } };
+	
+	
+	private currentContainerNode: ast.ContainerNode<any> = this.getAst();
+	
+	
+	private currentTokenIndex = 0;
+}
