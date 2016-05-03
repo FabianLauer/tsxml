@@ -13,7 +13,6 @@ It supports all kinds of XML nodes, including comments, markup declaration opene
 ### Parser
 The parser is:
 - liberal in what it accepts
-- agnostic towards
 
 The parser is not (yet):
 - incremental
