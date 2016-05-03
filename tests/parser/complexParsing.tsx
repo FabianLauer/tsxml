@@ -171,8 +171,7 @@ class Nesting_1_2_3_4sc extends test.UnitTest {
 
 class NestingWithAttributes_1_2_3_2_2sc extends test.UnitTest {
 	protected async performTest() {
-		const textContent = 'sample text node content',
-			ast = await xml.Parser.parseStringToAst(
+		const ast = await xml.Parser.parseStringToAst(
 			<alpha a="true">
 				<beta>
 					<gamma></gamma>

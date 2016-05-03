@@ -229,7 +229,7 @@ export class Parser {
 			this.advanceToNextToken();
 		}
 		while (!this.isAtEndOfInput()) {
-			if (this.getCurrentToken() === '<'/* && !this.doesTokenOccurBeforeNextOccurenceOfOtherToken('<', '>', this.getCurrentTokenIndex()) */) {
+			if (this.getCurrentToken() === '<' && !this.doesTokenOccurBeforeNextOccurenceOfOtherToken('<', '>', this.getCurrentTokenIndex())) {
 				break;
 			}
 			textNode.content += this.getCurrentToken();

@@ -15,7 +15,7 @@ class OpenAngleBracketInTextNodeContent extends test.UnitTest {
 		const textNode = wrapperNode.getChildAtIndex(0);
 		await this.assert(textNode instanceof xml.ast.Node, 'text node exists');
 		await this.assert(textNode instanceof xml.ast.TextNode, 'text node has correct ast node type');
-		await this.assert(textNode.content === textContent, 'text node has correct content');
+		await this.assert(textNode.content === textContent, `text node has correct content, got (type ${typeof textNode.content}) '${textNode.content}'`);
 	}
 }
 
