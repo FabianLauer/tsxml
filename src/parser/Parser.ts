@@ -1,4 +1,7 @@
 import * as ast from '../ast';
+import {Node} from '../ast/Node';
+import {DocumentNode} from '../ast/DocumentNode';
+import {ContainerNode} from '../ast/ContainerNode';
 import {SyntaxErrorCode} from './SyntaxErrorCode';
 import {SyntaxError} from './SyntaxError';
 
@@ -27,7 +30,7 @@ export class Parser {
 	 * Parses an XML string and returns a syntax tree.
 	 * @see Parser.parseString(...)
 	 */
-	public static async parseStringToAst(stringToParse: string): Promise<ast.DocumentNode> {
+	public static async parseStringToAst(stringToParse: string): Promise<DocumentNode> {
 		return (await Parser.parseString(stringToParse)).getAst();
 	}
 	
@@ -35,7 +38,7 @@ export class Parser {
 	/**
 	 * Returns the syntax tree object the parser creates.
 	 */
-	public getAst(): ast.DocumentNode {
+	public getAst(): DocumentNode {
 		return this.ast;
 	}
 	
@@ -111,7 +114,7 @@ export class Parser {
 	}
 	
 	
-	protected getCurrentContainerNode(): ast.ContainerNode<any> {
+	protected getCurrentContainerNode(): ContainerNode<any> {
 		return this.currentContainerNode;
 	}
 	
@@ -312,7 +315,7 @@ export class Parser {
 		if (!Parser.isTokenLegalInTagNameOrTagNameNamespacePrefix(this.getNextToken())) {
 			this.raiseError(this.createUnexpectedTokenSyntaxErrorAtCurrentToken(`expected beginning of tag name, got '${this.getNextToken()}'`));
 		}
-		const node = new ast.ContainerNode();
+		const node = new ContainerNode();
 		this.getCurrentContainerNode().appendChild(node);
 		// Skip over the node opener:
 		//     <alpha ...
@@ -457,7 +460,7 @@ export class Parser {
 	}
 	
 	
-	protected parseCompleteOpeningTagInto(node: ast.Node, allowDescendingIntoNewNode: boolean, allowSystemLiterals: boolean): void {
+	protected parseCompleteOpeningTagInto(node: Node, allowDescendingIntoNewNode: boolean, allowSystemLiterals: boolean): void {
 		// we could now be in any of the following constructs:
 		//     <alpha ...
 		//      ^
@@ -499,7 +502,7 @@ export class Parser {
 	 * Parses a tag name into an AST node. Supports namespace prefixes.
 	 * @param node The AST node to parse the tag name into.
 	 */
-	protected parseTagNameInto(node: ast.Node): void {
+	protected parseTagNameInto(node: Node): void {
 		// this will be set to `true` as soon as the first colon was seen
 		var colonSeen = false,
 			nameStash = '';
@@ -536,7 +539,7 @@ export class Parser {
 	}
 	
 	
-	protected parseAttributeListInto(node: ast.Node, allowSystemLiterals: boolean): void {
+	protected parseAttributeListInto(node: Node, allowSystemLiterals: boolean): void {
 		// We are now at the first token after the opening tag name, which could be either whitespace, the end of the opening tag or
 		// the start of a system literal:
 		//     <alpha fibo="nacci"...
@@ -697,13 +700,13 @@ export class Parser {
 	}
 	
 	
-	private ast = new ast.DocumentNode();
+	private ast = new DocumentNode();
 	
 	
 	private tokenMatrix: { [tokenIndex: number]: { line: number, column: number } };
 	
 	
-	private currentContainerNode: ast.ContainerNode<any> = this.getAst();
+	private currentContainerNode: ContainerNode<any> = this.getAst();
 	
 	
 	private currentTokenIndex = 0;
