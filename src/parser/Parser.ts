@@ -124,6 +124,12 @@ export class Parser {
 	}
 	
 	
+	///
+	/// SYNTAX ERROR HANDLING & FACTORY METHODS:
+	/// The following methods help creating and raising syntax errors.
+	///
+	
+	
 	protected createSyntaxError(errorCode: SyntaxErrorCode, line: number, column: number, message: string): SyntaxError {
 		return new SyntaxError(errorCode, line, column, this.stringToParse, message);
 	}
@@ -143,6 +149,12 @@ export class Parser {
 	protected raiseError(error: Error): void {
 		throw error;
 	}
+	
+	
+	///
+	/// TOKEN IDENTIFICATION & CLASSIFICATION UTILITIES:
+	/// Methods that help identifying certain tokens.
+	///
 	
 	
 	protected static isAlphabeticToken(token: string): boolean {
@@ -177,6 +189,14 @@ export class Parser {
 	}
 	
 	
+	///
+	/// TOKEN ITERATION METHODS:
+	/// These methods handle the iteration over the XML string that is being parsed. Only use
+	/// the methods provided here to iterate over, move along, look at (back or ahead) the XML
+	/// string, don't do this manually.
+	///
+	
+	
 	protected moveByNumberOfTokens(numberOfTokens: number): void {
 		this.currentTokenIndex += numberOfTokens;
 	}
@@ -200,6 +220,12 @@ export class Parser {
 	protected advanceToNextToken(): void {
 		this.advanceByNumberOfTokens(1);
 	}
+	
+	
+	///
+	/// PARSING METHODS:
+	/// All methods that actually parse XML into AST nodes. 
+	///
 	
 	
 	protected parseFromCurrentToken(): void {
@@ -698,6 +724,12 @@ export class Parser {
 		}
 		return getAttrInfo();
 	}
+	
+	
+	///
+	/// MISC METHODS & PROPERTIES:
+	///
+	
 	
 	
 	private getTokenMatrix() {
