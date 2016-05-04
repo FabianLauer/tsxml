@@ -1,4 +1,5 @@
-import * as ast from './ast';
+import {DocumentNode} from './ast/DocumentNode';
+import {IStringificationParams} from './ast/IStringificationParams';
 import {Parser} from './parser/Parser';
 
 export abstract class Compiler {
@@ -13,7 +14,7 @@ export abstract class Compiler {
 	/**
 	 * Parses an XML string and returns the a syntax tree.
 	 */
-	public static async parseXmlToAst(xmlString: string): Promise<ast.DocumentNode> {
+	public static async parseXmlToAst(xmlString: string): Promise<DocumentNode> {
 		return Parser.parseStringToAst(xmlString);
 	}
 	
@@ -21,7 +22,7 @@ export abstract class Compiler {
 	/**
 	 * Parses an XML string to a syntax tree, then serializes it to formatted XML.
 	 */
-	public static async formatXmlString(xmlString: string, formattingOptions: ast.IStringificationParams): Promise<string> {
+	public static async formatXmlString(xmlString: string, formattingOptions: IStringificationParams): Promise<string> {
 		return (await Parser.parseStringToAst(xmlString)).toFormattedString(formattingOptions);
 	}
 }
