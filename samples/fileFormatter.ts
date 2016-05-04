@@ -7,11 +7,12 @@ import * as fs from 'fs';
 import * as xml from '../src/index';
 
 (async () => {
-	const PATH_TO_FILE = process.argv[2];
-	const formattedXml = (await xml.Parser.parseStringToAst(fs.readFileSync(PATH_TO_FILE) + '')).toFormattedString({
-		indentChar: '  ',
-		newlineChar: '\n',
-		attrParen: '"'
-	});
-	process.stdout.write(formattedXml + '\n');
+	const PATH_TO_FILE = process.argv[2],
+		  sourceXml = fs.readFileSync(PATH_TO_FILE) + '',
+		  formattingOptions = {
+			indentChar: '  ',
+			newlineChar: '\n',
+			attrParen: '"'
+		 };
+	process.stdout.write(await xml.Compiler.formatXmlString(sourceXml, formattingOptions));
 })();

@@ -33,7 +33,7 @@ To-Do-List:
 ### XML Serialization (converting objects to XML strings)
 Syntax tree nodes support XML serialization with their `toString()` and `toFormattedString()` methods, for example:
 
-	const document = xml.Parser.parseStringToAst(`
+	const document = xml.Compiler.parseStringToAst(`
 		<foo><bar /></foo>
 	`);
 	/*
@@ -47,8 +47,18 @@ Syntax tree nodes support XML serialization with their `toString()` and `toForma
 				<bar />
 			</foo> 
 	*/
-	node.toFormattedString(); 
- 
+	node.toFormattedString();
+
+Formatting can also be done in a somewhat more concise way:
+
+	console.log(await xml.Compiler.formatXmlString('<foo><bar /></foo>'));
+	/*
+		...which will log:
+			<foo>
+				<bar />
+			</foo> 
+	*/
+
  
 
 ## Why build another XML parser, aren't there plenty already?

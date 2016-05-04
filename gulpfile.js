@@ -42,6 +42,7 @@ function compileTypeScript(files, declarations) {
 gulp.task('compileSources', (callback) => compileTypeScript([
 	'src/index.ts*',
 	'src/ast.ts*',
+	'src/Compiler.ts*',
 	'src/ast/*.ts*',
 	'src/parser/*.ts*'
 ], false));
@@ -52,6 +53,7 @@ gulp.task('compileSources', (callback) => compileTypeScript([
 gulp.task('compileDeclarationFile', () => compileTypeScript([
 	'src/index.ts*',
 	'src/ast.ts*',
+	'src/Compiler.ts*',
 	'src/ast/*.ts*',
 	'src/parser/*.ts*'
 ], true));
