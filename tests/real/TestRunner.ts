@@ -3,6 +3,8 @@ import * as fs from 'fs';
 import * as test from '../../src/test';
 import * as xml from '../../src/index';
 
+// increase the unit test timeout to 3 minutes for huge files:
+@test.UnitTest.timeout(1000 * 60 * 3)
 abstract class FileTest extends test.UnitTest {
 	protected abstract getFullPathToFile(): string;
 	
