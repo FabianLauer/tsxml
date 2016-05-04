@@ -110,7 +110,12 @@ export class Parser {
 	
 	
 	protected doesTokenOccurBeforeNextOccurenceOfOtherToken(token: string, otherToken: string, startIndex: number): boolean {
-		return this.findFirstOccurenceOfTokenAfterIndex(token, startIndex) < this.findFirstOccurenceOfTokenAfterIndex(otherToken, startIndex);
+		const tokenIndex = this.findFirstOccurenceOfTokenAfterIndex(token, startIndex),
+			  otherTokenIndex = this.findFirstOccurenceOfTokenAfterIndex(otherToken, startIndex);
+		if (tokenIndex < 0 || otherTokenIndex < 0) {
+			return false;
+		}
+		return tokenIndex < otherTokenIndex;
 	}
 	
 	
@@ -229,7 +234,26 @@ export class Parser {
 			this.advanceToNextToken();
 		}
 		while (!this.isAtEndOfInput()) {
-			if (this.getCurrentToken() === '<' && !this.doesTokenOccurBeforeNextOccurenceOfOtherToken('<', '>', this.getCurrentTokenIndex())) {
+			// If the current token is an open angle bracket ('<'), we could have the following two situations:
+			//     <a>123</a>
+			//           ^
+			// or:
+			//     <a>123<456</a>
+			//           ^
+			// To distinguish between these situations, we have to check whether another open angle bracket appears
+			// before the next closing bracket:
+			//     <a>123</a>
+			//           ^  |
+			//              ^ — There's no other open angle bracket before the closing one, hence
+			//                  the open angle bracket opens the closing tag.
+			// or:
+			//     <a>123<123</a>
+			//           ^   |
+			//               ^ — There is indeed another open angle bracket before the closing one,
+			//                   hence the open angle bracket we're at right now does *not* open the
+			//                   closing tag.
+			if (this.getCurrentToken() === '<' && !this.doesTokenOccurBeforeNextOccurenceOfOtherToken('<', '>', this.getCurrentTokenIndex() + 1)) {
+				// we're at the start of the closing tag, so don't collect any further text content
 				break;
 			}
 			textNode.content += this.getCurrentToken();
