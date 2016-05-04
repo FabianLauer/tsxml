@@ -241,8 +241,44 @@ export class Parser {
 				this.advanceToNextToken();
 				break;
 			case this.getCurrentToken() === '<':
-				this.parseFromBeginningOfTag();
+				this.parseFromOpenAngleBracket();
 				break;
+		}
+	}
+	
+	
+	/**
+	 * Called when the parser is at an open angle bracket (`<`) and needs to decide how to parse upcoming tokens. This method looks ahead to decide
+	 * whether the open angle bracket is the beginning of an XML tag, or if it's the beginning of text node content, so either:
+	 *     <foo...
+	 *     ^       here
+	 * or:
+	 *     <foo><</foo>
+	 *          ^ here
+	 * 
+	 * Keep in mind that this method must *only* be called in these two cases, all other possible occurances of open angle brackets are handled in
+	 * more specific methods (namely when parsing CDATA or comments), which are not ambiguous (comments and CDATA nodes have delimiters that clearly
+	 * indicate where their content begins and ends, text nodes do not have this).
+	 * The same goes for attributes: An open angle bracket in a properly quoted attribute string is always going to be parsed as an attribute value.
+	 * An open angle bracket in an attribute value *that is not enclosed by quotes* is always a syntax error:
+	 *     <foo bar="1<2" />
+	 *                ^       OK, but does not concern this method
+	 *     <foo bar=1<2 />
+	 *               ^        NOT OK, always a syntax error. Also doesn't concern this method.
+	 */
+	protected parseFromOpenAngleBracket(): void {
+		// If:
+		//     the next token does not indicate a CDATA node, comment, PI or MDO
+		//   and:
+		//     there's another open angle bracket before the next occurance of a closing angle bracket
+		// assume that the current open angle bracket is text node content. In all other cases, assume that the current open angle bracket indicates
+		// the bginning of a new tag.
+		if (this.getNextToken() !== '!' && this.getNextToken() !== '?' &&
+			this.doesTokenOccurBeforeNextOccurenceOfOtherToken('<', '>', this.getCurrentTokenIndex() + 1))
+		{
+			this.parseIntoNewTextNode();
+		} else {
+			this.parseFromBeginningOfTag();
 		}
 	}
 	
