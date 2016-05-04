@@ -200,8 +200,8 @@ export class CliRenderer {
 				assertionMessage += `${NEWLINE}${color}${symbol}${FG_DEFAULT} ${result.description || '???'}`;
 			});
 		}
-		
-		this.write(this.getFormattedStateSymbol(), this.getFormattedTestName(), assertionMessage, additionalMessage);
+
+		this.write(this.getFormattedStateSymbol(), this.getFormattedTestName(), `(${this.test.execTime}ms)`, assertionMessage, additionalMessage);
 	}
 	
 	
