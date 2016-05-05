@@ -1,5 +1,6 @@
 import * as ast from '../ast';
 import {Node} from '../ast/Node';
+import {SelfClosingNode} from '../ast/SelfClosingNode';
 import {DocumentNode} from '../ast/DocumentNode';
 import {ContainerNode} from '../ast/ContainerNode';
 import {SyntaxErrorCode} from './SyntaxErrorCode';
@@ -401,7 +402,7 @@ export class Parser {
 		if (!Parser.isTokenLegalInTagNameOrTagNameNamespacePrefix(this.getNextToken())) {
 			this.raiseError(this.createUnexpectedTokenSyntaxErrorAtCurrentToken(`expected beginning of tag name, got '${this.getNextToken()}'`));
 		}
-		const node = new ContainerNode();
+		const node = new SelfClosingNode();
 		this.getCurrentContainerNode().appendChild(node);
 		// Skip over the node opener:
 		//     <alpha ...
@@ -546,6 +547,15 @@ export class Parser {
 	}
 	
 	
+	protected static createContainerNodeFromOtherNode<TChildNode extends Node>(node: Node): ContainerNode<TChildNode> {
+		const containerNode = new ContainerNode<TChildNode>();
+		containerNode.namespacePrefix = node.namespacePrefix;
+		containerNode.tagName = node.tagName;
+		node.getAllAttributeNames().forEach(attrName => containerNode.setAttribute(attrName, node.getAttribute(attrName)));
+		return containerNode;
+	}
+	
+	
 	protected parseCompleteOpeningTagInto(node: Node, allowDescendingIntoNewNode: boolean, allowSystemLiterals: boolean): void {
 		// we could now be in any of the following constructs:
 		//     <alpha ...
@@ -575,8 +585,13 @@ export class Parser {
 				this.advanceToNextToken();
 				// FALL THROUGH
 			case this.getCurrentToken() === '>':
+				if (node instanceof SelfClosingNode) {
+					const containerNode = Parser.createContainerNodeFromOtherNode<any>(node);
+					node.parentNode.replaceChild(node, containerNode);
+					node = containerNode;
+				}
 				if (allowDescendingIntoNewNode) {
-					this.currentContainerNode = <ast.ContainerNode<any>>node;
+					this.currentContainerNode = <ContainerNode<any>>node;
 				}
 				this.advanceToNextToken();
 				break;
