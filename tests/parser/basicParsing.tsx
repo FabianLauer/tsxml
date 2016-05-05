@@ -23,9 +23,9 @@ class SimpleNode extends test.UnitTest {
 class SimpleSelfClosingNodesInRoot extends test.UnitTest {
 	protected async performTest() {
 		const ast = await xml.Parser.parseStringToAst('<alpha /><beta />');
-		await this.assert(ast.getChildAtIndex(0) instanceof xml.ast.Node, 'first ast node has correct ast node type');
+		await this.assert(ast.getChildAtIndex(0) instanceof xml.ast.SelfClosingNode, 'first ast node has correct ast node type');
 		await this.assert(ast.getChildAtIndex(0).tagName === 'alpha', 'first ast node has correct tag name');
-		await this.assert(ast.getChildAtIndex(1) instanceof xml.ast.Node, 'second ast node has correct ast node type');
+		await this.assert(ast.getChildAtIndex(1) instanceof xml.ast.SelfClosingNode, 'second ast node has correct ast node type');
 		await this.assert(ast.getChildAtIndex(1).tagName === 'beta', 'second ast node has correct tag name');
 	}
 }
@@ -34,7 +34,7 @@ class SimpleSelfClosingNodesInRoot extends test.UnitTest {
 class SimpleNodeWithNumberInTagName extends test.UnitTest {
 	protected async performTest() {
 		const ast = await xml.Parser.parseStringToAst(<alpha123 /> as any);
-		await this.assert(ast.getChildAtIndex(0) instanceof xml.ast.Node, 'correct ast node type');
+		await this.assert(ast.getChildAtIndex(0) instanceof xml.ast.SelfClosingNode, 'correct ast node type');
 		await this.assert(ast.getChildAtIndex(0).tagName === 'alpha123', 'ast node has correct tag name');
 	}
 }
@@ -61,7 +61,7 @@ class SimpleNodeTagNameStartingWithNumber extends test.UnitTest {
 class SimpleNodeWithUnderscoreInTagName extends test.UnitTest {
 	protected async performTest() {
 		const ast = await xml.Parser.parseStringToAst(<alpha_beta /> as any);
-		await this.assert(ast.getChildAtIndex(0) instanceof xml.ast.Node, 'correct ast node type');
+		await this.assert(ast.getChildAtIndex(0) instanceof xml.ast.SelfClosingNode, 'correct ast node type');
 		await this.assert(ast.getChildAtIndex(0).tagName === 'alpha_beta', 'ast node has correct tag name');
 	}
 }
@@ -70,7 +70,7 @@ class SimpleNodeWithUnderscoreInTagName extends test.UnitTest {
 class SimpleNodeWithOnlyUnderscoresInTagName extends test.UnitTest {
 	protected async performTest() {
 		const ast = await xml.Parser.parseStringToAst(<__ /> as any);
-		await this.assert(ast.getChildAtIndex(0) instanceof xml.ast.Node, 'correct ast node type');
+		await this.assert(ast.getChildAtIndex(0) instanceof xml.ast.SelfClosingNode, 'correct ast node type');
 		await this.assert(ast.getChildAtIndex(0).tagName === '__', 'ast node has correct tag name');
 	}
 }
@@ -79,7 +79,7 @@ class SimpleNodeWithOnlyUnderscoresInTagName extends test.UnitTest {
 class SimpleNodeTagNameStartingWithUnderscore extends test.UnitTest {
 	protected async performTest() {
 		const ast = await xml.Parser.parseStringToAst(<_abc /> as any);
-		await this.assert(ast.getChildAtIndex(0) instanceof xml.ast.Node, 'correct ast node type');
+		await this.assert(ast.getChildAtIndex(0) instanceof xml.ast.SelfClosingNode, 'correct ast node type');
 		await this.assert(ast.getChildAtIndex(0).tagName === '_abc', 'ast node has correct tag name');
 	}
 }
@@ -88,7 +88,7 @@ class SimpleNodeTagNameStartingWithUnderscore extends test.UnitTest {
 class SimpleNodeWithHyphenInTagName extends test.UnitTest {
 	protected async performTest() {
 		const ast = await xml.Parser.parseStringToAst(<alpha-beta /> as any);
-		await this.assert(ast.getChildAtIndex(0) instanceof xml.ast.Node, 'correct ast node type');
+		await this.assert(ast.getChildAtIndex(0) instanceof xml.ast.SelfClosingNode, 'correct ast node type');
 		await this.assert(ast.getChildAtIndex(0).tagName === 'alpha-beta', 'ast node has correct tag name');
 	}
 }
@@ -97,7 +97,7 @@ class SimpleNodeWithHyphenInTagName extends test.UnitTest {
 class SimpleNodeWithOnlyHyphensInTagName extends test.UnitTest {
 	protected async performTest() {
 		const ast = await xml.Parser.parseStringToAst('<-- />');
-		await this.assert(ast.getChildAtIndex(0) instanceof xml.ast.Node, 'correct ast node type');
+		await this.assert(ast.getChildAtIndex(0) instanceof xml.ast.SelfClosingNode, 'correct ast node type');
 		await this.assert(ast.getChildAtIndex(0).tagName === '--', 'ast node has correct tag name');
 	}
 }
@@ -106,7 +106,7 @@ class SimpleNodeWithOnlyHyphensInTagName extends test.UnitTest {
 class SimpleNodeTagNameStartingWithHyphen extends test.UnitTest {
 	protected async performTest() {
 		const ast = await xml.Parser.parseStringToAst('<-abc />');
-		await this.assert(ast.getChildAtIndex(0) instanceof xml.ast.Node, 'correct ast node type');
+		await this.assert(ast.getChildAtIndex(0) instanceof xml.ast.SelfClosingNode, 'correct ast node type');
 		await this.assert(ast.getChildAtIndex(0).tagName === '-abc', 'ast node has correct tag name');
 	}
 }
@@ -115,7 +115,7 @@ class SimpleNodeTagNameStartingWithHyphen extends test.UnitTest {
 class SimpleNodeWithNamespacePrefix extends test.UnitTest {
 	protected async performTest() {
 		const ast = await xml.Parser.parseStringToAst('<test:alpha />');
-		await this.assert(ast.getChildAtIndex(0) instanceof xml.ast.Node, 'correct ast node type');
+		await this.assert(ast.getChildAtIndex(0) instanceof xml.ast.SelfClosingNode, 'correct ast node type');
 		await this.assert(ast.getChildAtIndex(0).namespacePrefix === 'test', 'ast node has correct namespace prefix');
 		await this.assert(ast.getChildAtIndex(0).tagName === 'alpha', `ast node has correct tag name, got ${ast.getChildAtIndex(0).tagName}`);
 	}

@@ -38,7 +38,7 @@ class Nesting_1_2sc extends test.UnitTest {
 		await this.assert(alpha instanceof xml.ast.ContainerNode, 'outer ast node has correct ast node type');
 		await this.assert(alpha.tagName === 'alpha', 'outer ast node has correct tag name');
 		const beta = alpha.getChildAtIndex(0);
-		await this.assert(beta instanceof xml.ast.Node, 'inner ast node has correct ast node type');
+		await this.assert(beta instanceof xml.ast.SelfClosingNode, 'inner ast node has correct ast node type');
 		await this.assert(beta.tagName === 'beta', 'inner ast node has correct tag name');
 	}
 }
@@ -59,7 +59,7 @@ class Nesting_1mdo_1_2sc extends test.UnitTest {
 		await this.assert(alpha instanceof xml.ast.ContainerNode, 'outer ast node has correct ast node type');
 		await this.assert(alpha.tagName === 'alpha', 'outer ast node has correct tag name');
 		const beta = alpha.getChildAtIndex(0);
-		await this.assert(beta instanceof xml.ast.Node, 'inner ast node has correct ast node type');
+		await this.assert(beta instanceof xml.ast.SelfClosingNode, 'inner ast node has correct ast node type');
 		await this.assert(beta.tagName === 'beta', 'inner ast node has correct tag name');
 	}
 }
@@ -85,7 +85,7 @@ class Nesting_1c_1mdo_1_2sc extends test.UnitTest {
 		await this.assert(alpha instanceof xml.ast.ContainerNode, 'outer ast node has correct ast node type');
 		await this.assert(alpha.tagName === 'alpha', 'outer ast node has correct tag name');
 		const beta = alpha.getChildAtIndex(0);
-		await this.assert(beta instanceof xml.ast.Node, 'inner ast node has correct ast node type');
+		await this.assert(beta instanceof xml.ast.SelfClosingNode, 'inner ast node has correct ast node type');
 		await this.assert(beta.tagName === 'beta', 'inner ast node has correct tag name');
 	}
 }
@@ -103,10 +103,10 @@ class Nesting_1_2sc_2sc extends test.UnitTest {
 		await this.assert(alpha instanceof xml.ast.ContainerNode, 'outer ast node has correct ast node type');
 		await this.assert(alpha.tagName === 'alpha', 'outer ast node has correct tag name');
 		const beta = alpha.getChildAtIndex(0);
-		await this.assert(beta instanceof xml.ast.Node, 'inner ast node has correct ast node type');
+		await this.assert(beta instanceof xml.ast.SelfClosingNode, 'inner ast node has correct ast node type');
 		await this.assert(beta.tagName === 'beta', 'inner ast node has correct tag name');
 		const gamma = alpha.getChildAtIndex(1);
-		await this.assert(gamma instanceof xml.ast.Node, 'inner ast node has correct ast node type');
+		await this.assert(gamma instanceof xml.ast.SelfClosingNode, 'inner ast node has correct ast node type');
 		await this.assert(gamma.tagName === 'gamma', 'inner ast node has correct tag name');
 	}
 }
@@ -127,16 +127,16 @@ class Nesting_1_2sc_2sc_2c_2sc extends test.UnitTest {
 		await this.assert(alpha instanceof xml.ast.ContainerNode, 'outer ast node has correct ast node type');
 		await this.assert(alpha.tagName === 'alpha', 'outer ast node has correct tag name');
 		const beta = alpha.getChildAtIndex(0);
-		await this.assert(beta instanceof xml.ast.Node, 'inner ast node has correct ast node type');
+		await this.assert(beta instanceof xml.ast.SelfClosingNode, 'inner ast node has correct ast node type');
 		await this.assert(beta.tagName === 'beta', 'inner ast node has correct tag name');
 		const gamma = alpha.getChildAtIndex(1);
-		await this.assert(gamma instanceof xml.ast.Node, 'inner ast node has correct ast node type');
+		await this.assert(gamma instanceof xml.ast.SelfClosingNode, 'inner ast node has correct ast node type');
 		await this.assert(gamma.tagName === 'gamma', 'inner ast node has correct tag name');
 		const comment = alpha.getChildAtIndex(2) as xml.ast.CommentNode;
 		await this.assert(comment instanceof xml.ast.CommentNode, 'comment ast node has correct ast node type');
 		await this.assert(comment.content === commentContent, 'comment ast node has correct text content');
 		const delta = alpha.getChildAtIndex(3);
-		await this.assert(delta instanceof xml.ast.Node, 'inner ast node has correct ast node type');
+		await this.assert(delta instanceof xml.ast.SelfClosingNode, 'inner ast node has correct ast node type');
 		await this.assert(delta.tagName === 'delta', 'inner ast node has correct tag name');
 	}
 }
@@ -157,13 +157,13 @@ class Nesting_1_2_3_4sc extends test.UnitTest {
 		await this.assert(alpha instanceof xml.ast.ContainerNode, 'outer ast node has correct ast node type');
 		await this.assert(alpha.tagName === 'alpha', 'outer ast node has correct tag name');
 		const beta = alpha.getChildAtIndex(0) as xml.ast.ContainerNode<any>;
-		await this.assert(beta instanceof xml.ast.Node, 'inner ast node has correct ast node type');
+		await this.assert(beta instanceof xml.ast.ContainerNode, 'inner ast node has correct ast node type');
 		await this.assert(beta.tagName === 'beta', 'inner ast node has correct tag name');
 		const gamma = beta.getChildAtIndex(0) as xml.ast.ContainerNode<any>;
-		await this.assert(gamma instanceof xml.ast.Node, 'inner ast node has correct ast node type');
+		await this.assert(gamma instanceof xml.ast.ContainerNode, 'inner ast node has correct ast node type');
 		await this.assert(gamma.tagName === 'gamma', 'inner ast node has correct tag name');
 		const delta = gamma.getChildAtIndex(0) as xml.ast.ContainerNode<any>;
-		await this.assert(delta instanceof xml.ast.Node, 'inner ast node has correct ast node type');
+		await this.assert(delta instanceof xml.ast.SelfClosingNode, 'inner ast node has correct ast node type');
 		await this.assert(delta.tagName === 'delta', 'inner ast node has correct tag name');
 	}
 }
@@ -186,19 +186,19 @@ class NestingWithAttributes_1_2_3_2_2sc extends test.UnitTest {
 		await this.assert(alpha.tagName === 'alpha', 'outer ast node has correct tag name');
 		await this.assert(alpha.getAttribute('a') === 'true', 'outer ast node has correct attribute value');
 		const beta = alpha.getChildAtIndex(0) as xml.ast.ContainerNode<any>;
-		await this.assert(beta instanceof xml.ast.Node, 'inner ast node has correct ast node type');
+		await this.assert(beta instanceof xml.ast.ContainerNode, 'inner ast node has correct ast node type');
 		await this.assert(beta.tagName === 'beta', 'inner ast node has correct tag name');
 		const gamma = beta.getChildAtIndex(0) as xml.ast.ContainerNode<any>;
-		await this.assert(gamma instanceof xml.ast.Node, 'inner ast node has correct ast node type');
+		await this.assert(gamma instanceof xml.ast.ContainerNode, `inner ast node has correct ast node type, got: ${gamma.constructor.name}`);
 		await this.assert(gamma.tagName === 'gamma', 'inner ast node has correct tag name');
 		const delta = alpha.getChildAtIndex(1) as xml.ast.ContainerNode<any>;
-		await this.assert(delta instanceof xml.ast.Node, 'inner ast node has correct ast node type');
+		await this.assert(delta instanceof xml.ast.ContainerNode, 'inner ast node has correct ast node type');
 		await this.assert(delta.tagName === 'delta', 'inner ast node has correct tag name');
 		const epsilon = alpha.getChildAtIndex(2) as xml.ast.ContainerNode<any>;
-		await this.assert(epsilon instanceof xml.ast.Node, 'inner ast node has correct ast node type');
+		await this.assert(epsilon instanceof xml.ast.ContainerNode, 'inner ast node has correct ast node type');
 		await this.assert(epsilon.tagName === 'epsilon', 'inner ast node has correct tag name');
 		const zeta = alpha.getChildAtIndex(3);
-		await this.assert(zeta instanceof xml.ast.Node, 'inner ast node has correct ast node type');
+		await this.assert(zeta instanceof xml.ast.SelfClosingNode, 'inner ast node has correct ast node type');
 		await this.assert(zeta.tagName === 'zeta', 'inner ast node has correct tag name');
 		await this.assert(zeta.getAttribute('foo') === 'bar', 'inner ast node has correct attribute value');
 	}
@@ -223,22 +223,22 @@ class NestingWithAttributes_1_2_3txt_2_2sc extends test.UnitTest {
 		await this.assert(alpha.tagName === 'alpha', 'outer ast node has correct tag name');
 		await this.assert(alpha.getAttribute('a') === 'true', 'outer ast node has correct attribute value');
 		const beta = alpha.getChildAtIndex(0) as xml.ast.ContainerNode<any>;
-		await this.assert(beta instanceof xml.ast.Node, 'inner ast node has correct ast node type');
+		await this.assert(beta instanceof xml.ast.ContainerNode, 'inner ast node has correct ast node type');
 		await this.assert(beta.tagName === 'beta', 'inner ast node has correct tag name');
 		const gamma = beta.getChildAtIndex(0) as xml.ast.ContainerNode<any>;
-		await this.assert(gamma instanceof xml.ast.Node, 'inner ast node has correct ast node type');
+		await this.assert(gamma instanceof xml.ast.ContainerNode, 'inner ast node has correct ast node type');
 		await this.assert(gamma.tagName === 'gamma', 'inner ast node has correct tag name');
 		const text = gamma.getChildAtIndex(0) as xml.ast.TextNode;
 		await this.assert(text instanceof xml.ast.TextNode, 'text ast node has correct ast node type');
 		await this.assert(text.content.replace(/^ */, '').replace(/ *$/, '') === textContent, 'text ast node has correct text content');
 		const delta = alpha.getChildAtIndex(1) as xml.ast.ContainerNode<any>;
-		await this.assert(delta instanceof xml.ast.Node, 'inner ast node has correct ast node type');
+		await this.assert(delta instanceof xml.ast.ContainerNode, 'inner ast node has correct ast node type');
 		await this.assert(delta.tagName === 'delta', 'inner ast node has correct tag name');
 		const epsilon = alpha.getChildAtIndex(2) as xml.ast.ContainerNode<any>;
-		await this.assert(epsilon instanceof xml.ast.Node, 'inner ast node has correct ast node type');
+		await this.assert(epsilon instanceof xml.ast.ContainerNode, 'inner ast node has correct ast node type');
 		await this.assert(epsilon.tagName === 'epsilon', 'inner ast node has correct tag name');
 		const zeta = alpha.getChildAtIndex(3);
-		await this.assert(zeta instanceof xml.ast.Node, 'inner ast node has correct ast node type');
+		await this.assert(zeta instanceof xml.ast.SelfClosingNode, 'inner ast node has correct ast node type');
 		await this.assert(zeta.tagName === 'zeta', 'inner ast node has correct tag name');
 		await this.assert(zeta.getAttribute('foo') === 'bar', 'inner ast node has correct attribute value');
 	}
