@@ -1,0 +1,3 @@
+<!DOCTYPE "foo" "bar">
+@@ EXPECTATION @@
+<!DOCTYPE "foo" "bar">

@@ -1,0 +1,3 @@
+<!DOCTYPE fibo "foo" nacci "bar">
+@@ EXPECTATION @@
+<!DOCTYPE fibo "foo" nacci "bar">
