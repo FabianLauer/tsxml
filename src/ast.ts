@@ -2,6 +2,7 @@ import {Attribute} from './ast/Attribute';
 import {IAttribute} from './ast/IAttribute';
 import {IStringificationParams} from './ast/IStringificationParams';
 import {Node} from './ast/Node';
+import {SelfClosingNode} from './ast/SelfClosingNode';
 import {TextNode} from './ast/TextNode';
 import {CommentNode} from './ast/CommentNode';
 import {CDataSectionNode} from './ast/CDataSectionNode';
@@ -15,6 +16,7 @@ export {
 	IAttribute,
 	IStringificationParams,
 	Node,
+	SelfClosingNode,
 	TextNode,
 	CommentNode,
 	CDataSectionNode,
