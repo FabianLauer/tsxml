@@ -22,7 +22,7 @@ export abstract class Compiler {
 	/**
 	 * Parses an XML string to a syntax tree, then serializes it to formatted XML.
 	 */
-	public static async formatXmlString(xmlString: string, formattingOptions: IStringificationParams): Promise<string> {
+	public static async formatXmlString(xmlString: string, formattingOptions?: IStringificationParams): Promise<string> {
 		return (await Parser.parseStringToAst(xmlString)).toFormattedString(formattingOptions);
 	}
 }
