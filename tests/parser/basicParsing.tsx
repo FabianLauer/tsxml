@@ -304,6 +304,48 @@ class SimpleProcessingInstructionNodeWithMissingQuestionMarkAtEnd extends test.U
 }
 
 
+class SimpleProcessingInstructionNodeWithAttribute extends test.UnitTest {
+	protected async performTest() {
+		const tagName = 'svg',
+			  ast = await xml.Parser.parseStringToAst(`<?${tagName} alpha="beta" ?>`);
+		await this.assert(ast.getChildAtIndex(0) instanceof xml.ast.ProcessingInstructionNode, 'correct ast node type');
+		await this.assert(ast.getChildAtIndex(0).tagName === tagName, 'correct tag name');
+		await this.assert(JSON.stringify(ast.getChildAtIndex(0).getAllAttributeNames()) === JSON.stringify([
+			'alpha'
+		]), `are all attribute names parsed and are there no excess attributes? (got ${JSON.stringify(ast.getChildAtIndex(0).getAllAttributeNames())})`);
+		await this.assert(ast.getChildAtIndex(0).getAttribute('alpha') === 'beta', 'test attribute value');
+	}
+}
+
+
+class SimpleProcessingInstructionNodeWithAttributeAndNoSpaceAtEnd extends test.UnitTest {
+	protected async performTest() {
+		const tagName = 'svg',
+			  ast = await xml.Parser.parseStringToAst(`<?${tagName} alpha="beta" ?>`);
+		await this.assert(ast.getChildAtIndex(0) instanceof xml.ast.ProcessingInstructionNode, 'correct ast node type');
+		await this.assert(ast.getChildAtIndex(0).tagName === tagName, 'correct tag name');
+		await this.assert(JSON.stringify(ast.getChildAtIndex(0).getAllAttributeNames()) === JSON.stringify([
+			'alpha'
+		]), `are all attribute names parsed and are there no excess attributes? (got ${JSON.stringify(ast.getChildAtIndex(0).getAllAttributeNames())})`);
+		await this.assert(ast.getChildAtIndex(0).getAttribute('alpha') === 'beta', 'test attribute value');
+	}
+}
+
+
+class SimpleProcessingInstructionNodeWithEmptyAttribute extends test.UnitTest {
+	protected async performTest() {
+		const tagName = 'svg',
+			  ast = await xml.Parser.parseStringToAst(`<?${tagName} alpha= ?>`);
+		await this.assert(ast.getChildAtIndex(0) instanceof xml.ast.ProcessingInstructionNode, 'correct ast node type');
+		await this.assert(ast.getChildAtIndex(0).tagName === tagName, 'correct tag name');
+		await this.assert(JSON.stringify(ast.getChildAtIndex(0).getAllAttributeNames()) === JSON.stringify([
+			'alpha'
+		]), `are all attribute names parsed and are there no excess attributes? (got ${JSON.stringify(ast.getChildAtIndex(0).getAllAttributeNames())})`);
+		await this.assert(ast.getChildAtIndex(0).getAttribute('alpha') === undefined, 'test attribute value');
+	}
+}
+
+
 class SimpleNodeWithAttributes extends test.UnitTest {
 	protected async performTest() {
 		const ast = await xml.Parser.parseStringToAst(<alpha fibo="nacci" foo="bar" PI="3.14" /> as any);
@@ -483,6 +525,9 @@ export class TestRunner extends test.TestRunner {
 			new SimpleDeclarationOpenerNodeWithSystemLiteralsAndEmptyAttributes(),
 			new SimpleProcessingInstructionNode(),
 			new SimpleProcessingInstructionNodeWithMissingQuestionMarkAtEnd(),
+			new SimpleProcessingInstructionNodeWithAttribute(),
+			new SimpleProcessingInstructionNodeWithAttributeAndNoSpaceAtEnd(),
+			new SimpleProcessingInstructionNodeWithEmptyAttribute(),
 			new SimpleNodeWithAttributes(),
 			new SimpleVoidNodeWithAttributes(),
 			new SimpleNodeWithNamespacedAttributes(),
