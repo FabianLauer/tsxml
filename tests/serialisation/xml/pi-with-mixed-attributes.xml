@@ -1,0 +1,3 @@
+<?alpha foo="bar" fibo alpha="beta" gamma="123e4"?>
+@@ EXPECTATION @@
+<?alpha foo="bar" fibo alpha="beta" gamma="123e4" ?>

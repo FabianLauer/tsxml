@@ -1,0 +1,3 @@
+<?alpha foo bar fibo?>
+@@ EXPECTATION @@
+<?alpha foo bar fibo ?>

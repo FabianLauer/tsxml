@@ -1,0 +1,3 @@
+<?alpha foo="bar" ?>
+@@ EXPECTATION @@
+<?alpha foo="bar" ?>

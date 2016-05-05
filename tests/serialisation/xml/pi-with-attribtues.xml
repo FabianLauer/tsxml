@@ -1,0 +1,3 @@
+<?alpha foo="bar" fibo="nacci"?>
+@@ EXPECTATION @@
+<?alpha foo="bar" fibo="nacci" ?>
