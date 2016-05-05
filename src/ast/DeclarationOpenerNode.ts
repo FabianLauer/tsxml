@@ -7,6 +7,14 @@ export class DeclarationOpenerNode extends Node {
 	
 	protected stringify(params: IStringificationParams, nodeIndentDepth?: number): string {
 		nodeIndentDepth = Math.max(nodeIndentDepth || 0, 0);
-		return `${Node.generateIndentString(params.indentChar, nodeIndentDepth)}<!${this.tagName}${this.stringifyAttributes(nodeIndentDepth)} ${this.systemLiterals.join('')} />${params.newlineChar}`;
+		return `${Node.generateIndentString(params.indentChar, nodeIndentDepth)}<!${this.tagName}${this.stringifyAttributes(nodeIndentDepth)}${this.stringifySystemLiterals()}>${params.newlineChar}`;
+	}
+	
+	
+	private stringifySystemLiterals(): string {
+		if (this.systemLiterals.length > 0) {
+			return ' ' + this.systemLiterals.join('');;
+		}
+		return '';
 	}
 }
