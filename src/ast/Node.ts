@@ -34,6 +34,11 @@ export abstract class Node {
 	}
 	
 	
+	public getNumberOfAttributes(): number {
+		return this.getAllAttributeNames().length;
+	}
+	
+	
 	public hasAttribute(attrName: string): boolean {
 		return this.getAllAttributeNames().indexOf(attrName) !== -1;
 	}
@@ -75,6 +80,31 @@ export abstract class Node {
 			newlineChar: '',
 			attrParen: '"'
 		});
+	}
+	
+	
+	public isTagNameAndNamespaceIdenticalTo(otherNode: Node): boolean {
+		return this.namespacePrefix === otherNode.namespacePrefix &&
+			   this.tagName === otherNode.tagName;
+	}
+	
+	
+	public isAttributeListIdenticalTo(otherNode: Node): boolean {
+		if (this.getNumberOfAttributes() !== otherNode.getNumberOfAttributes()) {
+			return false;
+		}
+		const indexOfFirstNonIdenticalAttributeName = this.getAllAttributeNames().findIndex(attrName => {
+			return this.getAttribute(attrName) !== otherNode.getAttribute(attrName);
+		});
+		return indexOfFirstNonIdenticalAttributeName === -1;
+	}
+	
+	
+	/**
+	 * Checks whether a node is identical to another node by comparing tag names, attribute names and values.
+	 */
+	public isIdenticalTo(otherNode: Node): boolean {
+		return this.constructor === otherNode.constructor && this.isTagNameAndNamespaceIdenticalTo(otherNode) && this.isAttributeListIdenticalTo(otherNode);
 	}
 	
 	

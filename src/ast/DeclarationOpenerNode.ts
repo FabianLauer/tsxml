@@ -5,6 +5,27 @@ export class DeclarationOpenerNode extends Node {
 	public systemLiterals: string[] = [];
 	
 	
+	public isSystemLiteralListIdenticalTo(otherNode: DeclarationOpenerNode): boolean {
+		if (this.systemLiterals.length !== otherNode.systemLiterals.length) {
+			return false;
+		}
+		for (let i = 0; i < this.systemLiterals.length; i++) {
+			if (this.systemLiterals[i] !== otherNode.systemLiterals[i]) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	
+	/**
+	 * Checks whether a node is identical to another node by comparing tag names, attribute names and values and content.
+	 */
+	public isIdenticalTo(otherNode: DeclarationOpenerNode): boolean {
+		return super.isIdenticalTo(otherNode) && this.isSystemLiteralListIdenticalTo(otherNode);
+	}
+	
+	
 	/**
 	 * @override
 	 */

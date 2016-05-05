@@ -107,6 +107,27 @@ export class ContainerNode<TChildNode extends Node> extends Node {
 	}
 	
 	
+	public isSubtreeIdenticalTo(otherNode: ContainerNode<TChildNode>): boolean {
+		if (this.getNumberOfChildren() !== otherNode.getNumberOfChildren()) {
+			return false;
+		}
+		for (let i = 0; i < this.getNumberOfChildren(); i++) {
+			if (!this.getChildAtIndex(i).isIdenticalTo(otherNode.getChildAtIndex(i))) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	
+	/**
+	 * Checks whether a node is identical to another node by comparing tag names, attribute names and values and subtree.
+	 */
+	public isIdenticalTo(otherNode: ContainerNode<TChildNode>): boolean {
+		return super.isIdenticalTo(otherNode) && this.isSubtreeIdenticalTo(otherNode);
+	}
+	
+	
 	/**
 	 * @override
 	 */
