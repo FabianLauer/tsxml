@@ -9,7 +9,8 @@ abstract class FileTest extends test.UnitTest {
 	
 	protected async performTest() {
 		const serializedXml = FileTest.makeComparableString((await xml.Parser.parseStringToAst(await this.getSourceAsString())).toString());
-		await this.assert(serializedXml === FileTest.makeComparableString(await this.getExpectationAsString()), 'serialized XML meets expectation');
+		await this.assert(serializedXml === FileTest.makeComparableString(await this.getExpectationAsString()),
+						  `serialized XML meets expectation, got: ${serializedXml}`);
 		this.cleanup();
 	}
 	
@@ -37,12 +38,12 @@ abstract class FileTest extends test.UnitTest {
 	
 	
 	private async getSourceAsString(): Promise<string> {
-		return (await this.getFileContentAsString()).split(/\n@@/)[1];
+		return (await this.getFileContentAsString()).split(FileTest.splitRegex)[1];
 	}
 	
 	
 	private async getExpectationAsString(): Promise<string> {
-		return (await this.getFileContentAsString()).split(/\n@@/)[1];
+		return (await this.getFileContentAsString()).split(FileTest.splitRegex)[1];
 	}
 	
 	
