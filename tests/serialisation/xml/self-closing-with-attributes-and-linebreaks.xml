@@ -1,0 +1,6 @@
+<alpha fibo="nacci"
+	foo="bar"    	alpha="beta"
+	   gamma="delta"
+                   />
+@@ EXPECTATION @@
+<alpha fibo="nacci" foo="bar" alpha="beta" gamma="delta" />
