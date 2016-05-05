@@ -20,6 +20,17 @@ class SimpleNode extends test.UnitTest {
 }
 
 
+class SimpleSelfClosingNodesInRoot extends test.UnitTest {
+	protected async performTest() {
+		const ast = await xml.Parser.parseStringToAst('<alpha /><beta />');
+		await this.assert(ast.getChildAtIndex(0) instanceof xml.ast.Node, 'first ast node has correct ast node type');
+		await this.assert(ast.getChildAtIndex(0).tagName === 'alpha', 'first ast node has correct tag name');
+		await this.assert(ast.getChildAtIndex(1) instanceof xml.ast.Node, 'second ast node has correct ast node type');
+		await this.assert(ast.getChildAtIndex(1).tagName === 'beta', 'second ast node has correct tag name');
+	}
+}
+
+
 class SimpleNodeWithNumberInTagName extends test.UnitTest {
 	protected async performTest() {
 		const ast = await xml.Parser.parseStringToAst(<alpha123 /> as any);
@@ -447,6 +458,7 @@ export class TestRunner extends test.TestRunner {
 		this.add(
 			new EmptyParsing(),
 			new SimpleNode(),
+			new SimpleSelfClosingNodesInRoot(),
 			new SimpleNodeWithNumberInTagName(),
 			new SimpleNodeWithNumericTagName(),
 			new SimpleNodeTagNameStartingWithNumber(),
