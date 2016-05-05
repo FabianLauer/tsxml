@@ -8,10 +8,8 @@ import * as xml from '../../src/index';
 abstract class FileTest extends test.UnitTest {
 	protected abstract getFullPathToFile(): string;
 	
-	protected async performTest() {
-		const parser = xml.Parser.parseStringToAst(await this.getFileContentAsString());
-		await this.assert(true);
-	}
+	
+	protected async performTest() { }
 	
 	
 	protected async getFileContentAsString(): Promise<string> {
@@ -30,9 +28,11 @@ abstract class FileTest extends test.UnitTest {
 
 abstract class WellFormedFileTest extends FileTest {
 	protected async performTest() {
-		var hasException = false;
+		var hasException = false,
+			originalDocument: xml.ast.DocumentNode;
+		// parse the original test file content
 		try {
-			await xml.Parser.parseStringToAst(await this.getFileContentAsString());
+			originalDocument = await xml.Parser.parseStringToAst(await this.getFileContentAsString());
 		} catch(err) {
 			hasException = true;
 			await this.assert(false, `error parsing valid file: ${err}`);
@@ -40,6 +40,11 @@ abstract class WellFormedFileTest extends FileTest {
 		if (!hasException) {
 			await this.assert(true, 'no errors parsing valid file');
 		}
+		// serialise the parsed content of the original file
+		let serialisedDocument = await xml.Parser.parseStringToAst(originalDocument.toString());
+		await this.assert(serialisedDocument.isIdenticalTo(originalDocument), 'unformatted serialised document is identical to original document');
+		serialisedDocument = await xml.Parser.parseStringToAst(originalDocument.toFormattedString());
+		await this.assert(serialisedDocument.isIdenticalTo(originalDocument), 'formatted serialised document is identical to original document');
 	}
 }
 
