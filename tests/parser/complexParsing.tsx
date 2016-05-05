@@ -27,6 +27,21 @@ import * as xml from '../../src/index';
 import '../../src/test/jsx';
 
 
+class Nesting_1_2c extends test.UnitTest {
+	protected async performTest() {
+		const content = 'some comment content with 123 numbers and a\nline break',
+			  ast = await xml.Parser.parseStringToAst(`<a><!--${content}--></a>`);
+		const wrapperNode = ast.getChildAtIndex(0) as xml.ast.ContainerNode<xml.ast.CommentNode>;
+		await this.assert(wrapperNode instanceof xml.ast.ContainerNode, 'outer ast node has correct ast node type');
+		await this.assert(wrapperNode.tagName === 'a', 'outer ast node has correct tag name');
+		await this.assert(wrapperNode.getNumberOfChildren() === 1, 'outer ast node has expected number of child nodes');
+		const commentNode = wrapperNode.getChildAtIndex(0);
+		await this.assert(commentNode instanceof xml.ast.CommentNode, 'comment ast node has correct ast node type');
+		await this.assert(commentNode.content === content, 'comment ast node has correct text content');
+	}
+}
+
+
 class Nesting_1_2sc extends test.UnitTest {
 	protected async performTest() {
 		const ast = await xml.Parser.parseStringToAst(
@@ -250,6 +265,7 @@ export class TestRunner extends test.TestRunner {
 	constructor() {
 		super();
 		this.add(
+			new Nesting_1_2c(),
 			new Nesting_1_2sc(),
 			new Nesting_1mdo_1_2sc(),
 			new Nesting_1c_1mdo_1_2sc(),
