@@ -318,6 +318,16 @@ class SimpleProcessingInstructionNodeWithAttribute extends test.UnitTest {
 }
 
 
+class SimpleProcessingInstructionNodeWithAttributeAndMissingQuestionMarkAtEnd extends test.UnitTest {
+	protected async performTest() {
+		const tagName = 'svg',
+			  ast = await xml.Parser.parseStringToAst(`<?${tagName}>`);
+		await this.assert(ast.getChildAtIndex(0) instanceof xml.ast.ProcessingInstructionNode, 'correct ast node type');
+		await this.assert(ast.getChildAtIndex(0).tagName === tagName, 'correct tag name');
+	}
+}
+
+
 class SimpleProcessingInstructionNodeWithAttributeAndNoSpaceAtEnd extends test.UnitTest {
 	protected async performTest() {
 		const tagName = 'svg',
@@ -526,6 +536,7 @@ export class TestRunner extends test.TestRunner {
 			new SimpleProcessingInstructionNode(),
 			new SimpleProcessingInstructionNodeWithMissingQuestionMarkAtEnd(),
 			new SimpleProcessingInstructionNodeWithAttribute(),
+			new SimpleProcessingInstructionNodeWithAttributeAndMissingQuestionMarkAtEnd(),
 			new SimpleProcessingInstructionNodeWithAttributeAndNoSpaceAtEnd(),
 			new SimpleProcessingInstructionNodeWithEmptyAttribute(),
 			new SimpleNodeWithAttributes(),
