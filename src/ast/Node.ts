@@ -66,6 +66,8 @@ export abstract class Node {
 	public toFormattedString(stringificationParams?: IStringificationParams): string {
 		if (typeof stringificationParams === 'object' && stringificationParams !== null) {
 			stringificationParams = Node.mergeObjects(Node.defaultStringificationParams, stringificationParams);
+		} else {
+			stringificationParams = Node.defaultStringificationParams;
 		}
 		return this.stringify(stringificationParams);
 	}
