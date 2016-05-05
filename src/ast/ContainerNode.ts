@@ -91,6 +91,17 @@ export class ContainerNode<TChildNode extends Node> extends Node {
 	}
 	
 	
+	/**
+	 * @chainable
+	 */
+	public replaceChild(oldChild: TChildNode, newChild: TChildNode): ContainerNode<TChildNode> {
+		const index = this.getIndexOfChild(oldChild);
+		this.removeChildAt(index);
+		this.insertChildAt(newChild, index);
+		return this;
+	}
+	
+	
 	public forEachChildNode(fn: (childNode: TChildNode, index: number) => void): void {
 		(<TChildNode[]>this.childNodes).forEach((childNode, index) => fn(childNode, index));
 	}
