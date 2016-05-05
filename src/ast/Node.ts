@@ -138,7 +138,12 @@ export abstract class Node {
 	protected stringifyAttributes(nodeIndentDepth: number): string {
 		var attrString = '';
 		for (let attrName in this.attrList) {
-			attrString += ` ${attrName}="${this.attrList[attrName]}"`;
+			const attrValue = this.attrList[attrName];
+			if (typeof attrValue !== 'undefined') {
+				attrString += ` ${attrName}="${attrValue}"`;
+			} else {
+				attrString += ` ${attrName}`;
+			}
 		}
 		return attrString;
 	}
