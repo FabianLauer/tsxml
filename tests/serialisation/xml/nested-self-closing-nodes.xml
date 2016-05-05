@@ -1,0 +1,6 @@
+<alpha>
+	<beta />
+	<gamma />
+</alpha>
+@@ EXPECTATION @@
+<alpha><beta /><gamma /></alpha>
