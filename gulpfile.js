@@ -4,7 +4,8 @@ const gulp = require('gulp'),
 	  typescript = require('gulp-typescript'),
 	  concat = require('gulp-concat'),
 	  replace = require('gulp-replace'),
-	  babel = require('gulp-babel');
+	  babel = require('gulp-babel'),
+	  browserify = require('gulp-browserify');
 
 
 function copyFile(pathToSourceFile, pathToCopiedFile) {
@@ -99,7 +100,7 @@ gulp.task('compileTests', ['compileSources'], () => compileTypeScript([
 
 // Compiles all files (except those in the /tests/ directory) to JavaScript and compiles a single
 // declaration file into /build/xml.d.ts.
-gulp.task('prepareRelease', ['cleanup', 'compileSources', 'compileDeclarationFile'], () => {
+gulp.task('prepareNodeJsRelease', ['cleanup', 'compileSources', 'compileDeclarationFile'], () => {
 	// make sure the 'dist' directory exists
 	if (!fs.existsSync('./dist/')) {
 		fs.mkdirSync('./dist/');
@@ -112,5 +113,17 @@ gulp.task('prepareRelease', ['cleanup', 'compileSources', 'compileDeclarationFil
 			presets: ['es2016-node5'],
 			plugins: ['transform-runtime']
 		}))
+		.pipe(gulp.dest('./dist/'));
+});
+
+
+// Compiles all files (except those in the /tests/ directory) to JavaScript and compiles a single
+// declaration file into /build/xml.d.ts.
+gulp.task('prepareRelease', ['prepareNodeJsRelease'], () => {
+	return gulp.src(['./dist/index.js'])
+		.pipe(browserify({
+			standalone: 'xml'
+		}))
+		.pipe(concat('xml.js'))
 		.pipe(gulp.dest('./dist/'));
 });
