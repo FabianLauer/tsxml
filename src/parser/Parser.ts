@@ -540,7 +540,7 @@ export class Parser {
 		// Skip to after the end of the comment node:
 		//     <!-- some comment text, maybe with line breaks -->
 		//                                                   ^      we're here
-		this.advanceByNumberOfTokens(4);
+		this.advanceByNumberOfTokens(3);
 		//     <!-- some comment text, maybe with line breaks -->
 		//                                                       ^      we're now here
 		return;
