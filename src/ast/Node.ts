@@ -90,7 +90,7 @@ export abstract class Node {
 		return (target: Node, name: string): void => {
 			Object.defineProperty(target, name, { });
 			const property = Object.getOwnPropertyDescriptor(target, name);
-			property.get = () => {
+			property.get = (): any => {
 				const firstAttrNameMatch = attrNames.find((attrName) => target.hasAttribute(attrName));
 				if (typeof firstAttrNameMatch === 'string') {
 					target.getAttribute(firstAttrNameMatch);
