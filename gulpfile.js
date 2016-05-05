@@ -1,7 +1,22 @@
 const gulp = require('gulp'),
+	  fs = require('fs'),
+	  cp = require('child_process'),
 	  typescript = require('gulp-typescript'),
 	  concat = require('gulp-concat'),
-	  replace = require('gulp-replace');
+	  replace = require('gulp-replace'),
+	  babel = require('gulp-babel');
+
+
+function copyFile(pathToSourceFile, pathToCopiedFile) {
+	fs.createReadStream(pathToSourceFile)
+	  .pipe(fs.createWriteStream(pathToCopiedFile));
+}
+
+
+function removeDirectory(pathToDirectory) {
+	cp.execSync('rm -rf ' + pathToDirectory);
+}
+
 
 /**
  * Compiles one or more TypeScript files and generates one declaration file with the
@@ -38,6 +53,16 @@ function compileTypeScript(files, declarations) {
 }
 
 
+gulp.task('cleanup', () => {
+	if (fs.existsSync('./build/')) {
+		removeDirectory('./build/');
+	}
+	if (fs.existsSync('./dist/')) {
+		removeDirectory('./dist/');
+	}
+});
+
+
 // Compiles all files (except those in the /tests/ directory) to JavaScript.
 gulp.task('compileSources', (callback) => compileTypeScript([
 	'src/index.ts*',
@@ -70,3 +95,22 @@ gulp.task('compileTests', ['compileSources'], () => compileTypeScript([
 	'src/test.ts*',
 	'tests/**/*.ts*'
 ]), false);
+
+
+// Compiles all files (except those in the /tests/ directory) to JavaScript and compiles a single
+// declaration file into /build/xml.d.ts.
+gulp.task('prepareRelease', ['cleanup', 'compileSources', 'compileDeclarationFile'], () => {
+	// make sure the 'dist' directory exists
+	if (!fs.existsSync('./dist/')) {
+		fs.mkdirSync('./dist/');
+	}
+	// copy the declaration file to the 'dist' directory
+	copyFile('./build/xml.d.ts', './dist/xml.d.ts');
+	// transpile JS into the 'dist' directory
+	return gulp.src(['./build/src/**/*.js'])
+		.pipe(babel({
+			presets: ['es2016-node5'],
+			plugins: ['transform-runtime']
+		}))
+		.pipe(gulp.dest('./dist/'));
+});
