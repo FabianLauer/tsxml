@@ -284,6 +284,24 @@ class SimpleDeclarationOpenerNodeWithSystemLiteralsAndEmptyAttributes extends te
 }
 
 
+class SimpleDeclarationOpenerNodeWithComplexSystemLiteralsAndEmptyAttributes extends test.UnitTest {
+	protected async performTest() {
+		const ast = await xml.Parser.parseStringToAst(`<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">`);
+		const mdoNode = ast.getChildAtIndex(0) as xml.ast.DeclarationOpenerNode;
+		await this.assert(mdoNode instanceof xml.ast.DeclarationOpenerNode, 'correct ast node type');
+		await this.assert(mdoNode.tagName === 'DOCTYPE', 'correct tag name');
+		await this.assert(JSON.stringify(ast.getChildAtIndex(0).getAllAttributeNames()) === JSON.stringify([
+			'plist', 'PUBLIC'
+		]), `are all attribute names parsed and are there no excess attributes? (got ${JSON.stringify(ast.getChildAtIndex(0).getAllAttributeNames())})`);
+		await this.assert(ast.getChildAtIndex(0).getAttribute('plist') === undefined, 'test first attribute value');
+		await this.assert(ast.getChildAtIndex(0).getAttribute('PUBLIC') === undefined, 'test second attribute value');
+		await this.assert(mdoNode.systemLiterals.length === 2, 'correct amount of system literals');
+		await this.assert(mdoNode.systemLiterals[0] === '-//Apple//DTD PLIST 1.0//EN', `correct value of first system literal, got ${mdoNode.systemLiterals[0]}`);
+		await this.assert(mdoNode.systemLiterals[1] === 'http://www.apple.com/DTDs/PropertyList-1.0.dtd', `correct value of second system literal, got ${mdoNode.systemLiterals[1]}`);
+	}
+}
+
+
 class SimpleProcessingInstructionNode extends test.UnitTest {
 	protected async performTest() {
 		const tagName = 'svg',
@@ -533,6 +551,7 @@ export class TestRunner extends test.TestRunner {
 			new SimpleDeclarationOpenerNodeWithSystemLiteralAndAttributes(),
 			new SimpleDeclarationOpenerNodeWithSystemLiteralAndEmptyAttributes(),
 			new SimpleDeclarationOpenerNodeWithSystemLiteralsAndEmptyAttributes(),
+			new SimpleDeclarationOpenerNodeWithComplexSystemLiteralsAndEmptyAttributes(),
 			new SimpleProcessingInstructionNode(),
 			new SimpleProcessingInstructionNodeWithMissingQuestionMarkAtEnd(),
 			new SimpleProcessingInstructionNodeWithAttribute(),
