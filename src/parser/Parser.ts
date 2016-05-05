@@ -674,7 +674,7 @@ export class Parser {
 		}
 		let i = 0;
 		// advance until there are no attributes and literals to be parsed
-		while (this.getCurrentToken() !== '/' && this.getCurrentToken() !== '>' && i++ < 10) {
+		while (this.getCurrentToken() !== '>' && this.getCurrentToken() !== '/' && this.getCurrentToken() !== '?' && i++ < 10) {
 			if (this.getCurrentToken() === '"' || this.getCurrentToken() === '\'') {
 				if (!allowSystemLiterals) {
 					this.raiseError(this.createUnexpectedTokenSyntaxErrorAtCurrentToken('system literal not allowed on this node'));
