@@ -73,12 +73,13 @@ export class TestRunner extends test.TestRunner {
 	private prepareFileTestsForDirectory(directoryPath: string, testBaseClass: typeof FileTest): void {
 		const basePath = './tests/real/xml/';
 		fs.readdirSync(basePath + directoryPath).forEach(path => {
-			const fullPathToFile = basePath + directoryPath + path;
-			if (!fs.statSync(fullPathToFile).isFile()) {
+			const fullPathToFile = basePath + directoryPath + path,
+				  stat = fs.statSync(fullPathToFile);
+			if (!stat.isFile()) {
 				return;
 			}
 			this.add(new (class extends testBaseClass {
-				public get name() { return directoryPath + path; }
+				public get name() { return `${directoryPath}${path} (${(stat.size / 1e3).toFixed(2)}KB)`; }
 				protected getFullPathToFile() { return fullPathToFile; }
 			}));
 		});
