@@ -1,0 +1,21 @@
+<alpha foo="bar">
+	<beta>
+		<gamma />
+		<delta />
+		<beta>
+			<gamma />
+			<delta />
+		</beta>
+	</beta>
+	<beta>
+		<gamma />
+		<delta />
+		<beta>
+			<gamma />
+			<!-- test comment content -->
+			<delta />
+		</beta>
+	</beta>
+</alpha>
+@@ EXPECTATION @@
+<alpha foo="bar"><beta><gamma /><delta /><beta><gamma /><delta /></beta></beta><beta><gamma /><delta /><beta><gamma /><!-- test comment content --><delta /></beta></beta></alpha>

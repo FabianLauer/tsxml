@@ -1,0 +1,20 @@
+<alpha foo="bar">
+	<beta>
+		<gamma />
+		<delta />
+		<beta>
+			<gamma />
+			<delta />
+		</beta>
+	</beta>
+	<beta>
+		<gamma />
+		<delta />
+		<beta>
+			<gamma />
+			<delta />
+		</beta>
+	</beta>
+</alpha>
+@@ EXPECTATION @@
+<alpha foo="bar"><beta><gamma /><delta /><beta><gamma /><delta /></beta></beta><beta><gamma /><delta /><beta><gamma /><delta /></beta></beta></alpha>
