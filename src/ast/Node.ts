@@ -24,10 +24,6 @@ export abstract class Node {
 	public tagName: string;
 	
 	
-	@Node.attributeProxyProperty<string>('id', 'ID', 'Id', 'iD')
-	public id: IAttribute<string>;
-	
-	
 	public get parentNode(): ContainerNode<any> {
 		return this._parentNode;
 	}
@@ -79,30 +75,6 @@ export abstract class Node {
 			newlineChar: '',
 			attrParen: '"'
 		});
-	}
-	
-	
-	/**
-	 * Decorator.
-	 */
-	protected static attributeProxyProperty<TValue>(attrName: string, ...alternativeAttrNames: string[]) {
-		const attrNames = [attrName].concat(alternativeAttrNames);
-		return (target: Node, name: string): void => {
-			Object.defineProperty(target, name, { });
-			const property = Object.getOwnPropertyDescriptor(target, name);
-			property.get = (): any => {
-				const firstAttrNameMatch = attrNames.find((attrName) => target.hasAttribute(attrName));
-				if (typeof firstAttrNameMatch === 'string') {
-					target.getAttribute(firstAttrNameMatch);
-				}
-				return undefined;
-			};
-			property.set = (value: IAttribute<TValue>) => {
-				target.setAttribute(attrName, value);
-			};
-			property.configurable = false;
-			property.enumerable = false;
-		};
 	}
 	
 	
