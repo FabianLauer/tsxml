@@ -16,7 +16,7 @@ export class DeclarationOpenerNode extends Node {
 	
 	private stringifySystemLiterals(): string {
 		if (this.systemLiterals.length > 0) {
-			return ' ' + this.systemLiterals.join('');;
+			return ' ' + this.systemLiterals.map<string>(literal => `"${literal}"`).join(' ');
 		}
 		return '';
 	}
