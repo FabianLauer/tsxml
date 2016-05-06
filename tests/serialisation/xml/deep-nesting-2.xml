@@ -1,4 +1,25 @@
 <alpha foo="bar">
+<beta>
+<gamma />
+<delta />
+<beta>
+<gamma />
+<delta />
+</beta>
+</beta>
+<beta>
+<gamma />
+<delta />
+<beta>
+<gamma />
+<delta />
+</beta>
+</beta>
+</alpha>
+@@ COMPACT @@
+<alpha foo="bar"><beta><gamma /><delta /><beta><gamma /><delta /></beta></beta><beta><gamma /><delta /><beta><gamma /><delta /></beta></beta></alpha>
+@@ DEFAULT @@
+<alpha foo="bar">
 	<beta>
 		<gamma />
 		<delta />
@@ -16,5 +37,3 @@
 		</beta>
 	</beta>
 </alpha>
-@@ COMPACT @@
-<alpha foo="bar"><beta><gamma /><delta /><beta><gamma /><delta /></beta></beta><beta><gamma /><delta /><beta><gamma /><delta /></beta></beta></alpha>

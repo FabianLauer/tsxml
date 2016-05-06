@@ -4,3 +4,5 @@
                    />
 @@ COMPACT @@
 <alpha fibo="nacci" foo="bar" alpha="beta" gamma="delta" />
+@@ DEFAULT @@
+<alpha fibo="nacci" foo="bar" alpha="beta" gamma="delta" />

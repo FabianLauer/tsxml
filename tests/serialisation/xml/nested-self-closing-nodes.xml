@@ -4,3 +4,8 @@
 </alpha>
 @@ COMPACT @@
 <alpha><beta /><gamma /></alpha>
+@@ DEFAULT @@
+<alpha>
+	<beta />
+	<gamma />
+</alpha>

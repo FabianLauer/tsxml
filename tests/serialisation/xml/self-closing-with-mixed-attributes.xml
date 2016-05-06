@@ -3,3 +3,5 @@
 	   		alpha="beta" />
 @@ COMPACT @@
 <alpha fibo="nacci" foo alpha="beta" />
+@@ DEFAULT @@
+<alpha fibo="nacci" foo alpha="beta" />
