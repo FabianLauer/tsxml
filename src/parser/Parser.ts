@@ -682,6 +682,12 @@ export class Parser {
 				(<ast.DeclarationOpenerNode>node).systemLiterals.push(this.parseLiteral());
 			} else {
 				let attrInfo = this.parseAttribute();
+				/// TODO:
+				/// Empty attribute names should never happen (see issue #7). Find out why this happens, fix it, then remove the
+				/// `continue` workaround below.
+				if (attrInfo.name === '') {
+					continue;
+				}
 				node.setAttribute(attrInfo.name, attrInfo.value);
 				// skip all whitespace
 				while (Parser.isWhitespaceToken(this.getCurrentToken())) {
@@ -702,7 +708,6 @@ export class Parser {
 		while (!this.isAtEndOfInput()) {
 			this.advanceToNextToken();
 			if (this.getCurrentToken() === valueQuoteCharacter && this.getPreviousToken() !== '\\') {
-				this.advanceToNextToken();
 				break;
 			}
 			if (this.getCurrentToken() === '\\' && this.getNextToken() === valueQuoteCharacter) {
@@ -710,6 +715,7 @@ export class Parser {
 			}
 			value += this.getCurrentToken();
 		}
+		this.advanceToNextToken();
 		return value;
 	}
 	
