@@ -45,9 +45,7 @@ export abstract class Node {
 	
 	
 	public getAttribute<TValue>(attrName: string, namespaceName?: string): IAttribute<TValue> {
-		if (typeof namespaceName !== 'undefined') {
-			attrName = namespaceName + attrName;
-		}
+		attrName = Node.joinAttributeNameWithNamespacePrefix(attrName, namespaceName);
 		return this.attrList[attrName];
 	}
 	
@@ -56,9 +54,7 @@ export abstract class Node {
 	 * @chainable
 	 */
 	public setAttribute<TValue>(attrName: string, value: IAttribute<TValue>, namespaceName?: string): Node {
-		if (typeof namespaceName !== 'undefined') {
-			attrName = namespaceName + attrName;
-		}
+		attrName = Node.joinAttributeNameWithNamespacePrefix(attrName, namespaceName);
 		this.attrList[attrName] = value;
 		return this;
 	}
@@ -68,9 +64,7 @@ export abstract class Node {
 	 * @chainable
 	 */
 	public removeAttribute(attrName: string, namespaceName?: string): Node {
-		if (typeof namespaceName !== 'undefined') {
-			attrName = namespaceName + attrName;
-		}
+		attrName = Node.joinAttributeNameWithNamespacePrefix(attrName, namespaceName);
 		delete this.attrList[attrName];
 		return this;
 	}
@@ -120,6 +114,14 @@ export abstract class Node {
 	}
 	
 	
+	protected static joinAttributeNameWithNamespacePrefix(attrName: string, namespaceName: string): string {
+		if (typeof namespaceName !== 'undefined') {
+			attrName = namespaceName + ':' + attrName;
+		}
+		return attrName;
+	}
+	
+	
 	protected static changeParentNode(childNode: Node, newParentNode: ContainerNode<any>): void {
 		childNode._parentNode = newParentNode;
 	}
@@ -152,14 +154,18 @@ export abstract class Node {
 	protected stringifyAttributes(nodeIndentDepth: number): string {
 		var attrString = '';
 		for (let attrName in this.attrList) {
-			const attrValue = this.attrList[attrName];
-			if (typeof attrValue !== 'undefined') {
-				attrString += ` ${attrName}="${attrValue}"`;
-			} else {
-				attrString += ` ${attrName}`;
-			}
+			attrString += this.stringifyAttribute(attrName, this.attrList[attrName]);
 		}
 		return attrString;
+	}
+	
+	
+	protected stringifyAttribute(attrName: string, attrValue: any): string {
+		if (typeof attrValue !== 'undefined') {
+			return ` ${attrName}="${attrValue}"`;
+		} else {
+			return ` ${attrName}`;
+		}
 	}
 	
 	

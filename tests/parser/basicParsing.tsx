@@ -209,8 +209,8 @@ class SimpleDeclarationOpenerNodeWithSystemLiteral extends test.UnitTest {
 		const mdoNode = ast.getChildAtIndex(0) as xml.ast.DeclarationOpenerNode;
 		await this.assert(mdoNode instanceof xml.ast.DeclarationOpenerNode, 'correct ast node type');
 		await this.assert(mdoNode.tagName === tagName, 'correct tag name');
-		await this.assert(mdoNode.systemLiterals.length === 1, 'correct amount of system literals');
-		await this.assert(mdoNode.systemLiterals[0] === 'test.dtd', 'correct value of first system literal');
+		await this.assert(mdoNode.getNumberOfSystemLiterals() === 1, 'correct amount of system literals');
+		await this.assert(mdoNode.getSystemLiteralAtIndex(0) === 'test.dtd', 'correct value of first system literal');
 	}
 }
 
@@ -222,9 +222,9 @@ class SimpleDeclarationOpenerNodeWithSystemLiterals extends test.UnitTest {
 		const mdoNode = ast.getChildAtIndex(0) as xml.ast.DeclarationOpenerNode;
 		await this.assert(mdoNode instanceof xml.ast.DeclarationOpenerNode, 'correct ast node type');
 		await this.assert(mdoNode.tagName === tagName, 'correct tag name');
-		await this.assert(mdoNode.systemLiterals.length === 2, 'correct amount of system literals');
-		await this.assert(mdoNode.systemLiterals[0] === 'literal one', 'correct value of first system literal');
-		await this.assert(mdoNode.systemLiterals[1] === 'literal two', 'correct value of second system literal');
+		await this.assert(mdoNode.getNumberOfSystemLiterals() === 2, 'correct amount of system literals');
+		await this.assert(mdoNode.getSystemLiteralAtIndex(0) === 'literal one', 'correct value of first system literal');
+		await this.assert(mdoNode.getSystemLiteralAtIndex(1) === 'literal two', 'correct value of second system literal');
 	}
 }
 
@@ -241,8 +241,8 @@ class SimpleDeclarationOpenerNodeWithSystemLiteralAndAttributes extends test.Uni
 		]), `are all attribute names parsed and are there no excess attributes? (got ${JSON.stringify(ast.getChildAtIndex(0).getAllAttributeNames())})`);
 		await this.assert(ast.getChildAtIndex(0).getAttribute('html') === 'true', 'test first attribute value');
 		await this.assert(ast.getChildAtIndex(0).getAttribute('foo') === 'bar', 'test second attribute value');
-		await this.assert(mdoNode.systemLiterals.length === 1, 'correct amount of system literals');
-		await this.assert(mdoNode.systemLiterals[0] === 'test.dtd', `correct value of first system literal, got: ${mdoNode.systemLiterals[0]}`);
+		await this.assert(mdoNode.getNumberOfSystemLiterals() === 1, 'correct amount of system literals');
+		await this.assert(mdoNode.getSystemLiteralAtIndex(0) === 'test.dtd', `correct value of first system literal, got: ${mdoNode.getSystemLiteralAtIndex(0)}`);
 	}
 }
 
@@ -259,8 +259,8 @@ class SimpleDeclarationOpenerNodeWithSystemLiteralAndEmptyAttributes extends tes
 		]), `are all attribute names parsed and are there no excess attributes? (got ${JSON.stringify(ast.getChildAtIndex(0).getAllAttributeNames())})`);
 		await this.assert(ast.getChildAtIndex(0).getAttribute('html') === undefined, 'test first attribute value');
 		await this.assert(ast.getChildAtIndex(0).getAttribute('foo') === undefined, 'test second attribute value');
-		await this.assert(mdoNode.systemLiterals.length === 1, 'correct amount of system literals');
-		await this.assert(mdoNode.systemLiterals[0] === 'test.dtd', 'correct value of first system literal');
+		await this.assert(mdoNode.getNumberOfSystemLiterals() === 1, 'correct amount of system literals');
+		await this.assert(mdoNode.getSystemLiteralAtIndex(0) === 'test.dtd', 'correct value of first system literal');
 	}
 }
 
@@ -277,9 +277,9 @@ class SimpleDeclarationOpenerNodeWithSystemLiteralsAndEmptyAttributes extends te
 		]), `are all attribute names parsed and are there no excess attributes? (got ${JSON.stringify(ast.getChildAtIndex(0).getAllAttributeNames())})`);
 		await this.assert(ast.getChildAtIndex(0).getAttribute('html') === undefined, 'test first attribute value');
 		await this.assert(ast.getChildAtIndex(0).getAttribute('foo') === undefined, 'test second attribute value');
-		await this.assert(mdoNode.systemLiterals.length === 2, 'correct amount of system literals');
-		await this.assert(mdoNode.systemLiterals[0] === 'literal1.dtd', `correct value of first system literal, got ${mdoNode.systemLiterals[0]}`);
-		await this.assert(mdoNode.systemLiterals[1] === 'literal2.dtd', `correct value of second system literal, got ${mdoNode.systemLiterals[1]}`);
+		await this.assert(mdoNode.getNumberOfSystemLiterals() === 2, 'correct amount of system literals');
+		await this.assert(mdoNode.getSystemLiteralAtIndex(0) === 'literal1.dtd', `correct value of first system literal, got ${mdoNode.getSystemLiteralAtIndex(0)}`);
+		await this.assert(mdoNode.getSystemLiteralAtIndex(1) === 'literal2.dtd', `correct value of second system literal, got ${mdoNode.getSystemLiteralAtIndex(1)}`);
 	}
 }
 
@@ -295,9 +295,9 @@ class SimpleDeclarationOpenerNodeWithComplexSystemLiteralsAndEmptyAttributes ext
 		]), `are all attribute names parsed and are there no excess attributes? (got ${JSON.stringify(ast.getChildAtIndex(0).getAllAttributeNames())})`);
 		await this.assert(ast.getChildAtIndex(0).getAttribute('plist') === undefined, 'test first attribute value');
 		await this.assert(ast.getChildAtIndex(0).getAttribute('PUBLIC') === undefined, 'test second attribute value');
-		await this.assert(mdoNode.systemLiterals.length === 2, 'correct amount of system literals');
-		await this.assert(mdoNode.systemLiterals[0] === '-//Apple//DTD PLIST 1.0//EN', `correct value of first system literal, got ${mdoNode.systemLiterals[0]}`);
-		await this.assert(mdoNode.systemLiterals[1] === 'http://www.apple.com/DTDs/PropertyList-1.0.dtd', `correct value of second system literal, got ${mdoNode.systemLiterals[1]}`);
+		await this.assert(mdoNode.getNumberOfSystemLiterals() === 2, 'correct amount of system literals');
+		await this.assert(mdoNode.getSystemLiteralAtIndex(0) === '-//Apple//DTD PLIST 1.0//EN', `correct value of first system literal, got ${mdoNode.getSystemLiteralAtIndex(0)}`);
+		await this.assert(mdoNode.getSystemLiteralAtIndex(1) === 'http://www.apple.com/DTDs/PropertyList-1.0.dtd', `correct value of second system literal, got ${mdoNode.getSystemLiteralAtIndex(1)}`);
 	}
 }
 
