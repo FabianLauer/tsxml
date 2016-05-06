@@ -2,7 +2,68 @@ import {Node} from './Node';
 import {IStringificationParams} from './IStringificationParams';
 
 export class DeclarationOpenerNode extends Node {
-	public systemLiterals: string[] = [];
+	public getNumberOfSystemLiterals(): number {
+		return this.systemLiterals.length;
+	}
+	
+	
+	public getIndexOfSystemLiteral(literal: string): number {
+		return this.systemLiterals.indexOf(literal);
+	}
+	
+	
+	public hasSystemLiteral(literal: string): boolean {
+		return this.getIndexOfSystemLiteral(literal) !== -1;
+	}
+	
+	
+	/**
+	 * @chainable
+	 */
+	public insertIntoSystemLiteralList(literal: string, index: number): DeclarationOpenerNode {
+		this.systemLiterals.splice(index, 0, literal);
+		return this;
+	}
+	
+	
+	/**
+	 * @chainable
+	 */
+	public prependToSystemLiteralList(literal: string): DeclarationOpenerNode {
+		this.systemLiterals.push(literal);
+		return this;
+	}
+	
+	
+	/**
+	 * @chainable
+	 */
+	public appendToSystemLiteralList(literal: string): DeclarationOpenerNode {
+		this.systemLiterals.push(literal);
+		return this;
+	}
+	
+	
+	/**
+	 * @chainable
+	 */
+	public removeSystemLiteralAtIndex(index: number): DeclarationOpenerNode {
+		this.systemLiterals.splice(index, 1);
+		return this;
+	}
+	
+	
+	/**
+	 * @chainable
+	 */
+	public removeSystemLiteral(literal: string): DeclarationOpenerNode {
+		let index = this.getIndexOfSystemLiteral(literal);
+		while (index !== -1) {
+			this.systemLiterals.splice(index, 1);
+			index = this.getIndexOfSystemLiteral(literal);
+		}
+		return this;
+	}
 	
 	
 	public isSystemLiteralListIdenticalTo(otherNode: DeclarationOpenerNode): boolean {
@@ -41,4 +102,7 @@ export class DeclarationOpenerNode extends Node {
 		}
 		return '';
 	}
+	
+	
+	private systemLiterals: string[] = [];
 }

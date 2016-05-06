@@ -679,7 +679,7 @@ export class Parser {
 				if (!allowSystemLiterals) {
 					this.raiseError(this.createUnexpectedTokenSyntaxErrorAtCurrentToken('system literal not allowed on this node'));
 				}
-				(<ast.DeclarationOpenerNode>node).systemLiterals.push(this.parseLiteral());
+				(<ast.DeclarationOpenerNode>node).appendToSystemLiteralList(this.parseLiteral());
 			} else {
 				let attrInfo = this.parseAttribute();
 				/// TODO:
