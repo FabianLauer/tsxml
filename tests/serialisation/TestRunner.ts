@@ -8,15 +8,24 @@ abstract class FileTest extends test.UnitTest {
 	protected abstract getFullPathToFile(): string;
 	
 	protected async performTest() {
-		const serializedXml = FileTest.makeComparableString((await xml.Parser.parseStringToAst(await this.getSourceAsString())).toString());
-		await this.assert(serializedXml === FileTest.makeComparableString(await this.getExpectationAsString()),
-						  `serialized XML meets expectation, got: ${serializedXml}`);
+		const documentNode = await xml.Parser.parseStringToAst(await this.getSourceAsString());
+		if (typeof (await this.getCompactExpectationAsString()) === 'string' && (await this.getCompactExpectationAsString()).length > 0) {
+			const serializedXml = FileTest.makeComparableString(documentNode.toString());
+			await this.assert(serializedXml === (await this.getCompactExpectationAsString()),
+							  `compact serialized XML meets expectation, got: ${serializedXml}`);
+		}
+		if (typeof (await this.getDefaultExpectationAsString()) === 'string' && (await this.getDefaultExpectationAsString()).length > 0) {
+			const serializedXml = FileTest.makeComparableString(documentNode.toFormattedString());
+			await this.assert(serializedXml === (await this.getDefaultExpectationAsString()),
+							  `default serialized XML meets expectation, got: ${serializedXml}`);
+		}
+		await this.assert(this.assertionResults.length > 0, 'test has at least one expectation to test against');
 		this.cleanup();
 	}
 	
 	
 	private static makeComparableString(str: string): string {
-		return str.trim().replace(/^(\r?\n)+/, '').replace(/(\r?\n)+$/, '').trim();
+		return str.trim().replace(/^\s+/, '').replace(/\s+$/, '').trim();
 	}
 	
 	
@@ -38,12 +47,23 @@ abstract class FileTest extends test.UnitTest {
 	
 	
 	private async getSourceAsString(): Promise<string> {
-		return (await this.getFileContentAsString()).split(FileTest.splitRegex)[1];
+		return FileTest.makeComparableString(await this.getFileContentAsString()).split(FileTest.compactOrDefaultSplitRegex)[0];
 	}
 	
 	
-	private async getExpectationAsString(): Promise<string> {
-		return (await this.getFileContentAsString()).split(FileTest.splitRegex)[1];
+	private async getCompactExpectationAsString(): Promise<string> {
+		var fileContent = await this.getFileContentAsString();
+		fileContent = fileContent.split(FileTest.compactSplitRegex)[1] || '';
+		fileContent = fileContent.replace(/@@(\s|.)*$/, '');
+		return FileTest.makeComparableString(fileContent);
+	}
+	
+	
+	private async getDefaultExpectationAsString(): Promise<string> {
+		var fileContent = await this.getFileContentAsString();
+		fileContent = fileContent.split(FileTest.defaultSplitRegex)[1] || '';
+		fileContent = fileContent.replace(/@@(\s|.)*$/, '');
+		return FileTest.makeComparableString(fileContent);
 	}
 	
 	
@@ -52,7 +72,13 @@ abstract class FileTest extends test.UnitTest {
 	}
 	
 	
-	private static splitRegex = /\n@@ *EXPECTATION *@@/i;
+	private static compactOrDefaultSplitRegex = /\n@@ *(COMPACT|DEFAULT) *@@/i;
+	
+	
+	private static compactSplitRegex = /\n@@ *COMPACT *@@/i;
+	
+	
+	private static defaultSplitRegex = /\n@@ *DEFAULT *@@/i;
 	
 	
 	private fileContent: string;
