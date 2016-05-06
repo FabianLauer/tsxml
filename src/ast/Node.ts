@@ -64,6 +64,18 @@ export abstract class Node {
 	}
 	
 	
+	/**
+	 * @chainable
+	 */
+	public removeAttribute(attrName: string, namespaceName?: string): Node {
+		if (typeof namespaceName !== 'undefined') {
+			attrName = namespaceName + attrName;
+		}
+		delete this.attrList[attrName];
+		return this;
+	}
+	
+	
 	public toFormattedString(stringificationParams?: IStringificationParams): string {
 		if (typeof stringificationParams === 'object' && stringificationParams !== null) {
 			stringificationParams = Node.mergeObjects(Node.defaultStringificationParams, stringificationParams);
