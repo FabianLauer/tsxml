@@ -1,5 +1,5 @@
 <alpha foo="bar">
 	<!-- test comment content -->
 </alpha>
-@@ EXPECTATION @@
+@@ COMPACT @@
 <alpha foo="bar"><!-- test comment content --></alpha>

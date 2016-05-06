@@ -2,5 +2,5 @@
 	foo="bar"    	alpha="beta"
 	   gamma="delta"
                    />
-@@ EXPECTATION @@
+@@ COMPACT @@
 <alpha fibo="nacci" foo="bar" alpha="beta" gamma="delta" />

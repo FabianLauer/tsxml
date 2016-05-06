@@ -17,5 +17,5 @@
 		</beta>
 	</beta>
 </alpha>
-@@ EXPECTATION @@
+@@ COMPACT @@
 <alpha foo="bar"><beta><gamma /><delta /><beta><gamma /><delta /></beta></beta><beta><gamma /><delta /><beta><gamma /><!-- test comment content --><delta /></beta></beta></alpha>

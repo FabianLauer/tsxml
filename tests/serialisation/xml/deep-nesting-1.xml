@@ -3,5 +3,11 @@
 		<gamma />
 	</beta>
 </alpha>
-@@ EXPECTATION @@
+@@ COMPACT @@
 <alpha><beta><gamma /></beta></alpha>
+@@ DEFAULT @@
+<alpha>
+	<beta>
+		<gamma />
+	</beta>
+</alpha>

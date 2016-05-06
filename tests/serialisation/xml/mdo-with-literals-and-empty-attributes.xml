@@ -1,3 +1,3 @@
 <!DOCTYPE fibo "foo" nacci "bar">
-@@ EXPECTATION @@
+@@ COMPACT @@
 <!DOCTYPE fibo "foo" nacci "bar">

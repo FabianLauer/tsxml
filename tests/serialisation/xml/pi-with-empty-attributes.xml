@@ -1,3 +1,3 @@
 <?alpha foo bar fibo?>
-@@ EXPECTATION @@
+@@ COMPACT @@
 <?alpha foo bar fibo ?>

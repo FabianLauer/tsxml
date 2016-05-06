@@ -1,5 +1,5 @@
 <alpha fibo="nacci"
 	   foo
 	   		alpha="beta" />
-@@ EXPECTATION @@
+@@ COMPACT @@
 <alpha fibo="nacci" foo alpha="beta" />
