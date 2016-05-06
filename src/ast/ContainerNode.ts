@@ -133,7 +133,7 @@ export class ContainerNode<TChildNode extends Node> extends Node {
 	 */
 	protected stringify(params: IStringificationParams, nodeIndentDepth?: number): string {
 		nodeIndentDepth = Math.max(nodeIndentDepth || 0, 0);
-		return `${Node.generateIndentString(params.indentChar, nodeIndentDepth)}<${this.tagName}${this.stringifyAttributes(nodeIndentDepth)}>${this.stringifyAllChildNodes(params, nodeIndentDepth + 1)}${Node.generateIndentString(params.indentChar, nodeIndentDepth)}</${this.tagName}>${params.newlineChar}`;
+		return `${Node.generateIndentString(params.indentChar, nodeIndentDepth)}<${this.tagName}${this.stringifyAttributes(nodeIndentDepth)}>${this.stringifyAllChildNodes(params, nodeIndentDepth)}${Node.generateIndentString(params.indentChar, nodeIndentDepth)}</${this.tagName}>${params.newlineChar}`;
 	}
 	
 	
