@@ -116,7 +116,7 @@ gulp.task('prepareNodeJsRelease', ['cleanup', 'compileSources', 'compileDeclarat
 	// transpile JS into the 'dist' directory
 	return gulp.src(['./build/src/**/*.js'])
 		.pipe(babel({
-			presets: ['es2016-node5'],
+			presets: ['es2015'],// ['es2016-node5'],
 			plugins: ['transform-runtime']
 		}))
 		.pipe(gulp.dest('./dist/'));
