@@ -74,6 +74,12 @@ gulp.task('compileSources', (callback) => compileTypeScript([
 ], false));
 
 
+// Compiles all files (except those in the /tests/ directory) to JavaScript.
+gulp.task('compileExamples', ['compileSources'], () => compileTypeScript([
+	'examples/**/*.ts'
+]), false);
+
+
 // Compiles a single declaration file from all files (except those in the /tests/ directory) and
 // saves it in /build/xml.d.ts.
 gulp.task('compileDeclarationFile', () => compileTypeScript([
