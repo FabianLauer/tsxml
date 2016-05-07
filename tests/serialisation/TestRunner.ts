@@ -3,12 +3,11 @@ import * as fs from 'fs';
 import * as test from '../../src/test';
 import * as xml from '../../src/index';
 
-
 abstract class FileTest extends test.UnitTest {
 	protected abstract getFullPathToFile(): string;
 	
 	protected async performTest() {
-		const documentNode = await xml.Parser.parseStringToAst(await this.getSourceAsString());
+		const documentNode = await xml.Parser.parseStringToAst(await this.getSourceAsString(), this.getSyntaxRuleSet());
 		if (typeof (await this.getCompactExpectationAsString()) === 'string' && (await this.getCompactExpectationAsString()).length > 0) {
 			const serializedXml = FileTest.makeComparableString(documentNode.toString());
 			await this.assert(serializedXml === (await this.getCompactExpectationAsString()),
@@ -64,6 +63,17 @@ abstract class FileTest extends test.UnitTest {
 		fileContent = fileContent.split(FileTest.defaultSplitRegex)[1] || '';
 		fileContent = fileContent.replace(/@@(\s|.)*$/, '');
 		return FileTest.makeComparableString(fileContent);
+	}
+	
+	
+	private getSyntaxRuleSet(): typeof xml.parser.SyntaxRuleSet {
+		const fileNameSuffix = this.getFullPathToFile().split(/\.([a-z]+)$/)[1].toLowerCase();
+		switch (fileNameSuffix) {
+			default:
+				return undefined;
+			case 'html':
+				return xml.parser.ruleSet.Html5;
+		}
 	}
 	
 	
