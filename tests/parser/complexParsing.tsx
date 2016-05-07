@@ -1,7 +1,8 @@
 ///
 /// README:
-/// The tests in this file cover node nesting instead of just simple nodes. To keep code and tests 
-/// readable, test names contain the structure they test, such as:
+/// The tests in this file cover node nesting instead of just simple nodes. All tests in this
+/// file use **default syntax rules only**, no syntax rule overrides are allowed here.
+/// To keep code and tests readable, test names contain the structure they test, such as:
 ///     Nesting_1_2v_2sc_2c
 /// The numbers represent nodes on a certain nesting level, the 'v' and 'sc' stands for either
 /// 'void' or 'self closing' elements. The example test name from above would represent a node
