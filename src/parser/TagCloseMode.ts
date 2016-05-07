@@ -1,7 +1,7 @@
 /**
  * Enumerates all tag closing modes. Bitmap. 
  */
-export const enum TagCloseMode {
+export enum TagCloseMode {
 	/**
 	 * Indicates that a tag can be closed by a close tag, such as `<div></div>`.
 	 */
