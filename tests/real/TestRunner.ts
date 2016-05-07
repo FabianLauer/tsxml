@@ -31,7 +31,7 @@ abstract class FileTest extends test.UnitTest {
 			default:
 				return undefined;
 			case 'html':
-				return xml.parser.ruleSet.Html5;
+				return xml.parser.ruleSet.Html5.Loose;
 		}
 	}
 }
