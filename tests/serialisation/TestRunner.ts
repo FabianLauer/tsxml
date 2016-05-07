@@ -67,7 +67,7 @@ abstract class FileTest extends test.UnitTest {
 	
 	
 	private getSyntaxRuleSet(): typeof xml.parser.SyntaxRuleSet {
-		const fileNameSuffix = this.getFullPathToFile().split(/\.([a-z]+)$/)[1].toLowerCase();
+		const fileNameSuffix = this.getFullPathToFile().split(/\.([a-z]+)$/i)[1].toLowerCase();
 		switch (fileNameSuffix) {
 			default:
 				return undefined;
