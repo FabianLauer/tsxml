@@ -32,7 +32,7 @@ export class Parser {
 	 * @see Parser.parseStringToAst(...)
 	 */
 	public static async parseString(stringToParse: string): Promise<Parser> {
-		const parser = new Parser(stringToParse);
+		const parser = Parser.createForXmlString(stringToParse);
 		parser.parseComplete();
 		return parser;
 	}
