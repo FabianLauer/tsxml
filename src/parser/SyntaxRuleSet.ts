@@ -5,7 +5,7 @@ export class SyntaxRuleSet {
 	 * Creates an instance of the syntax rule set class this static method is called on.
 	 */
 	public static createInstance(): SyntaxRuleSet {
-		return new (<any>this.constructor)();
+		return new this();
 	}
 	
 	
