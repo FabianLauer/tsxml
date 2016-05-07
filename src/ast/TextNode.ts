@@ -25,7 +25,7 @@ export class TextNode extends Node {
 	
 	
 	public isContentIdenticalTo(otherNode: TextNode): boolean {
-		return (this.content || '').trim() === (otherNode.content || '').trim();
+		return TextNode.makeContentStringComparable(this.content || '') === TextNode.makeContentStringComparable(otherNode.content || '');
 	}
 	
 	
@@ -34,6 +34,11 @@ export class TextNode extends Node {
 	 */
 	public isIdenticalTo(otherNode: TextNode): boolean {
 		return super.isIdenticalTo(otherNode) && this.isContentIdenticalTo(otherNode);
+	}
+	
+	
+	protected static makeContentStringComparable(contentString: string): string {
+		return contentString.trim().replace(/[\t\r\n ]+/g, '').replace(/ +/g, ' ');
 	}
 	
 	
