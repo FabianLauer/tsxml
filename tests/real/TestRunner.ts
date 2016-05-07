@@ -23,6 +23,17 @@ abstract class FileTest extends test.UnitTest {
 			});
 		});
 	}
+	
+	
+	protected getSyntaxRuleSet(): typeof xml.parser.SyntaxRuleSet {
+		const fileNameSuffix = this.getFullPathToFile().split(/\.([a-z]+)$/)[1].toLowerCase();
+		switch (fileNameSuffix) {
+			default:
+				return undefined;
+			case 'html':
+				return xml.parser.ruleSet.Html5;
+		}
+	}
 }
 
 
@@ -32,7 +43,7 @@ abstract class WellFormedFileTest extends FileTest {
 			originalDocument: xml.ast.DocumentNode;
 		// parse the original test file content
 		try {
-			originalDocument = await xml.Parser.parseStringToAst(await this.getFileContentAsString());
+			originalDocument = await xml.Parser.parseStringToAst(await this.getFileContentAsString(), this.getSyntaxRuleSet());
 		} catch(err) {
 			hasException = true;
 			await this.assert(false, `error parsing valid file: ${err}`);
@@ -41,9 +52,9 @@ abstract class WellFormedFileTest extends FileTest {
 			await this.assert(true, 'no errors parsing valid file');
 		}
 		// serialise the parsed content of the original file
-		let serialisedDocument = await xml.Parser.parseStringToAst(originalDocument.toString());
+		let serialisedDocument = await xml.Parser.parseStringToAst(originalDocument.toString(), this.getSyntaxRuleSet());
 		await this.assert(serialisedDocument.isIdenticalTo(originalDocument), 'unformatted serialised document is identical to original document');
-		serialisedDocument = await xml.Parser.parseStringToAst(originalDocument.toFormattedString());
+		serialisedDocument = await xml.Parser.parseStringToAst(originalDocument.toFormattedString(), this.getSyntaxRuleSet());
 		await this.assert(serialisedDocument.isIdenticalTo(originalDocument), 'formatted serialised document is identical to original document');
 	}
 }
@@ -53,7 +64,7 @@ abstract class NonWellFormedFileTest extends FileTest {
 	protected async performTest() {
 		var hasException = false;
 		try {
-			await xml.Parser.parseStringToAst(await this.getFileContentAsString());
+			await xml.Parser.parseStringToAst(await this.getFileContentAsString(), this.getSyntaxRuleSet());
 		} catch(err) {
 			hasException = true;
 			await this.assert(true, 'error parsing invalid file');
