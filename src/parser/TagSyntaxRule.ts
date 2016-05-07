@@ -13,6 +13,20 @@ export class TagSyntaxRule {
 	}
 	
 	
+	
+	/**
+	 * Creates a new syntax rule for one or more tag names.
+	 * @param tagName The tag name to create the syntax rule for.
+	 */
+	public static createForTagNames(...tagNames: string[]): TagSyntaxRule {
+		return new TagSyntaxRule(
+			// make sure there are no duplicate tag names
+			/// TODO: Check whether this is fast enough on large tag name lists.
+			tagNames.filter((tagName: string, index: number, array: typeof tagNames) => array.indexOf(tagName) === index)
+		);
+	}
+	
+	
 	/**
 	 * Creates a new tag syntax rule object. **Use static method `createForTagName` instead.**
 	 */
