@@ -30,9 +30,14 @@ export class Parser {
 	/**
 	 * Parses an XML string and returns the parser object that parsed the string.
 	 * @see Parser.parseStringToAst(...)
+	 * @param stringToParse The XML string to be parsed.
+	 * @param ruleSet The sytnax rule set to apply to the parser. Optional. The parser falls back to default XML parsing rules when no other rules are provided.
 	 */
-	public static async parseString(stringToParse: string): Promise<Parser> {
+	public static async parseString(stringToParse: string, ruleSet?: SyntaxRuleSet): Promise<Parser> {
 		const parser = Parser.createForXmlString(stringToParse);
+		if (ruleSet instanceof SyntaxRuleSet) {
+			parser.applySyntaxRuleSet(ruleSet);
+		}
 		parser.parseComplete();
 		return parser;
 	}
@@ -41,9 +46,11 @@ export class Parser {
 	/**
 	 * Parses an XML string and returns a syntax tree.
 	 * @see Parser.parseString(...)
+	 * @param stringToParse The XML string to be parsed.
+	 * @param ruleSet The sytnax rule set to apply to the parser. Optional. The parser falls back to default XML parsing rules when no other rules are provided.
 	 */
-	public static async parseStringToAst(stringToParse: string): Promise<DocumentNode> {
-		return (await Parser.parseString(stringToParse)).getAst();
+	public static async parseStringToAst(stringToParse: string, ruleSet?: SyntaxRuleSet): Promise<DocumentNode> {
+		return (await Parser.parseString(stringToParse, ruleSet)).getAst();
 	}
 	
 	
