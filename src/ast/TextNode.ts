@@ -12,15 +12,15 @@ export class TextNode extends Node {
 		if (typeof this.content !== 'string' || this.content.length < 1) {
 			return [];
 		}
-		return this.content.split(/\r?\n/);
+		return this.content.trim().split(/\r?\n/);
 	}
 	
 	
 	/**
 	 * Returns whether the text content contains line breaks.
 	 */
-	public isContentMultiline(): boolean {
-		return this.getContentLines().length > 1;
+	public isContentMultiLine(): boolean {
+		return /\r?\n/.test(this.content.trim());
 	}
 	
 	
@@ -38,24 +38,41 @@ export class TextNode extends Node {
 	
 	
 	protected stringify(params: IStringificationParams, nodeIndentDepth?: number): string {
-		return `${Node.generateIndentString(params.indentChar, nodeIndentDepth)}${this.stringifyContent(params, nodeIndentDepth)}${params.newlineChar}`;
+		return this.stringifyContent(params, nodeIndentDepth);
 	}
 	
 	
 	protected stringifyContent(params: IStringificationParams, nodeIndentDepth?: number): string {
-		if (this.isContentMultiline()) {
-			return this.stringifyMultilineContent(params, nodeIndentDepth);
+		if (this.isContentMultiLine()) {
+			return this.stringifyMultiLineContent(params, nodeIndentDepth);
+		} else {
+			return this.stringifySingleLineContent(params, nodeIndentDepth);
 		}
-		return ` ${(this.content || '').trim().replace(/\r?\n/g, ' ')} `;
 	}
 	
 	
-	private stringifyMultilineContent(params: IStringificationParams, nodeIndentDepth?: number): string {
-		var stringifiedContent = '\n';
-		nodeIndentDepth = Math.max(nodeIndentDepth || 0, 0);
+	protected stringifyMultiLineContent(params: IStringificationParams, nodeIndentDepth?: number): string {
+		var stringifiedContent = '',
+			newlineChar = params.newlineChar;
+		if (!/\n/.test(params.newlineChar)) {
+			newlineChar = ' ';
+		}
 		stringifiedContent += this.getContentLines().map<string>(contentLine => {
-			return Node.generateIndentString(params.indentChar, nodeIndentDepth + 1) + contentLine.trim();
-		}).join(params.newlineChar);
+			return Node.generateIndentString(params.indentChar, nodeIndentDepth) + contentLine.trim();
+		}).join(newlineChar);
+		if (/\n/.test(params.newlineChar)) {
+			return stringifiedContent + params.newlineChar;
+		}
 		return stringifiedContent;
+	}
+	
+	
+	protected stringifySingleLineContent(params: IStringificationParams, nodeIndentDepth?: number): string {
+		const formattedContent = (this.content || '').trim().replace(/(\r?\n(\t*))+/g, ' ').trim();
+		if (/\n/.test(params.newlineChar)) {
+			return Node.generateIndentString(params.indentChar, nodeIndentDepth) + formattedContent + '\n';
+		} else {
+			return formattedContent;
+		}
 	}
 }
