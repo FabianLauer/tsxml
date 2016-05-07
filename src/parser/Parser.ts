@@ -7,6 +7,7 @@ import {SyntaxErrorCode} from './SyntaxErrorCode';
 import {SyntaxError} from './SyntaxError';
 import {TagCloseMode} from './TagCloseMode';
 import {TagSyntaxRule} from './TagSyntaxRule';
+import {SyntaxRuleSet} from './SyntaxRuleSet';
 
 /**
  * Parsers create a syntax tree from an XML string. Use the static methods `parse*()` instead of using `new Parser()`.
@@ -109,6 +110,17 @@ export class Parser {
 	 */
 	public removeTagSyntaxRulesForTagNames(tagNames: string[]) {
 		tagNames.forEach(tagName => this.removeTagSyntaxRuleForTagName(tagName));
+		return this;
+	}
+	
+	
+	/**
+	 * Applies all rules defined by a syntax rule set to the parser.
+	 * @chainable
+	 * @param ruleSet The syntax rule set to apply.
+	 */
+	public applySyntaxRuleSet(ruleSet: SyntaxRuleSet) {
+		this.addTagSyntaxRules(...ruleSet.getAllTagSyntaxRules());
 		return this;
 	}
 	
