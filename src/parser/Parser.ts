@@ -13,9 +13,17 @@ import {TagSyntaxRule} from './TagSyntaxRule';
  */
 export class Parser {
 	/**
-	 * Creates a new parser object. Use the static methods `parse*()` instead of instantiating manually.
+	 * Creates a new parser object. Use the static methods `create*()` or `parse*()` instead of instantiating manually.
 	 */
 	constructor(private stringToParse: string) { }
+	
+	
+	/**
+	 * Creates a parser object, but does not begin parsing.
+	 */
+	public static createForXmlString(stringToParse: string): Parser {
+		return new Parser(stringToParse);
+	}
 	
 	
 	/**
