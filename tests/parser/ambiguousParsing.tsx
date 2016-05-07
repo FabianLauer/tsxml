@@ -10,7 +10,7 @@ class OpenAngleBracketAsOnlyTextNodeContent extends test.UnitTest {
 		const textContent = '<',
 			  ast = await xml.Parser.parseStringToAst(`<a>${textContent}</a>`);
 		const wrapperNode = ast.getChildAtIndex(0) as xml.ast.ContainerNode<xml.ast.TextNode>;
-		await this.assert(wrapperNode instanceof xml.ast.Node, 'correct outer ast node type');
+		await this.assert(wrapperNode instanceof xml.ast.ContainerNode, 'correct outer ast node type');
 		await this.assert(wrapperNode.tagName === 'a', 'outer ast node has correct tag name');
 		const textNode = wrapperNode.getChildAtIndex(0);
 		await this.assert(textNode instanceof xml.ast.Node, 'text node exists');
@@ -25,7 +25,7 @@ class OpenAngleBracketInTextNodeContent extends test.UnitTest {
 		const textContent = '123<456',
 			  ast = await xml.Parser.parseStringToAst(`<a>${textContent}</a>`);
 		const wrapperNode = ast.getChildAtIndex(0) as xml.ast.ContainerNode<xml.ast.TextNode>;
-		await this.assert(wrapperNode instanceof xml.ast.Node, 'correct outer ast node type');
+		await this.assert(wrapperNode instanceof xml.ast.ContainerNode, 'correct outer ast node type');
 		await this.assert(wrapperNode.tagName === 'a', 'outer ast node has correct tag name');
 		const textNode = wrapperNode.getChildAtIndex(0);
 		await this.assert(textNode instanceof xml.ast.Node, 'text node exists');
@@ -40,10 +40,10 @@ class OpenAngleBracketInTextNodeContentInNestedNode extends test.UnitTest {
 		const textContent = '123<456',
 			  ast = await xml.Parser.parseStringToAst(`<a><b>${textContent}</b></a>`);
 		const outerNode = ast.getChildAtIndex(0) as xml.ast.ContainerNode<xml.ast.ContainerNode<xml.ast.TextNode>>;
-		await this.assert(outerNode instanceof xml.ast.Node, 'correct outer ast node type');
+		await this.assert(outerNode instanceof xml.ast.ContainerNode, 'correct outer ast node type');
 		await this.assert(outerNode.tagName === 'a', 'outer ast node has correct tag name');
 		const wrapperNode = outerNode.getChildAtIndex(0);
-		await this.assert(wrapperNode instanceof xml.ast.Node, 'correct wrapper ast node type');
+		await this.assert(wrapperNode instanceof xml.ast.ContainerNode, 'correct wrapper ast node type');
 		await this.assert(wrapperNode.tagName === 'b', 'wrapper ast node has correct tag name');
 		const textNode = wrapperNode.getChildAtIndex(0);
 		await this.assert(textNode instanceof xml.ast.Node, 'text node exists');
@@ -58,7 +58,7 @@ class OpenAngleBracketInCommentNodeContent extends test.UnitTest {
 		const textContent = '123<456',
 			  ast = await xml.Parser.parseStringToAst(`<a><!--${textContent}--></a>`);
 		const wrapperNode = ast.getChildAtIndex(0) as xml.ast.ContainerNode<xml.ast.CommentNode>;
-		await this.assert(wrapperNode instanceof xml.ast.Node, 'correct outer ast node type');
+		await this.assert(wrapperNode instanceof xml.ast.ContainerNode, 'correct outer ast node type');
 		await this.assert(wrapperNode.tagName === 'a', 'outer ast node has correct tag name');
 		const commentNode = wrapperNode.getChildAtIndex(0);
 		await this.assert(commentNode instanceof xml.ast.Node, 'comment node exists');
@@ -73,7 +73,7 @@ class OpenAngleBracketInCDataSectionNodeContent extends test.UnitTest {
 		const textContent = '123<456',
 			  ast = await xml.Parser.parseStringToAst(`<a><![CDATA[${textContent}]]></a>`);
 		const wrapperNode = ast.getChildAtIndex(0) as xml.ast.ContainerNode<xml.ast.CDataSectionNode>;
-		await this.assert(wrapperNode instanceof xml.ast.Node, 'correct outer ast node type');
+		await this.assert(wrapperNode instanceof xml.ast.ContainerNode, 'correct outer ast node type');
 		await this.assert(wrapperNode.tagName === 'a', 'outer ast node has correct tag name');
 		const cdataNode = wrapperNode.getChildAtIndex(0);
 		await this.assert(cdataNode instanceof xml.ast.Node, 'cdata node exists');
