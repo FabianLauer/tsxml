@@ -7,6 +7,6 @@ export class CommentNode extends TextNode {
 	 */
 	protected stringify(params: IStringificationParams, nodeIndentDepth?: number): string {
 		nodeIndentDepth = Math.max(nodeIndentDepth || 0, 0);
-		return `${CommentNode.generateIndentString(params.indentChar, nodeIndentDepth)}<!--${this.content}-->${params.newlineChar}`;
+		return `${CommentNode.generateIndentString(params.indentChar, nodeIndentDepth)}<!--${this.stringifyContent(params, nodeIndentDepth)}-->${params.newlineChar}`;
 	}
 }
