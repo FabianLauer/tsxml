@@ -4,7 +4,7 @@ import {SyntaxRuleSet} from '../SyntaxRuleSet';
 
 export class Html5 extends SyntaxRuleSet {
 	public static get Loose() {
-		return class Html5Loose extends Html5 {
+		return <typeof Html5>class Html5Loose extends Html5 {
 			constructor() {
 				super(true);
 			}
@@ -13,7 +13,7 @@ export class Html5 extends SyntaxRuleSet {
 	
 	
 	public static get Strict() {
-		return class Html5Strict extends Html5 {
+		return <typeof Html5>class Html5Strict extends Html5 {
 			constructor() {
 				super(false);
 			}
