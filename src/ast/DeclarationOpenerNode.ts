@@ -35,7 +35,7 @@ export class DeclarationOpenerNode extends Node {
 	/**
 	 * @chainable
 	 */
-	public insertIntoSystemLiteralList(literal: string, index: number): DeclarationOpenerNode {
+	public insertIntoSystemLiteralList(literal: string, index: number) {
 		this.appendSystemLiteralIndexToOrderList(index);
 		this.systemLiterals.splice(index, 0, literal);
 		return this;
@@ -45,7 +45,7 @@ export class DeclarationOpenerNode extends Node {
 	/**
 	 * @chainable
 	 */
-	public prependToSystemLiteralList(literal: string): DeclarationOpenerNode {
+	public prependToSystemLiteralList(literal: string) {
 		this.insertIntoSystemLiteralList(literal, 0);
 		return this;
 	}
@@ -54,7 +54,7 @@ export class DeclarationOpenerNode extends Node {
 	/**
 	 * @chainable
 	 */
-	public appendToSystemLiteralList(literal: string): DeclarationOpenerNode {
+	public appendToSystemLiteralList(literal: string) {
 		this.insertIntoSystemLiteralList(literal, this.getNumberOfSystemLiterals());
 		return this;
 	}
@@ -63,7 +63,7 @@ export class DeclarationOpenerNode extends Node {
 	/**
 	 * @chainable
 	 */
-	public removeSystemLiteralAtIndex(index: number): DeclarationOpenerNode {
+	public removeSystemLiteralAtIndex(index: number) {
 		this.removeSystemLiteralIndexFromOrderList(index);
 		this.systemLiterals.splice(index, 1);
 		return this;
@@ -73,7 +73,7 @@ export class DeclarationOpenerNode extends Node {
 	/**
 	 * @chainable
 	 */
-	public removeSystemLiteral(literal: string): DeclarationOpenerNode {
+	public removeSystemLiteral(literal: string) {
 		let index = this.getIndexOfSystemLiteral(literal);
 		while (index !== -1) {
 			this.systemLiterals.splice(index, 1);
@@ -89,7 +89,8 @@ export class DeclarationOpenerNode extends Node {
 	 */
 	public setAttribute<TValue>(attrName: string, value: IAttribute<TValue>, namespaceName?: string) {
 		this.appendAttributeToOrderList(Node.joinAttributeNameWithNamespacePrefix(attrName, namespaceName));
-		return super.setAttribute<TValue>(attrName, value, namespaceName);
+		super.setAttribute<TValue>(attrName, value, namespaceName);
+		return this;
 	}
 	
 	
@@ -99,7 +100,8 @@ export class DeclarationOpenerNode extends Node {
 	 */
 	public removeAttribute(attrName: string, namespaceName?: string) {
 		this.removeAttributeFromOrderList(Node.joinAttributeNameWithNamespacePrefix(attrName, namespaceName));
-		return super.removeAttribute(attrName, namespaceName);
+		super.removeAttribute(attrName, namespaceName);
+		return this;
 	}
 	
 	

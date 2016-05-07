@@ -53,7 +53,7 @@ export abstract class Node {
 	/**
 	 * @chainable
 	 */
-	public setAttribute<TValue>(attrName: string, value: IAttribute<TValue>, namespaceName?: string): Node {
+	public setAttribute<TValue>(attrName: string, value: IAttribute<TValue>, namespaceName?: string) {
 		attrName = Node.joinAttributeNameWithNamespacePrefix(attrName, namespaceName);
 		this.attrList[attrName] = value;
 		return this;
@@ -63,7 +63,7 @@ export abstract class Node {
 	/**
 	 * @chainable
 	 */
-	public removeAttribute(attrName: string, namespaceName?: string): Node {
+	public removeAttribute(attrName: string, namespaceName?: string) {
 		attrName = Node.joinAttributeNameWithNamespacePrefix(attrName, namespaceName);
 		delete this.attrList[attrName];
 		return this;

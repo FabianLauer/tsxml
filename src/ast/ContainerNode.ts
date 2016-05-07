@@ -32,7 +32,7 @@ export class ContainerNode<TChildNode extends Node> extends Node {
 	/**
 	 * @chainable
 	 */
-	public insertChildAt(child: TChildNode, index: number): ContainerNode<TChildNode> {
+	public insertChildAt(child: TChildNode, index: number) {
 		Node.changeParentNode(child, this);
 		this.childNodes.splice(index, 0, child);
 		return this;
@@ -42,7 +42,7 @@ export class ContainerNode<TChildNode extends Node> extends Node {
 	/**
 	 * @chainable
 	 */
-	public removeChildAt(index: number): ContainerNode<TChildNode> {
+	public removeChildAt(index: number) {
 		const removedNode = this.childNodes.splice(index, 1)[0];
 		Node.removeParentNode(removedNode);
 		return this;
@@ -52,7 +52,7 @@ export class ContainerNode<TChildNode extends Node> extends Node {
 	/**
 	 * @chainable
 	 */
-	public insertChildBefore(child: TChildNode, referenceChild: TChildNode): ContainerNode<TChildNode> {
+	public insertChildBefore(child: TChildNode, referenceChild: TChildNode) {
 		if (!this.hasChild(referenceChild)) {
 			throw new Error('Can not insert child: reference child not found.');
 		}
@@ -64,7 +64,7 @@ export class ContainerNode<TChildNode extends Node> extends Node {
 	/**
 	 * @chainable
 	 */
-	public insertChildAfter(child: TChildNode, referenceChild: TChildNode): ContainerNode<TChildNode> {
+	public insertChildAfter(child: TChildNode, referenceChild: TChildNode) {
 		if (!this.hasChild(referenceChild)) {
 			throw new Error('Can not insert child: reference child not found.');
 		}
@@ -76,7 +76,7 @@ export class ContainerNode<TChildNode extends Node> extends Node {
 	/**
 	 * @chainable
 	 */
-	public prependChild(child: TChildNode): ContainerNode<TChildNode> {
+	public prependChild(child: TChildNode) {
 		this.insertChildAt(child, 0);
 		return this;
 	}
@@ -85,7 +85,7 @@ export class ContainerNode<TChildNode extends Node> extends Node {
 	/**
 	 * @chainable
 	 */
-	public appendChild(child: TChildNode): ContainerNode<TChildNode> {
+	public appendChild(child: TChildNode) {
 		this.insertChildAt(child, this.getNumberOfChildren());
 		return this;
 	}
@@ -94,7 +94,7 @@ export class ContainerNode<TChildNode extends Node> extends Node {
 	/**
 	 * @chainable
 	 */
-	public replaceChild(oldChild: TChildNode, newChild: TChildNode): ContainerNode<TChildNode> {
+	public replaceChild(oldChild: TChildNode, newChild: TChildNode) {
 		const index = this.getIndexOfChild(oldChild);
 		this.removeChildAt(index);
 		this.insertChildAt(newChild, index);
