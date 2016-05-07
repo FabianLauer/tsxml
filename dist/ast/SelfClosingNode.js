@@ -18,17 +18,17 @@ var _inherits3 = _interopRequireDefault(_inherits2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var TextNode_1 = require('./TextNode');
+var Node_1 = require('./Node');
 
-var CDataSectionNode = function (_TextNode_1$TextNode) {
-  (0, _inherits3.default)(CDataSectionNode, _TextNode_1$TextNode);
+var SelfClosingNode = function (_Node_1$Node) {
+  (0, _inherits3.default)(SelfClosingNode, _Node_1$Node);
 
-  function CDataSectionNode() {
-    (0, _classCallCheck3.default)(this, CDataSectionNode);
-    return (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(CDataSectionNode).apply(this, arguments));
+  function SelfClosingNode() {
+    (0, _classCallCheck3.default)(this, SelfClosingNode);
+    return (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(SelfClosingNode).apply(this, arguments));
   }
 
-  return CDataSectionNode;
-}(TextNode_1.TextNode);
+  return SelfClosingNode;
+}(Node_1.Node);
 
-exports.CDataSectionNode = CDataSectionNode;
+exports.SelfClosingNode = SelfClosingNode;

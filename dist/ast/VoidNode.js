@@ -24,15 +24,15 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var Node_1 = require('./Node');
 
-var ProcessingInstructionNode = function (_Node_1$Node) {
-    (0, _inherits3.default)(ProcessingInstructionNode, _Node_1$Node);
+var VoidNode = function (_Node_1$Node) {
+    (0, _inherits3.default)(VoidNode, _Node_1$Node);
 
-    function ProcessingInstructionNode() {
-        (0, _classCallCheck3.default)(this, ProcessingInstructionNode);
-        return (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(ProcessingInstructionNode).apply(this, arguments));
+    function VoidNode() {
+        (0, _classCallCheck3.default)(this, VoidNode);
+        return (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(VoidNode).apply(this, arguments));
     }
 
-    (0, _createClass3.default)(ProcessingInstructionNode, [{
+    (0, _createClass3.default)(VoidNode, [{
         key: "stringify",
 
         /**
@@ -40,10 +40,10 @@ var ProcessingInstructionNode = function (_Node_1$Node) {
          */
         value: function stringify(params, nodeIndentDepth) {
             nodeIndentDepth = Math.max(nodeIndentDepth || 0, 0);
-            return Node_1.Node.generateIndentString(params.indentChar, nodeIndentDepth) + "<?" + this.tagName + this.stringifyAttributes(nodeIndentDepth) + " ?>" + params.newlineChar;
+            return Node_1.Node.generateIndentString(params.indentChar, nodeIndentDepth) + "<" + this.tagName + this.stringifyAttributes(nodeIndentDepth) + ">" + params.newlineChar;
         }
     }]);
-    return ProcessingInstructionNode;
+    return VoidNode;
 }(Node_1.Node);
 
-exports.ProcessingInstructionNode = ProcessingInstructionNode;
+exports.VoidNode = VoidNode;
