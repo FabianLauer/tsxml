@@ -33,9 +33,9 @@ export class Parser {
 	 * @param stringToParse The XML string to be parsed.
 	 * @param ruleSet The sytnax rule set to apply to the parser. Optional. The parser falls back to default XML parsing rules when no other rules are provided.
 	 */
-	public static async parseString(stringToParse: string, ruleSet?: SyntaxRuleSet): Promise<Parser> {
+	public static async parseString(stringToParse: string, ruleSet?: SyntaxRuleSet | typeof SyntaxRuleSet): Promise<Parser> {
 		const parser = Parser.createForXmlString(stringToParse);
-		if (ruleSet instanceof SyntaxRuleSet) {
+		if (ruleSet instanceof SyntaxRuleSet || SyntaxRuleSet.isSyntaxRuleSetClass(<typeof SyntaxRuleSet>ruleSet)) {
 			parser.applySyntaxRuleSet(ruleSet);
 		}
 		parser.parseComplete();
@@ -49,7 +49,7 @@ export class Parser {
 	 * @param stringToParse The XML string to be parsed.
 	 * @param ruleSet The sytnax rule set to apply to the parser. Optional. The parser falls back to default XML parsing rules when no other rules are provided.
 	 */
-	public static async parseStringToAst(stringToParse: string, ruleSet?: SyntaxRuleSet): Promise<DocumentNode> {
+	public static async parseStringToAst(stringToParse: string, ruleSet?: SyntaxRuleSet | typeof SyntaxRuleSet): Promise<DocumentNode> {
 		return (await Parser.parseString(stringToParse, ruleSet)).getAst();
 	}
 	
@@ -126,8 +126,11 @@ export class Parser {
 	 * @chainable
 	 * @param ruleSet The syntax rule set to apply.
 	 */
-	public applySyntaxRuleSet(ruleSet: SyntaxRuleSet) {
-		this.addTagSyntaxRules(...ruleSet.getAllTagSyntaxRules());
+	public applySyntaxRuleSet(ruleSet: SyntaxRuleSet | typeof SyntaxRuleSet) {
+		if (SyntaxRuleSet.isSyntaxRuleSetClass(<typeof SyntaxRuleSet>ruleSet)) {
+			ruleSet = (<typeof SyntaxRuleSet>ruleSet).createInstance();
+		}
+		this.addTagSyntaxRules(...(<SyntaxRuleSet>ruleSet).getAllTagSyntaxRules());
 		return this;
 	}
 	
