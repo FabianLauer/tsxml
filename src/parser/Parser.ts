@@ -5,6 +5,8 @@ import {DocumentNode} from '../ast/DocumentNode';
 import {ContainerNode} from '../ast/ContainerNode';
 import {SyntaxErrorCode} from './SyntaxErrorCode';
 import {SyntaxError} from './SyntaxError';
+import {TagCloseMode} from './TagCloseMode';
+import {TagSyntaxRule} from './TagSyntaxRule';
 
 /**
  * Parsers create a syntax tree from an XML string. Use the static methods `parse*()` instead of using `new Parser()`.
@@ -36,6 +38,78 @@ export class Parser {
 	}
 	
 	
+	///
+	/// CONFIGURATION METHODS:
+	///
+	
+	
+	public getDefaultTagSyntaxRule(): TagSyntaxRule {
+		return this.defaultTagSyntaxRule;
+	}
+	
+	
+	/**
+	 * @chainable
+	 */
+	public setDefaultTagSyntaxRule(rule: TagSyntaxRule) {
+		this.defaultTagSyntaxRule = rule;
+	}
+	
+	
+	public getTagSyntaxRuleForTagName(tagName: string): TagSyntaxRule {
+		return this.tagSyntaxRules[tagName] || undefined;
+	}
+	
+	 
+ 	public hasTagSyntaxRuleForTagName(tagName: string): boolean {
+		const rule = this.getTagSyntaxRuleForTagName(tagName);
+		return typeof rule === 'object' && rule !== null;
+	}
+	
+	
+	/**
+	 * @chainable
+	 */
+	public addTagSyntaxRule(rule: TagSyntaxRule) {
+		rule.getTagNames().forEach(tagName => {
+			this.tagSyntaxRules[tagName] = rule;
+		});
+		return this;
+	}
+	
+	
+	/**
+	 * @chainable
+	 */
+	public addTagSyntaxRules(...rules: TagSyntaxRule[]) {
+		rules.forEach(rule => this.addTagSyntaxRule(rule));
+		return this;
+	}
+	
+	
+	/**
+	 * @chainable
+	 */
+	public removeTagSyntaxRuleForTagName(tagName: string) {
+		this.tagSyntaxRules[tagName] = undefined;
+		return this;
+	}
+	
+	
+	/**
+	 * @chainable
+	 */
+	public removeTagSyntaxRulesForTagNames(tagNames: string[]) {
+		tagNames.forEach(tagName => this.removeTagSyntaxRuleForTagName(tagName));
+		return this;
+	}
+	
+	
+	///
+	/// PUBLIC GETTERS & REQUESTS:
+	///
+	
+	
 	/**
 	 * Returns the syntax tree object the parser creates.
 	 */
@@ -53,6 +127,11 @@ export class Parser {
 			this.parseFromCurrentToken();
 		}
 	}
+	
+	
+	///
+	/// INTERNAL GETTERS & REQUESTS:
+	///
 	
 	
 	protected getCurrentLine(): number {
@@ -149,6 +228,44 @@ export class Parser {
 	
 	protected raiseError(error: Error): void {
 		throw error;
+	}
+	
+	
+	///
+	/// SYNTAX RULE LOOKUPS:
+	///
+	
+	
+	protected static isSingularCloseMode(closeMode: TagCloseMode): boolean {
+		return closeMode in TagCloseMode;
+	}
+	
+	
+	protected static createDefaultTagSyntaxRule(): TagSyntaxRule {
+		const rule = TagSyntaxRule.createForTagName(undefined);
+		rule.setCloseMode(TagCloseMode.Tag | TagCloseMode.SelfClose | TagCloseMode.Void);
+		return rule;
+	}
+	
+	
+	protected getOverrideOrDefaultTagSyntaxRuleForTagName(tagName: string): TagSyntaxRule {
+		return this.getTagSyntaxRuleForTagName(tagName) || this.getDefaultTagSyntaxRule();
+	}
+	
+	
+	/**
+	 * Returns all tag close modes allowed for a certain tag name. The returned modes are either defined by tag syntax rules or fall back to the default if no syntax rule for the given tag name exists.
+	 */
+	protected getAllowedTagCloseModesForTagName(tagName: string): TagCloseMode {
+		return this.getOverrideOrDefaultTagSyntaxRuleForTagName(tagName).getCloseMode();
+	}
+	
+	
+	protected isCloseModeAllowedForTagName(tagName: string, closeMode: TagCloseMode): boolean {
+		if (!Parser.isSingularCloseMode(closeMode)) {
+			throw new Error('Rule lookup failed: tag close mode must not be a combination of close modes.');
+		}
+		return (this.getAllowedTagCloseModesForTagName(tagName) & closeMode) === closeMode;
 	}
 	
 	
@@ -811,6 +928,12 @@ export class Parser {
 			}
 		}
 	}
+	
+	
+	private defaultTagSyntaxRule = Parser.createDefaultTagSyntaxRule();
+	
+	
+	private tagSyntaxRules: { [tagName: string]: TagSyntaxRule; } = { };
 	
 	
 	private ast = new DocumentNode();
