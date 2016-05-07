@@ -4,4 +4,5 @@ export enum SyntaxErrorCode {
 	MissingTagNameAfterNamespacePrefix,
 	MissingAttrNameAfterAttrPrefix,
 	IllegalNamespacePrefix,
+	IllegalSelfClose
 }

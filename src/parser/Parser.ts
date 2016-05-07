@@ -3,6 +3,7 @@ import {Node} from '../ast/Node';
 import {SelfClosingNode} from '../ast/SelfClosingNode';
 import {DocumentNode} from '../ast/DocumentNode';
 import {ContainerNode} from '../ast/ContainerNode';
+import {VoidNode} from '../ast/VoidNode';
 import {SyntaxErrorCode} from './SyntaxErrorCode';
 import {SyntaxError} from './SyntaxError';
 import {TagCloseMode} from './TagCloseMode';
@@ -273,7 +274,7 @@ export class Parser {
 	
 	protected static createDefaultTagSyntaxRule(): TagSyntaxRule {
 		const rule = TagSyntaxRule.createForTagName(undefined);
-		rule.setCloseMode(TagCloseMode.Tag | TagCloseMode.SelfClose | TagCloseMode.Void);
+		rule.setCloseMode(TagCloseMode.Tag | TagCloseMode.SelfClose);
 		return rule;
 	}
 	
@@ -703,7 +704,16 @@ export class Parser {
 	}
 	
 	
-	protected parseCompleteOpeningTagInto(node: Node, allowDescendingIntoNewNode: boolean, allowSystemLiterals: boolean): void {
+	protected static createVoidNodeFromOtherNode(node: Node): VoidNode {
+		const voidNode = new VoidNode();
+		voidNode.namespacePrefix = node.namespacePrefix;
+		voidNode.tagName = node.tagName;
+		node.getAllAttributeNames().forEach(attrName => voidNode.setAttribute(attrName, node.getAttribute(attrName)));
+		return voidNode;
+	}
+	
+	
+	protected parseCompleteOpeningTagInto(node: Node, allowDescendingIntoNewContainerNode: boolean, allowSystemLiterals: boolean): void {
 		// we could now be in any of the following constructs:
 		//     <alpha ...
 		//      ^
@@ -726,22 +736,38 @@ export class Parser {
 				this.raiseError(this.createUnexpectedTokenSyntaxErrorAtCurrentToken(`expected end of opening tag`));
 				break;
 			case this.getTokenRangeStartingAt(this.getCurrentTokenIndex(), 2) === '/>':
+				// raise an error if the current node is not allowed to self close
+				if (!this.isCloseModeAllowedForTagName(node.tagName, TagCloseMode.SelfClose)) {
+					this.raiseError(this.createSyntaxErrorAtCurrentToken(SyntaxErrorCode.IllegalSelfClose, `tag '${node.tagName}' must not self-close`));
+				}
 				this.advanceByNumberOfTokens(2);
 				return;
 			case this.getCurrentToken() === '?':
 				this.advanceToNextToken();
 				// FALL THROUGH
 			case this.getCurrentToken() === '>':
-				if (node instanceof SelfClosingNode) {
-					const containerNode = Parser.createContainerNodeFromOtherNode<any>(node);
-					node.parentNode.replaceChild(node, containerNode);
-					node = containerNode;
-				}
-				if (allowDescendingIntoNewNode) {
-					this.currentContainerNode = <ContainerNode<any>>node;
-				}
+				this.parseEndOfNonSelfClosingOpeningTag(node, allowDescendingIntoNewContainerNode);
 				this.advanceToNextToken();
 				break;
+		}
+	}
+	
+	
+	protected parseEndOfNonSelfClosingOpeningTag(node: Node, allowDescendingIntoNewContainerNode: boolean): void {
+		if (!(node instanceof SelfClosingNode)) {
+			return;
+		}
+		if (this.isCloseModeAllowedForTagName(node.tagName, TagCloseMode.Void)) {
+			const voidNode = Parser.createVoidNodeFromOtherNode(node);
+			node.parentNode.replaceChild(node, voidNode);
+			node = voidNode;
+		} else {
+			const containerNode = Parser.createContainerNodeFromOtherNode<any>(node);
+			node.parentNode.replaceChild(node, containerNode);
+			node = containerNode;
+			if (allowDescendingIntoNewContainerNode) {
+				this.currentContainerNode = <ContainerNode<any>>node;
+			}
 		}
 	}
 	
