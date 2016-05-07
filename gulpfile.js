@@ -68,6 +68,7 @@ gulp.task('cleanup', () => {
 gulp.task('compileSources', (callback) => compileTypeScript([
 	'src/index.ts*',
 	'src/ast.ts*',
+	'src/parser.ts*',
 	'src/Compiler.ts*',
 	'src/ast/*.ts*',
 	'src/parser/*.ts*'
@@ -85,6 +86,7 @@ gulp.task('compileExamples', ['compileSources'], () => compileTypeScript([
 gulp.task('compileDeclarationFile', () => compileTypeScript([
 	'src/index.ts*',
 	'src/ast.ts*',
+	'src/parser.ts*',
 	'src/Compiler.ts*',
 	'src/ast/*.ts*',
 	'src/parser/*.ts*'

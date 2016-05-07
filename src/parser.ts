@@ -1,15 +1,13 @@
-import * as ast from './ast';
-import * as parser from './parser';
 import {SyntaxErrorCode} from './parser/SyntaxErrorCode';
 import {SyntaxError} from './parser/SyntaxError';
+import {TagCloseMode} from './parser/TagCloseMode';
+import {TagSyntaxRule} from './parser/TagSyntaxRule';
 import {Parser} from './parser/Parser';
-import {Compiler} from './Compiler';
 
 export {
-	ast,
-	parser,
 	SyntaxErrorCode,
 	SyntaxError,
-	Parser,
-	Compiler
+	TagCloseMode,
+	TagSyntaxRule,
+	Parser
 }
