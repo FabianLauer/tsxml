@@ -11,17 +11,24 @@ import {TagSyntaxRule} from './TagSyntaxRule';
 import {SyntaxRuleSet} from './SyntaxRuleSet';
 
 /**
- * Parsers create a syntax tree from an XML string. Use the static methods `parse*()` instead of using `new Parser()`.
+ * Parsers create a syntax tree from an XML string.
+ * PARSER INTERNALS:
+ * Parsers see every character in an XML string as a "token". This means that there is no tokenization stage, but rather just a quick (and lazy) mapping of characters to their line and column number. Even without tokenization, XML is fairly simple to parse due to its non-complex syntax. The absence of a tokenization stage means there are less dependencies, less coupling is necessary, which leads to lower maintenance time. Also, we're saving a few CPU cycles and some memory, although performance is not the primary factor for the decision against a dedicated tokenizer.
+ * The public interface provided by the parser class encourages the use of static methods, such as `parseStringToAst(...)`, instead of manually creating and handling parser objects (at least for now). Also, these static methods enforce user code to await promises, even though parser code is not **yet** async, but it might become async when (and if) incremental parsing and streams are implemented (incremental parsing might use generators and allow async user code to interfere with the parser).
+ * SYNTAX RULES:
+ * Parsers can accept some syntax rules, however by default they expect XML (no void tags, unclosed tags are handled as if they were). To override default parsing rules, use the `addTagSyntaxRule(...)` (and similar) methods.
  */
 export class Parser {
 	/**
 	 * Creates a new parser object. Use the static methods `create*()` or `parse*()` instead of instantiating manually.
+	 * @param stringToParse The XML string to be parsed.
 	 */
 	constructor(private stringToParse: string) { }
 	
 	
 	/**
 	 * Creates a parser object, but does not begin parsing.
+	 * @param stringToParse The XML string to be parsed.
 	 */
 	public static createForXmlString(stringToParse: string): Parser {
 		return new Parser(stringToParse);
@@ -149,6 +156,9 @@ export class Parser {
 	}
 	
 	
+	/**
+	 * Parses the complete XML string passed to a parser instance.
+	 */
 	public parseComplete(): void {
 		// don't do anything if the source string is empty
 		if (this.stringToParse.length < 1) {
@@ -165,61 +175,107 @@ export class Parser {
 	///
 	
 	
+	/**
+	 * Returns the line the parser's cursor is currently on.
+	 */
 	protected getCurrentLine(): number {
 		return this.getTokenMatrix()[this.getCurrentTokenIndex()].line;
 	}
 	
 	
+	/**
+	 * Returns the column the parser's cursor is currently at.
+	 */
 	protected getCurrentColumn(): number {
 		return this.getTokenMatrix()[this.getCurrentTokenIndex()].column;
 	}
 	
 	
+	/**
+	 * Returns the index of the current token in the XML source string.
+	 */
 	protected getCurrentTokenIndex(): number {
 		return this.currentTokenIndex;
 	}
 	
 	
+	/**
+	 * Returns whether the parser's cursor has reached the end of the XML source string.
+	 */
 	protected isAtEndOfInput(): boolean {
 		return this.getCurrentTokenIndex() >= this.stringToParse.length;
 	}
 	
 	
+	/**
+	 * Returns the token at a certain index in the XML source string.
+	 */
 	protected getTokenAtIndex(index: number): string {
 		return this.stringToParse[index];
 	}
 	
 	
+	/**
+	 * Return the token at the current cursor index.
+	 */
 	protected getCurrentToken(): string {
 		return this.getTokenAtIndex(this.getCurrentTokenIndex());
 	}
 	
 	
+	/**
+	 * Returns a range of tokens from the source XML string.
+	 * @param startIndex The index of the first token in the requested range.
+	 * @param endIndex The index of the last token in the requested range (inclusive).
+	 */
 	protected getTokenRange(startIndex: number, endIndex: number): string {
+		/// TODO: Prevent this from returning ranges that go "beyond" the end of the source string.
 		return this.stringToParse.slice(startIndex, endIndex);
 	}
 	
 	
+	/**
+	 * Returns a range of tokens from the source XML string.
+	 * @param startIndex The index of the first token in the requested range.
+	 * @param length The length of the range to be returned.
+	 */
 	protected getTokenRangeStartingAt(startIndex: number, length: number): string {
 		return this.stringToParse.slice(startIndex, startIndex + length);
 	}
 	
 	
+	/**
+	 * Returns the token that follows the token the cursor is currently at.
+	 */
 	protected getNextToken(): string {
 		return this.getTokenAtIndex(this.getCurrentTokenIndex() + 1);
 	}
 	
 	
+	/**
+	 * Returns the token that preceeds the token the cursor is currently at.
+	 */
 	protected getPreviousToken(): string {
 		return this.getTokenAtIndex(this.getCurrentTokenIndex() - 1);
 	}
 	
 	
+	/**
+	 * Finds the first occurence of a certain token after in the source XML string after a certain token index and returns the index of the searched token.
+	 * @param token The token to find.
+	 * @param startIndex The index at which to start searching.
+	 */
 	protected findFirstOccurenceOfTokenAfterIndex(token: string, startIndex: number): number {
 		return this.stringToParse.indexOf(token[0], startIndex);
 	}
 	
 	
+	/**
+	 * Checks if a certain token occurs before the next occurence of another token.
+	 * @param token The token to check if it occurs before `otherToken`.
+	 * @param otherToken The token before which `token` must occur for this method to return `true`.
+	 * @param startIndex The index at which to start searching for `token` and `otherToken`.
+	 */
 	protected doesTokenOccurBeforeNextOccurenceOfOtherToken(token: string, otherToken: string, startIndex: number): boolean {
 		const tokenIndex = this.findFirstOccurenceOfTokenAfterIndex(token, startIndex),
 			  otherTokenIndex = this.findFirstOccurenceOfTokenAfterIndex(otherToken, startIndex);
@@ -230,6 +286,9 @@ export class Parser {
 	}
 	
 	
+	/**
+	 * Returns the container ast node the parser is currently parsing into, depending on the semantic context around the cursor. At the start and end of each parsing run, this will return the outermost `DocumentNode` of the syntax tree.
+	 */
 	protected getCurrentContainerNode(): ContainerNode<any> {
 		return this.currentContainerNode;
 	}
@@ -405,7 +464,7 @@ export class Parser {
 	 *     <foo><</foo>
 	 *          ^ here
 	 * 
-	 * Keep in mind that this method must *only* be called in these two cases, all other possible occurances of open angle brackets are handled in
+	 * Keep in mind that this method must *only* be called in these two cases, all other possible occurences of open angle brackets are handled in
 	 * more specific methods (namely when parsing CDATA or comments), which are not ambiguous (comments and CDATA nodes have delimiters that clearly
 	 * indicate where their content begins and ends, text nodes do not have this).
 	 * The same goes for attributes: An open angle bracket in a properly quoted attribute string is always going to be parsed as an attribute value.
@@ -419,7 +478,7 @@ export class Parser {
 		// If:
 		//     the next token does not indicate a CDATA node, comment, PI or MDO
 		//   and:
-		//     there's another open angle bracket before the next occurance of a closing angle bracket
+		//     there's another open angle bracket before the next occurence of a closing angle bracket
 		// assume that the current open angle bracket is text node content. In all other cases, assume that the current open angle bracket indicates
 		// the bginning of a new tag.
 		if (this.getNextToken() !== '!' && this.getNextToken() !== '?' &&
