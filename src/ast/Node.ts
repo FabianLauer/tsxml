@@ -6,6 +6,11 @@ import {ContainerNode} from './ContainerNode';
  * Base class for all nodes.
  */
 export abstract class Node {
+	constructor() {
+		this.applyAttributePropertyBindings();
+	}
+	
+	
 	/**
 	 * The default formatting options for stringification.
 	 */
@@ -45,6 +50,9 @@ export abstract class Node {
 	
 	
 	public getAttribute<TValue>(attrName: string, namespaceName?: string): IAttribute<TValue> {
+		if (typeof this.attrList !== 'object' || this.attrList === null) {
+			return undefined;
+		}
 		attrName = Node.joinAttributeNameWithNamespacePrefix(attrName, namespaceName);
 		return this.attrList[attrName];
 	}
@@ -55,6 +63,7 @@ export abstract class Node {
 	 */
 	public setAttribute<TValue>(attrName: string, value: IAttribute<TValue>, namespaceName?: string) {
 		attrName = Node.joinAttributeNameWithNamespacePrefix(attrName, namespaceName);
+		this.attrList = this.attrList || {};
 		this.attrList[attrName] = value;
 		return this;
 	}
@@ -111,6 +120,38 @@ export abstract class Node {
 	 */
 	public isIdenticalTo(otherNode: Node): boolean {
 		return this.constructor === otherNode.constructor && this.isTagNameAndNamespaceIdenticalTo(otherNode) && this.isAttributeListIdenticalTo(otherNode);
+	}
+	
+	
+	/**
+	 * Decorator.
+	 */
+	public static attributePropertyBinding(attributeName: string) {
+		return (target: Node, propertyName: string) => {
+			target.addAttributeProxyProperty(propertyName, attributeName);
+		};
+	}
+	
+	
+	public getBoundAttributeNameForProperty(propertyName: string): string {
+		if (typeof this.attrPropertyBindings !== 'object' || this.attrPropertyBindings === null) {
+			return undefined;
+		}
+		return this.attrPropertyBindings[propertyName];
+	}
+	
+	
+	public getBoundPropertyNamesForAttribute(attributeName: string): string[] {
+		const propertyNames: string[] = [];
+		if (typeof this.attrPropertyBindings !== 'object' || this.attrPropertyBindings === null) {
+			return propertyNames;
+		}
+		for (let propertyName in this.attrPropertyBindings) {
+			if (this.attrPropertyBindings[propertyName] === attributeName) {
+				propertyNames.push(propertyName);
+			}
+		}
+		return propertyNames;
 	}
 	
 	
@@ -175,6 +216,35 @@ export abstract class Node {
 		}
 		return baseObject;
 	}
+	
+	
+	private addAttributeProxyProperty(propertyName: string, attrName: string): void {
+		this.attrPropertyBindings = this.attrPropertyBindings || {};
+		this.attrPropertyBindings[propertyName] = attrName;
+	}
+	
+	
+	private applyAttributePropertyBindings(): void {
+		if (typeof this.attrPropertyBindings !== 'object' || this.attrPropertyBindings === null) {
+			return;
+		}
+		for (let propertyName in this.attrPropertyBindings) {
+			this.applyAttributePropertyBinding(propertyName, this.attrPropertyBindings[propertyName]);
+		}
+	}
+	
+	
+	private applyAttributePropertyBinding(propertyName: string, attributeName: string): void {
+		const value = (<any>this)[propertyName];
+		Object.defineProperty(this, propertyName, {
+			get: () => this.getAttribute(attributeName),
+			set: (newValue: string) => this.setAttribute(attributeName, newValue)
+		});
+		this.setAttribute(attributeName, value);
+	}
+	
+	
+	private attrPropertyBindings: { [propertyName: string]: string; };
 	
 	
 	private _parentNode: ContainerNode<any>;

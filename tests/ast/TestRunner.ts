@@ -1,7 +1,7 @@
 import * as test from '../../src/test';
 import * as decorators from './decorators';
 
-@TestRunner.testName('Parser Tests')
+@TestRunner.testName('AST Tests')
 export class TestRunner extends test.TestRunner {
 	constructor() {
 		super();

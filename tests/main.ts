@@ -11,10 +11,10 @@ import * as serialisation from './serialisation/TestRunner';
 		  serialisationTestRunner = new serialisation.TestRunner();
 	new test.CliRenderer(astTestRunner);
 	await astTestRunner.run();
-	/*new test.CliRenderer(parserTestRunner);
+	new test.CliRenderer(parserTestRunner);
 	await parserTestRunner.run();
 	new test.CliRenderer(serialisationTestRunner);
 	await serialisationTestRunner.run();
 	new test.CliRenderer(realTestRunner);
-	await realTestRunner.run();*/
+	await realTestRunner.run();
 })();
