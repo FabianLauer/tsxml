@@ -122,6 +122,16 @@ class SimpleNodeWithNamespacePrefix extends test.UnitTest {
 }
 
 
+class SimpleContainerNodeWithNamespacePrefix extends test.UnitTest {
+	protected async performTest() {
+		const ast = await xml.Parser.parseStringToAst('<test:alpha></test:alpha>');
+		await this.assert(ast.getChildAtIndex(0) instanceof xml.ast.ContainerNode, 'correct ast node type');
+		await this.assert(ast.getChildAtIndex(0).namespacePrefix === 'test', 'ast node has correct namespace prefix');
+		await this.assert(ast.getChildAtIndex(0).tagName === 'alpha', `ast node has correct tag name, got ${ast.getChildAtIndex(0).tagName}`);
+	}
+}
+
+
 class SimpleNodeWithIllegalDoubleNamespacePrefix extends test.UnitTest {
 	protected async performTest() {
 		var error: xml.SyntaxError;
@@ -539,6 +549,7 @@ export class TestRunner extends test.TestRunner {
 			new SimpleNodeWithOnlyHyphensInTagName(),
 			new SimpleNodeTagNameStartingWithHyphen(),
 			new SimpleNodeWithNamespacePrefix(),
+			new SimpleContainerNodeWithNamespacePrefix(),
 			new SimpleNodeWithIllegalDoubleNamespacePrefix(),
 			new SimpleNodeWithNamespacePrefixAndMissingTagName(),
 			new SimpleCommentNode(),
