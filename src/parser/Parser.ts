@@ -633,15 +633,7 @@ export class Parser {
 		this.advanceByNumberOfTokens(2);
 		//     </alpha
 		//       ^      we're here
-		while (Parser.isWhitespaceToken(this.getCurrentToken())) {
-			this.advanceToNextToken();
-		}
-		while (Parser.isTokenLegalInTagNameOrTagNameNamespacePrefix(this.getCurrentToken())) {
-			this.advanceToNextToken();
-		}
-		while (Parser.isWhitespaceToken(this.getCurrentToken())) {
-			this.advanceToNextToken();
-		}
+		this.parseTagName();
 		if (this.getCurrentToken() !== '>') {
 			this.raiseError(this.createUnexpectedTokenSyntaxErrorAtCurrentToken(`expected end of close tag, got '${this.getCurrentToken()}'`));
 		}
@@ -831,14 +823,14 @@ export class Parser {
 	}
 	
 	
-	/**
-	 * Parses a tag name into an AST node. Supports namespace prefixes.
-	 * @param node The AST node to parse the tag name into.
-	 */
-	protected parseTagNameInto(node: Node): void {
+	protected parseTagName() {
 		// this will be set to `true` as soon as the first colon was seen
 		var colonSeen = false,
-			nameStash = '';
+			nameStash = '',
+			tagNameInfo: { namespacePrefix?: string, tagName: string } = {
+				namespacePrefix: undefined,
+				tagName: undefined
+			};
 		// we could now be in any of the following constructs:
 		//     <alpha ...
 		//      ^
@@ -856,8 +848,7 @@ export class Parser {
 					this.raiseError(this.createSyntaxErrorAtCurrentToken(SyntaxErrorCode.IllegalNamespacePrefix, 'illegal multiple namespace prefix (multiple colons in tag name)'));
 				}
 				colonSeen = true;
-				node.namespacePrefix = node.namespacePrefix || '';
-				node.namespacePrefix += nameStash;
+				tagNameInfo.namespacePrefix = nameStash;
 				nameStash = '';
 				this.advanceToNextToken();
 				if (!Parser.isAlphabeticToken(this.getCurrentToken())) {
@@ -868,7 +859,19 @@ export class Parser {
 			nameStash += this.getCurrentToken();
 			this.advanceToNextToken();
 		}
-		node.tagName = nameStash;
+		tagNameInfo.tagName = nameStash;
+		return tagNameInfo;
+	}
+	
+	
+	/**
+	 * Parses a tag name into an AST node. Supports namespace prefixes.
+	 * @param node The AST node to parse the tag name into.
+	 */
+	protected parseTagNameInto(node: Node): void {
+		const tagNameInfo = this.parseTagName();
+		node.namespacePrefix = tagNameInfo.namespacePrefix;
+		node.tagName = tagNameInfo.tagName;
 	}
 	
 	
