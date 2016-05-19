@@ -65,7 +65,7 @@ gulp.task('cleanup', () => {
 
 
 // Compiles all files (except those in the /tests/ directory) to JavaScript.
-gulp.task('compileSources', (callback) => compileTypeScript([
+gulp.task('compileSources', () => compileTypeScript([
 	'src/index.ts*',
 	'src/ast.ts*',
 	'src/parser.ts*',
@@ -103,7 +103,7 @@ gulp.task('compileTests', ['compileSources'], () => compileTypeScript([
 	'src/test/*.ts*',
 	'src/test.ts*',
 	'tests/**/*.ts*'
-]), false);
+], false));
 
 
 // Compiles all files (except those in the /tests/ directory) to JavaScript and compiles a single
