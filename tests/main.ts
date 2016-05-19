@@ -9,8 +9,8 @@ import * as serialisation from './serialisation/TestRunner';
 const testRunners: Array<typeof test.TestRunner> = [
 	ast.TestRunner,
 	parser.TestRunner,
-	real.TestRunner,
-	serialisation.TestRunner
+	serialisation.TestRunner,
+	real.TestRunner
 ];
 
 
