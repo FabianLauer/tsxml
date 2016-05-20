@@ -16,6 +16,12 @@ function getSyntaxRuleSet(pathToFile: string): typeof xml.parser.SyntaxRuleSet {
 	}
 }
 
+
+process.on('unhandledRejection', (reason: any) => {
+	console.error('Could not format: ', reason.stack || reason);
+});
+
+
 (async () => {
 	const PATH_TO_FILE = process.argv[2],
 		  sourceXml = fs.readFileSync(PATH_TO_FILE) + '',
