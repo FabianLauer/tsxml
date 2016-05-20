@@ -122,6 +122,28 @@ class SimpleNodeWithNamespacePrefix extends test.UnitTest {
 }
 
 
+class SimpleContainerNode extends test.UnitTest {
+	protected async performTest() {
+		const ast = await xml.Parser.parseStringToAst('<alpha></alpha>');
+		await this.assert(ast.getChildAtIndex(0) instanceof xml.ast.ContainerNode, 'correct ast node type');
+		await this.assert(ast.getChildAtIndex(0).tagName === 'alpha', `ast node has correct tag name, got ${ast.getChildAtIndex(0).tagName}`);
+	}
+}
+
+
+class SimpleContainerNodeWithAttribute extends test.UnitTest {
+	protected async performTest() {
+		const ast = await xml.Parser.parseStringToAst('<alpha foo="bar"></alpha>');
+		await this.assert(ast.getChildAtIndex(0) instanceof xml.ast.ContainerNode, 'correct ast node type');
+		await this.assert(ast.getChildAtIndex(0).tagName === 'alpha', `ast node has correct tag name, got ${ast.getChildAtIndex(0).tagName}`);
+		await this.assert(JSON.stringify(ast.getChildAtIndex(0).getAllAttributeNames()) === JSON.stringify([
+			'foo'
+		]), `are all attribute names parsed and are there no excess attributes? (got ${JSON.stringify(ast.getChildAtIndex(0).getAllAttributeNames())})`);
+		await this.assert(ast.getChildAtIndex(0).getAttribute('foo') === 'bar', 'test first attribute value');
+	}
+}
+
+
 class SimpleContainerNodeWithNamespacePrefix extends test.UnitTest {
 	protected async performTest() {
 		const ast = await xml.Parser.parseStringToAst('<test:alpha></test:alpha>');
@@ -549,6 +571,8 @@ export class TestRunner extends test.TestRunner {
 			new SimpleNodeWithOnlyHyphensInTagName(),
 			new SimpleNodeTagNameStartingWithHyphen(),
 			new SimpleNodeWithNamespacePrefix(),
+			new SimpleContainerNode(),
+			new SimpleContainerNodeWithAttribute(),
 			new SimpleContainerNodeWithNamespacePrefix(),
 			new SimpleNodeWithIllegalDoubleNamespacePrefix(),
 			new SimpleNodeWithNamespacePrefixAndMissingTagName(),

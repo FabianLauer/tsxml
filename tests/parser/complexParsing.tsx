@@ -43,6 +43,24 @@ class Nesting_1_2c extends test.UnitTest {
 }
 
 
+class Nesting_1_2 extends test.UnitTest {
+	protected async performTest() {
+		const ast = await xml.Parser.parseStringToAst(
+			<alpha>
+				<beta></beta>
+			</alpha> as any
+		);
+		const wrapperNode = ast.getChildAtIndex(0) as xml.ast.ContainerNode<xml.ast.ContainerNode<any>>;
+		await this.assert(wrapperNode instanceof xml.ast.ContainerNode, 'outer ast node has correct ast node type');
+		await this.assert(wrapperNode.tagName === 'alpha', 'outer ast node has correct tag name');
+		await this.assert(wrapperNode.getNumberOfChildren() === 1, 'outer ast node has expected number of child nodes');
+		const innerNode = wrapperNode.getChildAtIndex(0);
+		await this.assert(innerNode instanceof xml.ast.ContainerNode, 'inner ast node has correct ast node type');
+		await this.assert(innerNode.tagName === 'beta', 'inner ast node has correct tag name');
+	}
+}
+
+
 class Nesting_1_2sc extends test.UnitTest {
 	protected async performTest() {
 		const ast = await xml.Parser.parseStringToAst(
@@ -267,6 +285,7 @@ export class TestRunner extends test.TestRunner {
 		super();
 		this.add(
 			new Nesting_1_2c(),
+			new Nesting_1_2(),
 			new Nesting_1_2sc(),
 			new Nesting_1mdo_1_2sc(),
 			new Nesting_1c_1mdo_1_2sc(),
