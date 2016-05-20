@@ -532,6 +532,12 @@ export class Parser {
 	}
 	
 	
+	/**
+	 * Parses from the beginning of any kind of tag. The cursor is expected to point at the open angle bracket of the tag, such as:
+	 *     <xsl:stylesheet ...
+	 *     ^
+	 * Comments and CDATA sections are also supported by this method. Depending on the kind of tag (MDO, PI, normal, etc), this method will delegate parsing the tag to other more specific methods.
+	 */
 	protected parseFromBeginningOfTag(): void {
 		// Find out if we're dealing with a "normal" node here or with a MDO (markup declaration opener), PI (processing instruction) or comment.
 		// We will not know whether the node is self closing, or if it has child nodes or text content, but
@@ -622,7 +628,7 @@ export class Parser {
 	}
 	
 	
-	protected parseFromBeginningOfCloseTag(): void {
+	protected parseFromBeginningOfCloseTag(): void { 
 		// Validate that we actually have a close tag:
 		if (this.getTokenRangeStartingAt(this.getCurrentTokenIndex(), 2) !== '</') {
 			this.raiseError(this.createUnexpectedTokenSyntaxErrorAtCurrentToken(`expected beginning of close tag (</...), got '${this.getTokenRangeStartingAt(this.getCurrentTokenIndex(), 2)}'`));
@@ -764,12 +770,34 @@ export class Parser {
 	}
 	
 	
-	protected parseCompleteOpeningTagInto(node: Node, allowDescendingIntoNewContainerNode: boolean, allowSystemLiterals: boolean): void {
+	/**
+	 * Parses a complete opening tag with namespace prefix, tag name and attributes into a given node. This method will decide whether the node it is parsing is a container node or a void node and upgrade the node passed into it in param `node` to the respective ast node type.
+	 * The cursor is expected to be pointing at the first token after the tag opener:
+	 * for "normal" nodes:
+	 *     <alpha ...
+	 *      ^
+	 * for MDOs:
+	 *     <!DOCTYPE ...
+	 *       ^
+	 * for CDATA sections:
+	 *     <![CDATA[ ...
+	 *       ^
+	 * for PIs:
+	 *     <?svg ...
+	 *       ^
+	 * @param node The node to parse namespace prefix, tag name and attributes into.
+	 * @param allowDescendingIntoNewContainerNode Whether the parser should be allowed to descend if this method discovers that the node it is parsing is a container node.
+	 * @param allowSystemLiterals Whether system literals should be allowed in the parsed tag.
+	 */
+	protected parseCompleteOpeningTagInto(node: SelfClosingNode, allowDescendingIntoNewContainerNode: boolean, allowSystemLiterals: boolean): void {
 		// we could now be in any of the following constructs:
 		//     <alpha ...
 		//      ^
 		// or:
 		//     <!DOCTYPE ...
+		//       ^
+		// or:
+		//     <![CDATA[ ...
 		//       ^
 		// or:
 		//     <?svg ...
@@ -795,7 +823,7 @@ export class Parser {
 				return;
 			case this.getCurrentToken() === '?':
 				this.advanceToNextToken();
-				// FALL THROUGH
+				// ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   FALL THROUGH   ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓
 			case this.getCurrentToken() === '>':
 				this.parseEndOfNonSelfClosingOpeningTag(node, allowDescendingIntoNewContainerNode);
 				this.advanceToNextToken();
@@ -804,7 +832,26 @@ export class Parser {
 	}
 	
 	
-	protected parseEndOfNonSelfClosingOpeningTag(node: Node, allowDescendingIntoNewContainerNode: boolean): void {
+	/**
+	 * Parses the end of 
+	 * This method will decide whether the node it is parsing is a container node or a void node and upgrade the node passed into it in param `node` to the respective ast node type.
+	 * The cursor is expected to be pointing at the first token after the tag opener:
+	 * for "normal" nodes:
+	 *     <alpha ...
+	 *      ^
+	 * for MDOs:
+	 *     <!DOCTYPE ...
+	 *       ^
+	 * for CDATA sections:
+	 *     <![CDATA[ ...
+	 *       ^
+	 * for PIs:
+	 *     <?svg ...
+	 *       ^
+	 * @param node The node to parse namespace prefix, tag name and attributes into.
+	 * @param allowDescendingIntoNewContainerNode Whether the parser should be allowed to descend if this method discovers that the node it is parsing is a container node.
+	 */
+	protected parseEndOfNonSelfClosingOpeningTag(node: SelfClosingNode, allowDescendingIntoNewContainerNode: boolean): void {
 		if (!(node instanceof SelfClosingNode)) {
 			return;
 		}
@@ -1016,6 +1063,7 @@ export class Parser {
 		}
 		return getAttrInfo();
 	}
+	
 	
 	
 	///
