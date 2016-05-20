@@ -45,11 +45,9 @@ class Nesting_1_2c extends test.UnitTest {
 
 class Nesting_1_2 extends test.UnitTest {
 	protected async performTest() {
-		const ast = await xml.Parser.parseStringToAst(
-			<alpha>
-				<beta></beta>
-			</alpha> as any
-		);
+		const ast = await xml.Parser.parseStringToAst(`<alpha>
+			<beta></beta>
+		</alpha>`);
 		const wrapperNode = ast.getChildAtIndex(0) as xml.ast.ContainerNode<xml.ast.ContainerNode<any>>;
 		await this.assert(wrapperNode instanceof xml.ast.ContainerNode, 'outer ast node has correct ast node type');
 		await this.assert(wrapperNode.tagName === 'alpha', 'outer ast node has correct tag name');
@@ -206,14 +204,14 @@ class Nesting_1_2_3_4sc extends test.UnitTest {
 class NestingWithAttributes_1_2_3_2_2sc extends test.UnitTest {
 	protected async performTest() {
 		const ast = await xml.Parser.parseStringToAst(
-			<alpha a="true">
+			`<alpha a="true">
 				<beta>
 					<gamma></gamma>
 				</beta>
 				<delta></delta>
 				<epsilon></epsilon>
 				<zeta foo="bar" />
-			</alpha> as any
+			</alpha>`
 		);
 		const alpha = ast.getChildAtIndex(0) as xml.ast.ContainerNode<any>;
 		await this.assert(alpha instanceof xml.ast.ContainerNode, 'outer ast node has correct ast node type');
@@ -243,14 +241,14 @@ class NestingWithAttributes_1_2_3txt_2_2sc extends test.UnitTest {
 	protected async performTest() {
 		const textContent = 'sample text node content',
 			ast = await xml.Parser.parseStringToAst(
-			<alpha a="true">
+			`<alpha a="true">
 				<beta>
-					<gamma>{textContent}</gamma>
+					<gamma>${textContent}</gamma>
 				</beta>
 				<delta></delta>
 				<epsilon></epsilon>
 				<zeta foo="bar" />
-			</alpha> as any
+			</alpha>`
 		);
 		const alpha = ast.getChildAtIndex(0) as xml.ast.ContainerNode<any>;
 		await this.assert(alpha instanceof xml.ast.ContainerNode, 'outer ast node has correct ast node type');
