@@ -7,18 +7,21 @@
 /// The numbers represent nodes on a certain nesting level, the 'v' and 'sc' stands for either
 /// 'void' or 'self closing' elements. The example test name from above would represent a node
 /// structure such as:
-///     <A>             1
-///         <B>         2v
-///         <C/>        2sc
-///         <!-- -->    2c
+///     <A>             			1
+///         <B>         			2v
+///         <C/>        			2sc
+///         <xsl:stylesheet />		p2sc
+///         <!-- -->    			2c
 ///     </A>
 /// If there's no shortcut on a number, it just means the node is a "normal", non-self-closing node.
 ///
 /// Here are all shortcuts:
+///     p     tag name with prefix (this shortcut goes *before* the number)
 ///     sc    self closing node
 ///     v     void node (self closing without slash)
 ///     c     comment node
 ///     txt   text node
+///     cdt   CDATA node
 ///     mdo   markup declaration opener node (e.g. a doctype)
 ///     pi    processing instruction node (e.g. <?svg...)
 ///
@@ -277,6 +280,61 @@ class NestingWithAttributes_1_2_3txt_2_2sc extends test.UnitTest {
 }
 
 
+class Nesting_p1_p2txt extends test.UnitTest {
+	protected async performTest() {
+		const textContent = 'test',
+			  ast = await xml.Parser.parseStringToAst(`
+			<xsl:element>
+				<xsl:attribute name="class">${textContent}</xsl:attribute>
+			</xsl:element>
+		`);
+		const wrapperNode = ast.getChildAtIndex(0) as xml.ast.ContainerNode<xml.ast.ContainerNode<xml.ast.TextNode>>;
+		await this.assert(wrapperNode instanceof xml.ast.ContainerNode, 'outer ast node has correct ast node type');
+		await this.assert(wrapperNode.namespacePrefix === 'xsl', 'outer ast node has correct namespace prefix');
+		await this.assert(wrapperNode.tagName === 'element', 'outer ast node has correct tag name');
+		await this.assert(wrapperNode.getNumberOfChildren() === 1, 'outer ast node has expected number of child nodes');
+		const innerNode = wrapperNode.getChildAtIndex(0);
+		await this.assert(innerNode instanceof xml.ast.ContainerNode, 'inner ast node has correct ast node type');
+		await this.assert(innerNode.namespacePrefix === 'xsl', 'inner ast node has correct namespace prefix');
+		await this.assert(innerNode.tagName === 'attribute', 'inner ast node has correct tag name');
+		await this.assert(innerNode.getNumberOfChildren() === 1, 'inner ast node has expected number of child nodes');
+		const textNode = innerNode.getChildAtIndex(0);
+		await this.assert(textNode instanceof xml.ast.TextNode, 'text node has correct ast node type');
+		await this.assert(textNode.content === textContent, 'text node has correct content');
+	}
+}
+
+
+class Nesting_p1_p2sc_p2txt extends test.UnitTest {
+	protected async performTest() {
+		const textContent = 'test',
+			  ast = await xml.Parser.parseStringToAst(`
+			<xsl:element>
+				<xsl:value-of select="@name" />
+				<xsl:attribute name="class">${textContent}</xsl:attribute>
+			</xsl:element>
+		`);
+		const wrapperNode = ast.getChildAtIndex(0) as xml.ast.ContainerNode<xml.ast.Node>;
+		await this.assert(wrapperNode instanceof xml.ast.ContainerNode, 'outer ast node has correct ast node type');
+		await this.assert(wrapperNode.namespacePrefix === 'xsl', 'outer ast node has correct namespace prefix');
+		await this.assert(wrapperNode.tagName === 'element', 'outer ast node has correct tag name');
+		await this.assert(wrapperNode.getNumberOfChildren() === 2, 'outer ast node has expected number of child nodes');
+		const firstInnerNode = wrapperNode.getChildAtIndex(0) as xml.ast.SelfClosingNode;
+		await this.assert(firstInnerNode instanceof xml.ast.SelfClosingNode, 'first inner ast node has correct ast node type');
+		await this.assert(firstInnerNode.namespacePrefix === 'xsl', 'first inner ast node has correct namespace prefix');
+		await this.assert(firstInnerNode.tagName === 'value-of', 'first inner ast node has correct tag name');
+		const secondInnerNode = wrapperNode.getChildAtIndex(1) as xml.ast.ContainerNode<xml.ast.TextNode>;
+		await this.assert(secondInnerNode instanceof xml.ast.ContainerNode, 'second inner ast node has correct ast node type');
+		await this.assert(secondInnerNode.namespacePrefix === 'xsl', 'second inner ast node has correct namespace prefix');
+		await this.assert(secondInnerNode.tagName === 'attribute', 'second inner ast node has correct tag name');
+		await this.assert(secondInnerNode.getNumberOfChildren() === 1, 'second inner ast node has expected number of child nodes');
+		const textNode = secondInnerNode.getChildAtIndex(0);
+		await this.assert(textNode instanceof xml.ast.TextNode, 'text node has correct ast node type');
+		await this.assert(textNode.content === textContent, 'text node has correct content');
+	}
+}
+
+
 @TestRunner.testName('Complex Parsing')
 export class TestRunner extends test.TestRunner {
 	constructor() {
@@ -291,7 +349,9 @@ export class TestRunner extends test.TestRunner {
 			new Nesting_1_2sc_2sc_2c_2sc(),
 			new Nesting_1_2_3_4sc(),
 			new NestingWithAttributes_1_2_3_2_2sc(),
-			new NestingWithAttributes_1_2_3txt_2_2sc()
+			new NestingWithAttributes_1_2_3txt_2_2sc(),
+			new Nesting_p1_p2txt(),
+			new Nesting_p1_p2sc_p2txt()
 		);
 	}
 }
