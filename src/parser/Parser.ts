@@ -294,6 +294,19 @@ export class Parser {
 	}
 	
 	
+	protected descendInto(containerNode: ContainerNode<Node>): void {
+		this.currentContainerNode = containerNode;
+	}
+	
+	
+	protected ascend(): void {
+		if (!(this.currentContainerNode.parentNode instanceof ContainerNode)) {
+			this.raiseError(this.createSyntaxErrorAtCurrentToken(SyntaxErrorCode.Unknown, `can not ascend: current containing node has no parent node`));
+		}
+		this.currentContainerNode = this.currentContainerNode.parentNode;
+	}
+	
+	
 	///
 	/// SYNTAX ERROR HANDLING & FACTORY METHODS:
 	/// The following methods help creating and raising syntax errors.
@@ -644,7 +657,7 @@ export class Parser {
 			this.raiseError(this.createUnexpectedTokenSyntaxErrorAtCurrentToken(`expected end of close tag, got '${this.getCurrentToken()}'`));
 		}
 		this.advanceToNextToken();
-		this.currentContainerNode = this.currentContainerNode.parentNode;
+		this.ascend();
 		return;
 	}
 	
@@ -848,9 +861,8 @@ export class Parser {
 		} else {
 			const containerNode = Parser.createContainerNodeFromOtherNode<any>(node);
 			node.parentNode.replaceChild(node, containerNode);
-			node = containerNode;
 			if (allowDescendingIntoNewContainerNode) {
-				this.currentContainerNode = <ContainerNode<any>>node;
+				this.descendInto(containerNode);
 			}
 		}
 	}
