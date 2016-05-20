@@ -833,21 +833,7 @@ export class Parser {
 	
 	
 	/**
-	 * Parses the end of 
-	 * This method will decide whether the node it is parsing is a container node or a void node and upgrade the node passed into it in param `node` to the respective ast node type.
-	 * The cursor is expected to be pointing at the first token after the tag opener:
-	 * for "normal" nodes:
-	 *     <alpha ...
-	 *      ^
-	 * for MDOs:
-	 *     <!DOCTYPE ...
-	 *       ^
-	 * for CDATA sections:
-	 *     <![CDATA[ ...
-	 *       ^
-	 * for PIs:
-	 *     <?svg ...
-	 *       ^
+	 * Parses the end of opening tags that are not self closing. This method will decide whether the node it is parsing is a container node or a void node and upgrade the node passed into it in param `node` to the respective ast node type.
 	 * @param node The node to parse namespace prefix, tag name and attributes into.
 	 * @param allowDescendingIntoNewContainerNode Whether the parser should be allowed to descend if this method discovers that the node it is parsing is a container node.
 	 */
