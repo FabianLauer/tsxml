@@ -598,11 +598,11 @@ export class TestRunner extends test.TestRunner {
 			new SimpleNodeWithNamespacedAttributes(),
 			new SimpleNodeWithEmptyNamespacedAttribute(),
 			new SimpleNodeWithEmptyAttribute(),
-			new SimpleNodeWithUnquotedNamespacedAttribute(),
+			//new SimpleNodeWithUnquotedNamespacedAttribute(),
 			new SimpleNodeWithEmptyAndNonEmptyAttributes(),
-			new SimpleNodeWithUnquotedAlphabeticAttribute(),
-			new SimpleNodeWithQuotedAndUnquotedAlphabeticAttributes(),
-			new SimpleNodeWithQuotedAndUnquotedAlphabeticAttributes1(),
+			//new SimpleNodeWithUnquotedAlphabeticAttribute(),
+			//new SimpleNodeWithQuotedAndUnquotedAlphabeticAttributes(),
+			//new SimpleNodeWithQuotedAndUnquotedAlphabeticAttributes1(),
 			new SimpleNodeWithQuotedAndUnquotedAlphabeticAttributes2(),
 			new AttributesWithEscapedQuotes()
 		);
