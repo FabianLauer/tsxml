@@ -1,6 +1,7 @@
 import {IAttribute} from './IAttribute';
 import {IStringificationParams} from './IStringificationParams';
 import {ContainerNode} from './ContainerNode';
+import {NodeFlags} from '../parser/NodeFlags';
 
 /**
  * Base class for all nodes.
@@ -21,6 +22,9 @@ export abstract class Node {
 			newlineChar: '\n'
 		};
 	}
+	
+	
+	public parserFlags: NodeFlags = NodeFlags.None;
 	
 	
 	public namespacePrefix: string;

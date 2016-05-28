@@ -3,6 +3,7 @@ import {SyntaxErrorCode} from './SyntaxErrorCode';
 export class SyntaxError extends Error {
 	constructor(private errorCode: SyntaxErrorCode, private line: number, private column: number, private source: string, message: string) {
 		super(message);
+		this.source = this.source || '';
 	}
 	
 	
@@ -42,6 +43,10 @@ export class SyntaxError extends Error {
 	
 	
 	private getTokenAt(line: number, column: number): string {
-		return this.source.split(/\n/)[line - 1].split('')[column - 1];
+		const sourceLine = this.source.split(/\n/)[line - 1];
+		if (typeof sourceLine !== 'string') {
+			return '';
+		}
+		return sourceLine.split('')[column - 1];
 	}
 }

@@ -9,6 +9,14 @@ import {SyntaxError} from './SyntaxError';
 import {TagCloseMode} from './TagCloseMode';
 import {TagSyntaxRule} from './TagSyntaxRule';
 import {SyntaxRuleSet} from './SyntaxRuleSet';
+import {NodeFlags} from './NodeFlags';
+
+
+interface ITagNameInfo {
+	namespacePrefix?: string;
+	tagName: string;
+}
+
 
 /**
  * Parsers create a syntax tree from an XML string.
@@ -179,7 +187,14 @@ export class Parser {
 	 * Returns the line the parser's cursor is currently on.
 	 */
 	protected getCurrentLine(): number {
-		return this.getTokenMatrix()[this.getCurrentTokenIndex()].line;
+		const tokenMatrix = this.getTokenMatrix();
+		if (tokenMatrix[this.getCurrentTokenIndex()]) {
+			return tokenMatrix[this.getCurrentTokenIndex()].line;
+		} else if (this.getCurrentTokenIndex() === 0) {
+			return 1;
+		} else {
+			return undefined;
+		}
 	}
 	
 	
@@ -187,7 +202,14 @@ export class Parser {
 	 * Returns the column the parser's cursor is currently at.
 	 */
 	protected getCurrentColumn(): number {
-		return this.getTokenMatrix()[this.getCurrentTokenIndex()].column;
+		const tokenMatrix = this.getTokenMatrix();
+		if (tokenMatrix[this.getCurrentTokenIndex()]) {
+			return tokenMatrix[this.getCurrentTokenIndex()].column;
+		} else if (this.getCurrentTokenIndex() === 0) {
+			return 1;
+		} else {
+			return undefined;
+		}
 	}
 	
 	
@@ -329,6 +351,11 @@ export class Parser {
 	}
 	
 	
+	/**
+	 * Raises an error. Use this method instead of throwing manually so errors can be logged or modified by the parser before it is thrown.
+	 * @throws
+	 * @param error The error to raise.
+	 */
 	protected raiseError(error: Error): void {
 		throw error;
 	}
@@ -628,6 +655,7 @@ export class Parser {
 		if (!Parser.isTokenLegalInTagNameOrTagNameNamespacePrefix(this.getNextToken())) {
 			this.raiseError(this.createUnexpectedTokenSyntaxErrorAtCurrentToken(`expected beginning of tag name, got '${this.getNextToken()}'`));
 		}
+		// we assume all "normal" nodes to be self closing until proven they're not:
 		const node = new SelfClosingNode();
 		this.getCurrentContainerNode().appendChild(node);
 		// Skip over the node opener:
@@ -638,6 +666,20 @@ export class Parser {
 		//      ^      we're here
 		this.parseCompleteOpeningTagInto(node, true, false);
 		return;
+	}
+	
+	
+	protected findUnclosedNodeMatchingTagName(tagNameInfo: ITagNameInfo): ContainerNode<Node> {
+		var containerNode = this.getCurrentContainerNode();
+		do {
+			if (containerNode.parserFlags & NodeFlags.Closed ||
+			    containerNode.namespacePrefix !== tagNameInfo.namespacePrefix ||
+				containerNode.tagName !== tagNameInfo.tagName)
+			{
+				continue;
+			}
+			return containerNode;
+		} while ((containerNode = containerNode.parentNode) && containerNode.parentNode instanceof Node);
 	}
 	
 	
@@ -652,7 +694,12 @@ export class Parser {
 		this.advanceByNumberOfTokens(2);
 		//     </alpha
 		//       ^      we're here
-		this.parseTagName();
+		// we now parse the tag name and check if there are any unclosed container nodes with the exact same tag name
+		const tagNameInfo = this.parseTagName(),
+			  closedNode = this.findUnclosedNodeMatchingTagName(tagNameInfo);
+		if (!(closedNode instanceof ContainerNode)) {
+			this.raiseError(this.createSyntaxErrorAtCurrentToken(SyntaxErrorCode.ExcessCloseTag, `close tag '${tagNameInfo.tagName}' has no open tag`));
+		}
 		if (this.getCurrentToken() !== '>') {
 			this.raiseError(this.createUnexpectedTokenSyntaxErrorAtCurrentToken(`expected end of close tag, got '${this.getCurrentToken()}'`));
 		}
@@ -827,16 +874,20 @@ export class Parser {
 			default:
 				this.raiseError(this.createUnexpectedTokenSyntaxErrorAtCurrentToken(`expected end of opening tag`));
 				break;
+			// self closing node
 			case this.getTokenRangeStartingAt(this.getCurrentTokenIndex(), 2) === '/>':
 				// raise an error if the current node is not allowed to self close
 				if (!this.isCloseModeAllowedForTagName(node.tagName, TagCloseMode.SelfClose)) {
 					this.raiseError(this.createSyntaxErrorAtCurrentToken(SyntaxErrorCode.IllegalSelfClose, `tag '${node.tagName}' must not self-close`));
 				}
+				node.parserFlags |= NodeFlags.SelfClosing;
 				this.advanceByNumberOfTokens(2);
 				return;
+			// processing instruction
 			case this.getCurrentToken() === '?':
 				this.advanceToNextToken();
 				// ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   FALL THROUGH   ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓
+			// container node
 			case this.getCurrentToken() === '>':
 				this.parseEndOfNonSelfClosingOpeningTag(node, allowDescendingIntoNewContainerNode);
 				this.advanceToNextToken();
@@ -858,9 +909,11 @@ export class Parser {
 			const voidNode = Parser.createVoidNodeFromOtherNode(node);
 			node.parentNode.replaceChild(node, voidNode);
 			node = voidNode;
+			node.parserFlags |= NodeFlags.Void;
 		} else {
 			const containerNode = Parser.createContainerNodeFromOtherNode<any>(node);
 			node.parentNode.replaceChild(node, containerNode);
+			node.parserFlags |= NodeFlags.Opened;
 			if (allowDescendingIntoNewContainerNode) {
 				this.descendInto(containerNode);
 			}
@@ -868,11 +921,11 @@ export class Parser {
 	}
 	
 	
-	protected parseTagName() {
+	protected parseTagName(): ITagNameInfo {
 		// this will be set to `true` as soon as the first colon was seen
 		var colonSeen = false,
 			nameStash = '',
-			tagNameInfo: { namespacePrefix?: string, tagName: string } = {
+			tagNameInfo: ITagNameInfo = {
 				namespacePrefix: undefined,
 				tagName: undefined
 			};
