@@ -1,5 +1,5 @@
 <?alpha foo="bar" fibo="nacci"?>
 @@ COMPACT @@
-<?alpha foo="bar" fibo="nacci" ?>
+<?alpha foo="bar" fibo="nacci"?>
 @@ DEFAULT @@
-<?alpha foo="bar" fibo="nacci" ?>
+<?alpha foo="bar" fibo="nacci"?>

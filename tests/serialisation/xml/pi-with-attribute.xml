@@ -1,5 +1,5 @@
 <?alpha foo="bar" ?>
 @@ COMPACT @@
-<?alpha foo="bar" ?>
+<?alpha foo="bar"?>
 @@ DEFAULT @@
-<?alpha foo="bar" ?>
+<?alpha foo="bar"?>
