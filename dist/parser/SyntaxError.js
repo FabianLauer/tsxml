@@ -36,6 +36,7 @@ var SyntaxError = function (_Error) {
         _this.line = line;
         _this.column = column;
         _this.source = source;
+        _this.source = _this.source || '';
         return _this;
     }
 
@@ -72,7 +73,11 @@ var SyntaxError = function (_Error) {
     }, {
         key: 'getTokenAt',
         value: function getTokenAt(line, column) {
-            return this.source.split(/\n/)[line - 1].split('')[column - 1];
+            var sourceLine = this.source.split(/\n/)[line - 1];
+            if (typeof sourceLine !== 'string') {
+                return '';
+            }
+            return sourceLine.split('')[column - 1];
         }
     }], [{
         key: 'getSyntaxErrorCodeName',

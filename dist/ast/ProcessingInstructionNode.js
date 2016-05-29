@@ -40,7 +40,7 @@ var ProcessingInstructionNode = function (_Node_1$Node) {
          */
         value: function stringify(params, nodeIndentDepth) {
             nodeIndentDepth = Math.max(nodeIndentDepth || 0, 0);
-            return Node_1.Node.generateIndentString(params.indentChar, nodeIndentDepth) + "<?" + this.tagName + this.stringifyAttributes(nodeIndentDepth) + " ?>" + params.newlineChar;
+            return Node_1.Node.generateIndentString(params.indentChar, nodeIndentDepth) + "<?" + this.tagName + this.stringifyAttributes(nodeIndentDepth) + "?>" + params.newlineChar;
         }
     }]);
     return ProcessingInstructionNode;

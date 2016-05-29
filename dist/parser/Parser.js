@@ -51,6 +51,7 @@ var __awaiter = undefined && undefined.__awaiter || function (thisArg, _argument
     });
 };
 var ast = require('../ast');
+var Node_1 = require('../ast/Node');
 var SelfClosingNode_1 = require('../ast/SelfClosingNode');
 var DocumentNode_1 = require('../ast/DocumentNode');
 var ContainerNode_1 = require('../ast/ContainerNode');
@@ -60,13 +61,20 @@ var SyntaxError_1 = require('./SyntaxError');
 var TagCloseMode_1 = require('./TagCloseMode');
 var TagSyntaxRule_1 = require('./TagSyntaxRule');
 var SyntaxRuleSet_1 = require('./SyntaxRuleSet');
+var NodeFlags_1 = require('./NodeFlags');
 /**
- * Parsers create a syntax tree from an XML string. Use the static methods `parse*()` instead of using `new Parser()`.
+ * Parsers create a syntax tree from an XML string.
+ * PARSER INTERNALS:
+ * Parsers see every character in an XML string as a "token". This means that there is no tokenization stage, but rather just a quick (and lazy) mapping of characters to their line and column number. Even without tokenization, XML is fairly simple to parse due to its non-complex syntax. The absence of a tokenization stage means there are less dependencies, less coupling is necessary, which leads to lower maintenance time. Also, we're saving a few CPU cycles and some memory, although performance is not the primary factor for the decision against a dedicated tokenizer.
+ * The public interface provided by the parser class encourages the use of static methods, such as `parseStringToAst(...)`, instead of manually creating and handling parser objects (at least for now). Also, these static methods enforce user code to await promises, even though parser code is not **yet** async, but it might become async when (and if) incremental parsing and streams are implemented (incremental parsing might use generators and allow async user code to interfere with the parser).
+ * SYNTAX RULES:
+ * Parsers can accept some syntax rules, however by default they expect XML (no void tags, unclosed tags are handled as if they were). To override default parsing rules, use the `addTagSyntaxRule(...)` (and similar) methods.
  */
 
 var Parser = function () {
     /**
      * Creates a new parser object. Use the static methods `create*()` or `parse*()` instead of instantiating manually.
+     * @param stringToParse The XML string to be parsed.
      */
 
     function Parser(stringToParse) {
@@ -81,6 +89,7 @@ var Parser = function () {
     }
     /**
      * Creates a parser object, but does not begin parsing.
+     * @param stringToParse The XML string to be parsed.
      */
 
 
@@ -196,6 +205,10 @@ var Parser = function () {
         value: function getAst() {
             return this.ast;
         }
+        /**
+         * Parses the complete XML string passed to a parser instance.
+         */
+
     }, {
         key: 'parseComplete',
         value: function parseComplete() {
@@ -210,62 +223,133 @@ var Parser = function () {
         ///
         /// INTERNAL GETTERS & REQUESTS:
         ///
+        /**
+         * Returns the line the parser's cursor is currently on.
+         */
 
     }, {
         key: 'getCurrentLine',
         value: function getCurrentLine() {
-            return this.getTokenMatrix()[this.getCurrentTokenIndex()].line;
+            var tokenMatrix = this.getTokenMatrix();
+            if (tokenMatrix[this.getCurrentTokenIndex()]) {
+                return tokenMatrix[this.getCurrentTokenIndex()].line;
+            } else if (this.getCurrentTokenIndex() === 0) {
+                return 1;
+            } else {
+                return undefined;
+            }
         }
+        /**
+         * Returns the column the parser's cursor is currently at.
+         */
+
     }, {
         key: 'getCurrentColumn',
         value: function getCurrentColumn() {
-            return this.getTokenMatrix()[this.getCurrentTokenIndex()].column;
+            var tokenMatrix = this.getTokenMatrix();
+            if (tokenMatrix[this.getCurrentTokenIndex()]) {
+                return tokenMatrix[this.getCurrentTokenIndex()].column;
+            } else if (this.getCurrentTokenIndex() === 0) {
+                return 1;
+            } else {
+                return undefined;
+            }
         }
+        /**
+         * Returns the index of the current token in the XML source string.
+         */
+
     }, {
         key: 'getCurrentTokenIndex',
         value: function getCurrentTokenIndex() {
             return this.currentTokenIndex;
         }
+        /**
+         * Returns whether the parser's cursor has reached the end of the XML source string.
+         */
+
     }, {
         key: 'isAtEndOfInput',
         value: function isAtEndOfInput() {
             return this.getCurrentTokenIndex() >= this.stringToParse.length;
         }
+        /**
+         * Returns the token at a certain index in the XML source string.
+         */
+
     }, {
         key: 'getTokenAtIndex',
         value: function getTokenAtIndex(index) {
             return this.stringToParse[index];
         }
+        /**
+         * Return the token at the current cursor index.
+         */
+
     }, {
         key: 'getCurrentToken',
         value: function getCurrentToken() {
             return this.getTokenAtIndex(this.getCurrentTokenIndex());
         }
+        /**
+         * Returns a range of tokens from the source XML string.
+         * @param startIndex The index of the first token in the requested range.
+         * @param endIndex The index of the last token in the requested range (inclusive).
+         */
+
     }, {
         key: 'getTokenRange',
         value: function getTokenRange(startIndex, endIndex) {
+            /// TODO: Prevent this from returning ranges that go "beyond" the end of the source string.
             return this.stringToParse.slice(startIndex, endIndex);
         }
+        /**
+         * Returns a range of tokens from the source XML string.
+         * @param startIndex The index of the first token in the requested range.
+         * @param length The length of the range to be returned.
+         */
+
     }, {
         key: 'getTokenRangeStartingAt',
         value: function getTokenRangeStartingAt(startIndex, length) {
             return this.stringToParse.slice(startIndex, startIndex + length);
         }
+        /**
+         * Returns the token that follows the token the cursor is currently at.
+         */
+
     }, {
         key: 'getNextToken',
         value: function getNextToken() {
             return this.getTokenAtIndex(this.getCurrentTokenIndex() + 1);
         }
+        /**
+         * Returns the token that preceeds the token the cursor is currently at.
+         */
+
     }, {
         key: 'getPreviousToken',
         value: function getPreviousToken() {
             return this.getTokenAtIndex(this.getCurrentTokenIndex() - 1);
         }
+        /**
+         * Finds the first occurence of a certain token after in the source XML string after a certain token index and returns the index of the searched token.
+         * @param token The token to find.
+         * @param startIndex The index at which to start searching.
+         */
+
     }, {
         key: 'findFirstOccurenceOfTokenAfterIndex',
         value: function findFirstOccurenceOfTokenAfterIndex(token, startIndex) {
             return this.stringToParse.indexOf(token[0], startIndex);
         }
+        /**
+         * Checks if a certain token occurs before the next occurence of another token.
+         * @param token The token to check if it occurs before `otherToken`.
+         * @param otherToken The token before which `token` must occur for this method to return `true`.
+         * @param startIndex The index at which to start searching for `token` and `otherToken`.
+         */
+
     }, {
         key: 'doesTokenOccurBeforeNextOccurenceOfOtherToken',
         value: function doesTokenOccurBeforeNextOccurenceOfOtherToken(token, otherToken, startIndex) {
@@ -276,10 +360,27 @@ var Parser = function () {
             }
             return tokenIndex < otherTokenIndex;
         }
+        /**
+         * Returns the container ast node the parser is currently parsing into, depending on the semantic context around the cursor. At the start and end of each parsing run, this will return the outermost `DocumentNode` of the syntax tree.
+         */
+
     }, {
         key: 'getCurrentContainerNode',
         value: function getCurrentContainerNode() {
             return this.currentContainerNode;
+        }
+    }, {
+        key: 'descendInto',
+        value: function descendInto(containerNode) {
+            this.currentContainerNode = containerNode;
+        }
+    }, {
+        key: 'ascend',
+        value: function ascend() {
+            if (!(this.currentContainerNode.parentNode instanceof ContainerNode_1.ContainerNode)) {
+                this.raiseError(this.createSyntaxErrorAtCurrentToken(SyntaxErrorCode_1.SyntaxErrorCode.Unknown, 'can not ascend: current containing node has no parent node'));
+            }
+            this.currentContainerNode = this.currentContainerNode.parentNode;
         }
         ///
         /// SYNTAX ERROR HANDLING & FACTORY METHODS:
@@ -302,6 +403,12 @@ var Parser = function () {
             message = message || 'token can not be parsed';
             return this.createSyntaxErrorAtCurrentToken(SyntaxErrorCode_1.SyntaxErrorCode.UnexpectedToken, message);
         }
+        /**
+         * Raises an error. Use this method instead of throwing manually so errors can be logged or modified by the parser before it is thrown.
+         * @throws
+         * @param error The error to raise.
+         */
+
     }, {
         key: 'raiseError',
         value: function raiseError(error) {
@@ -403,7 +510,7 @@ var Parser = function () {
          *     <foo><</foo>
          *          ^ here
          *
-         * Keep in mind that this method must *only* be called in these two cases, all other possible occurances of open angle brackets are handled in
+         * Keep in mind that this method must *only* be called in these two cases, all other possible occurences of open angle brackets are handled in
          * more specific methods (namely when parsing CDATA or comments), which are not ambiguous (comments and CDATA nodes have delimiters that clearly
          * indicate where their content begins and ends, text nodes do not have this).
          * The same goes for attributes: An open angle bracket in a properly quoted attribute string is always going to be parsed as an attribute value.
@@ -420,7 +527,7 @@ var Parser = function () {
             // If:
             //     the next token does not indicate a CDATA node, comment, PI or MDO
             //   and:
-            //     there's another open angle bracket before the next occurance of a closing angle bracket
+            //     there's another open angle bracket before the next occurence of a closing angle bracket
             // assume that the current open angle bracket is text node content. In all other cases, assume that the current open angle bracket indicates
             // the bginning of a new tag.
             if (this.getNextToken() !== '!' && this.getNextToken() !== '?' && this.doesTokenOccurBeforeNextOccurenceOfOtherToken('<', '>', this.getCurrentTokenIndex() + 1)) {
@@ -471,6 +578,13 @@ var Parser = function () {
                 this.advanceToNextToken();
             }
         }
+        /**
+         * Parses from the beginning of any kind of tag. The cursor is expected to point at the open angle bracket of the tag, such as:
+         *     <xsl:stylesheet ...
+         *     ^
+         * Comments and CDATA sections are also supported by this method. Depending on the kind of tag (MDO, PI, normal, etc), this method will delegate parsing the tag to other more specific methods.
+         */
+
     }, {
         key: 'parseFromBeginningOfTag',
         value: function parseFromBeginningOfTag() {
@@ -550,6 +664,7 @@ var Parser = function () {
             if (!Parser.isTokenLegalInTagNameOrTagNameNamespacePrefix(this.getNextToken())) {
                 this.raiseError(this.createUnexpectedTokenSyntaxErrorAtCurrentToken('expected beginning of tag name, got \'' + this.getNextToken() + '\''));
             }
+            // we assume all "normal" nodes to be self closing until proven they're not:
             var node = new SelfClosingNode_1.SelfClosingNode();
             this.getCurrentContainerNode().appendChild(node);
             // Skip over the node opener:
@@ -560,6 +675,17 @@ var Parser = function () {
             //      ^      we're here
             this.parseCompleteOpeningTagInto(node, true, false);
             return;
+        }
+    }, {
+        key: 'findUnclosedNodeMatchingTagName',
+        value: function findUnclosedNodeMatchingTagName(tagNameInfo) {
+            var containerNode = this.getCurrentContainerNode();
+            do {
+                if (containerNode.parserFlags & NodeFlags_1.NodeFlags.Closed || containerNode.namespacePrefix !== tagNameInfo.namespacePrefix || containerNode.tagName !== tagNameInfo.tagName) {
+                    continue;
+                }
+                return containerNode;
+            } while ((containerNode = containerNode.parentNode) && containerNode.parentNode instanceof Node_1.Node);
         }
     }, {
         key: 'parseFromBeginningOfCloseTag',
@@ -574,20 +700,17 @@ var Parser = function () {
             this.advanceByNumberOfTokens(2);
             //     </alpha
             //       ^      we're here
-            while (Parser.isWhitespaceToken(this.getCurrentToken())) {
-                this.advanceToNextToken();
-            }
-            while (Parser.isTokenLegalInTagNameOrTagNameNamespacePrefix(this.getCurrentToken())) {
-                this.advanceToNextToken();
-            }
-            while (Parser.isWhitespaceToken(this.getCurrentToken())) {
-                this.advanceToNextToken();
+            // we now parse the tag name and check if there are any unclosed container nodes with the exact same tag name
+            var tagNameInfo = this.parseTagName(),
+                closedNode = this.findUnclosedNodeMatchingTagName(tagNameInfo);
+            if (!(closedNode instanceof ContainerNode_1.ContainerNode)) {
+                this.raiseError(this.createSyntaxErrorAtCurrentToken(SyntaxErrorCode_1.SyntaxErrorCode.ExcessCloseTag, 'close tag \'' + tagNameInfo.tagName + '\' has no open tag'));
             }
             if (this.getCurrentToken() !== '>') {
                 this.raiseError(this.createUnexpectedTokenSyntaxErrorAtCurrentToken('expected end of close tag, got \'' + this.getCurrentToken() + '\''));
             }
             this.advanceToNextToken();
-            this.currentContainerNode = this.currentContainerNode.parentNode;
+            this.ascend();
             return;
         }
     }, {
@@ -696,12 +819,35 @@ var Parser = function () {
         }
     }, {
         key: 'parseCompleteOpeningTagInto',
+
+        /**
+         * Parses a complete opening tag with namespace prefix, tag name and attributes into a given node. This method will decide whether the node it is parsing is a container node or a void node and upgrade the node passed into it in param `node` to the respective ast node type.
+         * The cursor is expected to be pointing at the first token after the tag opener:
+         * for "normal" nodes:
+         *     <alpha ...
+         *      ^
+         * for MDOs:
+         *     <!DOCTYPE ...
+         *       ^
+         * for CDATA sections:
+         *     <![CDATA[ ...
+         *       ^
+         * for PIs:
+         *     <?svg ...
+         *       ^
+         * @param node The node to parse namespace prefix, tag name and attributes into.
+         * @param allowDescendingIntoNewContainerNode Whether the parser should be allowed to descend if this method discovers that the node it is parsing is a container node.
+         * @param allowSystemLiterals Whether system literals should be allowed in the parsed tag.
+         */
         value: function parseCompleteOpeningTagInto(node, allowDescendingIntoNewContainerNode, allowSystemLiterals) {
             // we could now be in any of the following constructs:
             //     <alpha ...
             //      ^
             // or:
             //     <!DOCTYPE ...
+            //       ^
+            // or:
+            //     <![CDATA[ ...
             //       ^
             // or:
             //     <?svg ...
@@ -718,22 +864,32 @@ var Parser = function () {
                 default:
                     this.raiseError(this.createUnexpectedTokenSyntaxErrorAtCurrentToken('expected end of opening tag'));
                     break;
+                // self closing node
                 case this.getTokenRangeStartingAt(this.getCurrentTokenIndex(), 2) === '/>':
                     // raise an error if the current node is not allowed to self close
                     if (!this.isCloseModeAllowedForTagName(node.tagName, TagCloseMode_1.TagCloseMode.SelfClose)) {
                         this.raiseError(this.createSyntaxErrorAtCurrentToken(SyntaxErrorCode_1.SyntaxErrorCode.IllegalSelfClose, 'tag \'' + node.tagName + '\' must not self-close'));
                     }
+                    node.parserFlags |= NodeFlags_1.NodeFlags.SelfClosing;
                     this.advanceByNumberOfTokens(2);
                     return;
+                // processing instruction
                 case this.getCurrentToken() === '?':
                     this.advanceToNextToken();
-                // FALL THROUGH
+                // ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   FALL THROUGH   ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓
+                // container node
                 case this.getCurrentToken() === '>':
                     this.parseEndOfNonSelfClosingOpeningTag(node, allowDescendingIntoNewContainerNode);
                     this.advanceToNextToken();
                     break;
             }
         }
+        /**
+         * Parses the end of opening tags that are not self closing. This method will decide whether the node it is parsing is a container node or a void node and upgrade the node passed into it in param `node` to the respective ast node type.
+         * @param node The node to parse namespace prefix, tag name and attributes into.
+         * @param allowDescendingIntoNewContainerNode Whether the parser should be allowed to descend if this method discovers that the node it is parsing is a container node.
+         */
+
     }, {
         key: 'parseEndOfNonSelfClosingOpeningTag',
         value: function parseEndOfNonSelfClosingOpeningTag(node, allowDescendingIntoNewContainerNode) {
@@ -744,26 +900,26 @@ var Parser = function () {
                 var voidNode = Parser.createVoidNodeFromOtherNode(node);
                 node.parentNode.replaceChild(node, voidNode);
                 node = voidNode;
+                node.parserFlags |= NodeFlags_1.NodeFlags.Void;
             } else {
                 var containerNode = Parser.createContainerNodeFromOtherNode(node);
                 node.parentNode.replaceChild(node, containerNode);
-                node = containerNode;
+                node.parserFlags |= NodeFlags_1.NodeFlags.Opened;
                 if (allowDescendingIntoNewContainerNode) {
-                    this.currentContainerNode = node;
+                    this.descendInto(containerNode);
                 }
             }
         }
-        /**
-         * Parses a tag name into an AST node. Supports namespace prefixes.
-         * @param node The AST node to parse the tag name into.
-         */
-
     }, {
-        key: 'parseTagNameInto',
-        value: function parseTagNameInto(node) {
+        key: 'parseTagName',
+        value: function parseTagName() {
             // this will be set to `true` as soon as the first colon was seen
             var colonSeen = false,
-                nameStash = '';
+                nameStash = '',
+                tagNameInfo = {
+                namespacePrefix: undefined,
+                tagName: undefined
+            };
             // we could now be in any of the following constructs:
             //     <alpha ...
             //      ^
@@ -781,8 +937,7 @@ var Parser = function () {
                         this.raiseError(this.createSyntaxErrorAtCurrentToken(SyntaxErrorCode_1.SyntaxErrorCode.IllegalNamespacePrefix, 'illegal multiple namespace prefix (multiple colons in tag name)'));
                     }
                     colonSeen = true;
-                    node.namespacePrefix = node.namespacePrefix || '';
-                    node.namespacePrefix += nameStash;
+                    tagNameInfo.namespacePrefix = nameStash;
                     nameStash = '';
                     this.advanceToNextToken();
                     if (!Parser.isAlphabeticToken(this.getCurrentToken())) {
@@ -793,7 +948,20 @@ var Parser = function () {
                 nameStash += this.getCurrentToken();
                 this.advanceToNextToken();
             }
-            node.tagName = nameStash;
+            tagNameInfo.tagName = nameStash;
+            return tagNameInfo;
+        }
+        /**
+         * Parses a tag name into an AST node. Supports namespace prefixes.
+         * @param node The AST node to parse the tag name into.
+         */
+
+    }, {
+        key: 'parseTagNameInto',
+        value: function parseTagNameInto(node) {
+            var tagNameInfo = this.parseTagName();
+            node.namespacePrefix = tagNameInfo.namespacePrefix;
+            node.tagName = tagNameInfo.tagName;
         }
     }, {
         key: 'parseAttributeListInto',

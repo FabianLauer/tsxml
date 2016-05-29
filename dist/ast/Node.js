@@ -1,7 +1,8 @@
 "use strict";
-/**
- * Base class for all nodes.
- */
+
+var _defineProperty = require('babel-runtime/core-js/object/define-property');
+
+var _defineProperty2 = _interopRequireDefault(_defineProperty);
 
 var _typeof2 = require('babel-runtime/helpers/typeof');
 
@@ -21,11 +22,18 @@ var _createClass3 = _interopRequireDefault(_createClass2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var NodeFlags_1 = require('../parser/NodeFlags');
+/**
+ * Base class for all nodes.
+ */
+
 var Node = function () {
     function Node() {
         (0, _classCallCheck3.default)(this, Node);
 
+        this.parserFlags = NodeFlags_1.NodeFlags.None;
         this.attrList = {};
+        this.applyAttributePropertyBindings();
     }
     /**
      * The default formatting options for stringification.
@@ -50,6 +58,9 @@ var Node = function () {
     }, {
         key: 'getAttribute',
         value: function getAttribute(attrName, namespaceName) {
+            if ((0, _typeof3.default)(this.attrList) !== 'object' || this.attrList === null) {
+                return undefined;
+            }
             attrName = Node.joinAttributeNameWithNamespacePrefix(attrName, namespaceName);
             return this.attrList[attrName];
         }
@@ -61,6 +72,7 @@ var Node = function () {
         key: 'setAttribute',
         value: function setAttribute(attrName, value, namespaceName) {
             attrName = Node.joinAttributeNameWithNamespacePrefix(attrName, namespaceName);
+            this.attrList = this.attrList || {};
             this.attrList[attrName] = value;
             return this;
         }
@@ -121,6 +133,32 @@ var Node = function () {
         value: function isIdenticalTo(otherNode) {
             return this.constructor === otherNode.constructor && this.isTagNameAndNamespaceIdenticalTo(otherNode) && this.isAttributeListIdenticalTo(otherNode);
         }
+        /**
+         * Decorator.
+         */
+
+    }, {
+        key: 'getBoundAttributeNameForProperty',
+        value: function getBoundAttributeNameForProperty(propertyName) {
+            if ((0, _typeof3.default)(this.attrPropertyBindings) !== 'object' || this.attrPropertyBindings === null) {
+                return undefined;
+            }
+            return this.attrPropertyBindings[propertyName];
+        }
+    }, {
+        key: 'getBoundPropertyNamesForAttribute',
+        value: function getBoundPropertyNamesForAttribute(attributeName) {
+            var propertyNames = [];
+            if ((0, _typeof3.default)(this.attrPropertyBindings) !== 'object' || this.attrPropertyBindings === null) {
+                return propertyNames;
+            }
+            for (var propertyName in this.attrPropertyBindings) {
+                if (this.attrPropertyBindings[propertyName] === attributeName) {
+                    propertyNames.push(propertyName);
+                }
+            }
+            return propertyNames;
+        }
     }, {
         key: 'stringify',
         value: function stringify(params, nodeIndentDepth) {
@@ -146,11 +184,50 @@ var Node = function () {
             }
         }
     }, {
+        key: 'addAttributeProxyProperty',
+        value: function addAttributeProxyProperty(propertyName, attrName) {
+            this.attrPropertyBindings = this.attrPropertyBindings || {};
+            this.attrPropertyBindings[propertyName] = attrName;
+        }
+    }, {
+        key: 'applyAttributePropertyBindings',
+        value: function applyAttributePropertyBindings() {
+            if ((0, _typeof3.default)(this.attrPropertyBindings) !== 'object' || this.attrPropertyBindings === null) {
+                return;
+            }
+            for (var propertyName in this.attrPropertyBindings) {
+                this.applyAttributePropertyBinding(propertyName, this.attrPropertyBindings[propertyName]);
+            }
+        }
+    }, {
+        key: 'applyAttributePropertyBinding',
+        value: function applyAttributePropertyBinding(propertyName, attributeName) {
+            var _this2 = this;
+
+            var value = this[propertyName];
+            (0, _defineProperty2.default)(this, propertyName, {
+                get: function get() {
+                    return _this2.getAttribute(attributeName);
+                },
+                set: function set(newValue) {
+                    return _this2.setAttribute(attributeName, newValue);
+                }
+            });
+            this.setAttribute(attributeName, value);
+        }
+    }, {
         key: 'parentNode',
         get: function get() {
             return this._parentNode;
         }
     }], [{
+        key: 'attributePropertyBinding',
+        value: function attributePropertyBinding(attributeName) {
+            return function (target, propertyName) {
+                target.addAttributeProxyProperty(propertyName, attributeName);
+            };
+        }
+    }, {
         key: 'joinAttributeNameWithNamespacePrefix',
         value: function joinAttributeNameWithNamespacePrefix(attrName, namespaceName) {
             if (typeof namespaceName !== 'undefined') {
