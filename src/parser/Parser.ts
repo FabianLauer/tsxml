@@ -10,12 +10,7 @@ import {TagCloseMode} from './TagCloseMode';
 import {TagSyntaxRule} from './TagSyntaxRule';
 import {SyntaxRuleSet} from './SyntaxRuleSet';
 import {NodeFlags} from './NodeFlags';
-
-
-interface ITagNameInfo {
-	namespacePrefix?: string;
-	tagName: string;
-}
+import {ITagNameInfo} from './ITagNameInfo';
 
 
 /**
