@@ -150,11 +150,15 @@ export class Parser {
 	 * Checks whether an identifier starting at a certain index is a function call or not.
 	 */
 	protected isIdentifierAtIndexAFunctionCall(index: number): boolean {
-		while (index + 1) {
+		while (index += 1) {
 			const token = this.getTokenAtIndex(index);
+			if (typeof token !== 'string') {
+				return false;
+			}
 			if (token === '(') {
 				return true;
-			} else if (!Parser.isAlphabeticToken(token)) {
+			}
+			if (!Parser.isAlphabeticToken(token)) {
 				return false;
 			}
 		}
@@ -187,7 +191,7 @@ export class Parser {
 	protected parseAlphabeticSelector(): void {
 		const selector = new ast.NodeSelector();
 		this.getCurrentContainingExpression().addPart(selector);
-		throw 'not fully implemented';
+		this.advance();
 	}
 	
 	

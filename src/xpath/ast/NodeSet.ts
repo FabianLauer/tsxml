@@ -2,6 +2,14 @@ import * as xml from '../../ast';
 
 export class NodeSet<TNodeType extends xml.Node> {
 	/**
+	 * Returns the number of nodes in the set.
+	 */
+	public getNumberOfNodes(): number {
+		return this.nodes.length;
+	}
+	
+	
+	/**
 	 * Returns all nodes in the node set as an array.
 	 */
 	public getAllNodes(): TNodeType[] {
@@ -27,6 +35,7 @@ export class NodeSet<TNodeType extends xml.Node> {
 		if (this.containsNode(node)) {
 			return;
 		}
+		this.nodes.push(node);
 		return this;
 	}
 	

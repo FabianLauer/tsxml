@@ -74,8 +74,8 @@ export class NodeSelector extends Selector<xml.SelfClosingNode | xml.ContainerNo
 	
 	
 	protected executeConcrete(context: NodeSet<xml.Node>): NodeSet<xml.SelfClosingNode | xml.ContainerNode<xml.Node>> {
-		throw 'not fully implemented';
 		context = this.applyContextSelector(context);
+		/// TODO: implement this method completely
 		return this.applyPredicate(context);
 	}
 }

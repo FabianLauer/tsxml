@@ -8,10 +8,10 @@ import * as xpath from './xpath/TestRunner';
 
 // all test runners that should be run:
 const testRunners: Array<typeof test.TestRunner> = [
-	ast.TestRunner,
+	/*ast.TestRunner,
 	parser.TestRunner,
 	serialisation.TestRunner,
-	real.TestRunner,
+	real.TestRunner,*/
 	xpath.TestRunner
 ];
 
