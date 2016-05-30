@@ -3,6 +3,7 @@ import * as ast from './ast/TestRunner';
 import * as parser from './parser/TestRunner';
 import * as real from './real/TestRunner';
 import * as serialisation from './serialisation/TestRunner';
+import * as xpath from './xpath/TestRunner';
 
 
 // all test runners that should be run:
@@ -10,7 +11,8 @@ const testRunners: Array<typeof test.TestRunner> = [
 	ast.TestRunner,
 	parser.TestRunner,
 	serialisation.TestRunner,
-	real.TestRunner
+	real.TestRunner,
+	xpath.TestRunner
 ];
 
 
