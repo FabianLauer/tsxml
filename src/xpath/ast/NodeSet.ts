@@ -72,7 +72,7 @@ export class NodeSet<TNodeType extends xml.Node> {
 	 * @chainable
 	 */
 	public merge(otherSet: NodeSet<TNodeType>) {
-		throw 'not implemented';
+		otherSet.getAllNodes().forEach(node => this.addNode(node));
 		return this;
 	}
 	
