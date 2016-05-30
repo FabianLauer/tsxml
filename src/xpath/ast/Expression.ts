@@ -4,29 +4,29 @@ import {ExecutableNode} from './ExecutableNode';
 
 export class Expression extends ExecutableNode<xml.Node> {
 	/**
-	 * Adds a sub-expression to an expression.
+	 * Adds a part to an expression.
 	 * @chainable
 	 */
-	public addSubExpression(subExpression: Expression) {
-		this.subExpressions.push(subExpression);
+	public addPart(part: ExecutableNode<xml.Node>) {
+		this.parts.push(part);
 		return this;
 	}
 	
 	
 	/**
-	 * Returns all sub-expressions of an expression.
+	 * Returns all parts of an expression.
 	 */
-	public getSubExpressions(): Expression[] {
-		return [].concat(this.subExpressions);
+	public getAllParts(): Array<ExecutableNode<xml.Node>> {
+		return [].concat(this.parts);
 	}
 	
 	
 	protected executeConcrete(context: NodeSet<xml.Node>): NodeSet<xml.Node> {
 		const result = new NodeSet<xml.Node>();
-		this.subExpressions.forEach(subExpression => result.merge(subExpression.execute(context)));
+		this.getAllParts().forEach(part => result.merge(part.execute(context)));
 		return result;
 	}
 	
 	
-	private subExpressions: Expression[] = [];
+	private parts: Array<ExecutableNode<xml.Node>> = [];
 }
