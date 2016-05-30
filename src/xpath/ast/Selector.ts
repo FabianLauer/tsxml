@@ -1,13 +1,14 @@
 import * as xml from '../../ast';
+import {NodeSet} from './NodeSet';
 import {ExecutableNode} from './ExecutableNode';
-import {Context} from './Context';
+import {ContextSelector} from './ContextSelector';
 import {Predicate} from './Predicate';
 
 export abstract class Selector<TResult extends xml.Node> extends ExecutableNode<TResult> {
 	/**
 	 * Returns the selector's context.
 	 */
-	protected getContext(): Context {
+	protected getContext(): ContextSelector {
 		return this.context;
 	}
 	
@@ -17,7 +18,7 @@ export abstract class Selector<TResult extends xml.Node> extends ExecutableNode<
 	 * @chainable
 	 * @param context The new context for the selector.
 	 */
-	protected setContext(context: Context) {
+	protected setContext(context: ContextSelector) {
 		this.context = context;
 		return this;
 	}
@@ -27,7 +28,7 @@ export abstract class Selector<TResult extends xml.Node> extends ExecutableNode<
 	 * Returns whether the selector has a specified context.
 	 */
 	protected hasSpecifiedContext(): boolean {
-		return this.context instanceof Context;
+		return this.context instanceof ContextSelector;
 	}
 	
 	
@@ -58,7 +59,23 @@ export abstract class Selector<TResult extends xml.Node> extends ExecutableNode<
 	}
 	
 	
-	private context: Context;
+	protected applyContextSelector(context: NodeSet<xml.Node>): NodeSet<xml.Node> {
+		if (this.hasSpecifiedContext()) {
+			return this.getContext().execute(context);
+		}
+		return context;
+	}
+	
+	
+	protected applyPredicate(context: NodeSet<xml.Node>): NodeSet<xml.Node> {
+		if (this.hasSpecifiedPredicate()) {
+			return this.getPredicate().execute(context);
+		}
+		return context;
+	}
+	
+	
+	private context: ContextSelector;
 	
 	
 	private predicate: Predicate;

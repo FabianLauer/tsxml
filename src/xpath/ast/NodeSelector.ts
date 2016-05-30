@@ -1,7 +1,7 @@
 import * as xml from '../../ast';
 import {NodeSet} from './NodeSet';
 import {Selector} from './Selector';
-import {Context} from './Context';
+import {ContextSelector} from './ContextSelector';
 import {Predicate} from './Predicate';
 
 export class NodeSelector extends Selector<xml.SelfClosingNode | xml.ContainerNode<xml.Node>> {
@@ -17,7 +17,7 @@ export class NodeSelector extends Selector<xml.SelfClosingNode | xml.ContainerNo
 	 * Returns the selector's context.
 	 * @override
 	 */
-	protected getContext(): Context {
+	protected getContext(): ContextSelector {
 		return super.getContext();
 	}
 	
@@ -28,7 +28,7 @@ export class NodeSelector extends Selector<xml.SelfClosingNode | xml.ContainerNo
 	 * @override
 	 * @param context The new context for the selector.
 	 */
-	protected setContext(context: Context) {
+	protected setContext(context: ContextSelector) {
 		super.setContext(context);
 		return this;
 	}
@@ -74,6 +74,8 @@ export class NodeSelector extends Selector<xml.SelfClosingNode | xml.ContainerNo
 	
 	
 	protected executeConcrete(context: NodeSet<xml.Node>): NodeSet<xml.SelfClosingNode | xml.ContainerNode<xml.Node>> {
-		throw 'not implemented';
+		throw 'not fully implemented';
+		context = this.applyContextSelector(context);
+		return this.applyPredicate(context);
 	}
 }

@@ -1,7 +1,7 @@
 import * as xml from '../../ast';
 import {NodeSet} from './NodeSet';
 import {NodeSelector} from './NodeSelector';
-import {Context} from './Context';
+import {ContextSelector} from './ContextSelector';
 import {Predicate} from './Predicate';
 
 export class RootNodeSelector extends NodeSelector {
@@ -17,7 +17,7 @@ export class RootNodeSelector extends NodeSelector {
 	 * Returns the selector's context.
 	 * @override
 	 */
-	protected getContext(): Context {
+	protected getContext(): ContextSelector {
 		return undefined;
 	}
 	
@@ -28,7 +28,7 @@ export class RootNodeSelector extends NodeSelector {
 	 * @override
 	 * @param context The new context for the selector.
 	 */
-	protected setContext(context: Context) {
+	protected setContext(context: ContextSelector) {
 		return this;
 	}
 	
