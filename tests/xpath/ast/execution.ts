@@ -89,6 +89,14 @@ class SingleVoidNode extends SingleSelfClosingNode {
 	/**
 	 * @override
 	 */
+	protected getXPathString(): string {
+		return 'meta';
+	}
+	
+	
+	/**
+	 * @override
+	 */
 	protected getXmlString() {
 		return '<meta>';
 	}
