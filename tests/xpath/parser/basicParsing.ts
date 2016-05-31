@@ -41,6 +41,17 @@ class TagNameWithNamespacePrefixSelector extends ParserTest {
 }
 
 
+class SimpleWildcardSelector extends ParserTest {
+	protected async performTest() {
+		const expression = await this.parseXPathQuery('*'),
+			  selector = <xml.xpath.ast.WildcardSelector>expression.getAllParts()[0];
+		await this.assert(expression.getNumberOfParts() === 1, 'expression has correct number of parts');
+		await this.assert(selector instanceof xml.xpath.ast.WildcardSelector, 'selector has correct type');
+		await this.assert(selector.type === xml.xpath.ast.WildcardSelectorType.ElementNodes, 'selector has correct wildcard type');
+	}
+}
+
+
 @TestRunner.testName('Basic XPath Parsing')
 export class TestRunner extends test.TestRunner {
 	constructor() {
@@ -48,7 +59,8 @@ export class TestRunner extends test.TestRunner {
 		this.add(
 			new EmptyParsing(),
 			new TagNameWithoutNamespacePrefixSelector(),
-			new TagNameWithNamespacePrefixSelector()
+			new TagNameWithNamespacePrefixSelector(),
+			new SimpleWildcardSelector()
 		);
 	}
 }

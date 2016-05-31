@@ -29,6 +29,22 @@ abstract class ExecutionTest<TResult extends xml.ast.Node> extends test.UnitTest
 	}
 	
 	
+	protected doesXPathResultContainNode(node: TResult): boolean {
+		return this.xpathResult.getAllNodes().indexOf(node) !== -1;
+	}
+	
+	
+	protected doesXPathResultContainAllOfTheseNodes(...nodes: TResult[]): boolean {
+		for (let i = 0; i < nodes.length; i++) {
+			const node = nodes[i];
+			if (!this.doesXPathResultContainNode(node)) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	
 	private async parseXml(): Promise<void> {
 		this._xmlDocument = await xml.Parser.parseStringToAst(this.getXmlString(), this.getXmlSyntaxRuleSet());
 	}
@@ -161,6 +177,25 @@ class NestedSingleVoidNode extends NestedSingleSelfClosingNode {
 }
 
 
+class WildcardOnMultipleNonNestedNodes extends ExecutionTest<xml.ast.SelfClosingNode | xml.ast.ContainerNode<any>> {
+	protected getXmlString(): string {
+		return '<alpha /><gamma></gamma>';
+	}
+	
+	
+	protected getXPathString(): string {
+		return '*';
+	}
+	
+	
+	protected async performTest() {
+		await this.prepareTest();
+		await this.assert(this.xpathResult.getNumberOfNodes() === 2, 'correct number of nodes');
+		await this.assert(this.doesXPathResultContainAllOfTheseNodes(...this.xmlDocument.childNodes), 'result contains all expected nodes');
+	}
+}
+
+
 @TestRunner.testName('XPath AST Execution')
 export class TestRunner extends test.TestRunner {
 	constructor() {
@@ -171,7 +206,8 @@ export class TestRunner extends test.TestRunner {
 			new SingleVoidNode(),
 			new NestedSingleSelfClosingNode(),
 			new NestedSingleContainerNode(),
-			new NestedSingleVoidNode()
+			new NestedSingleVoidNode(),
+			new WildcardOnMultipleNonNestedNodes()
 		);
 	}
 }
