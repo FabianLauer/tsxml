@@ -1,13 +1,17 @@
-/// Tests correct execution of XPath queries with manually built queries.
 import * as test from '../../../src/test';
 import * as xml from '../../../src/index';
 
 
-abstract class QueryTest<TResult extends xml.ast.Node> extends test.UnitTest {
+abstract class ExecutionTest<TResult extends xml.ast.Node> extends test.UnitTest {
 	protected abstract getXmlString(): string;
 	
 	
 	protected abstract getXPathString(): string;
+
+
+	protected getXmlSyntaxRuleSet(): xml.parser.SyntaxRuleSet | typeof xml.parser.SyntaxRuleSet {
+		return undefined;
+	}
 	
 	
 	protected async prepareTest(): Promise<void> {
@@ -26,7 +30,7 @@ abstract class QueryTest<TResult extends xml.ast.Node> extends test.UnitTest {
 	
 	
 	private async parseXml(): Promise<void> {
-		this._xmlDocument = await xml.Parser.parseStringToAst(this.getXmlString());
+		this._xmlDocument = await xml.Parser.parseStringToAst(this.getXmlString(), this.getXmlSyntaxRuleSet());
 	}
 	
 	
@@ -44,7 +48,7 @@ abstract class QueryTest<TResult extends xml.ast.Node> extends test.UnitTest {
 }
 
 
-class SingleSelfClosingNode extends QueryTest<xml.ast.SelfClosingNode> {
+class SingleSelfClosingNode extends ExecutionTest<xml.ast.SelfClosingNode> {
 	protected getXmlString(): string {
 		return '<alpha />';
 	}
@@ -67,19 +71,38 @@ class SingleContainerNode extends SingleSelfClosingNode {
 	/**
 	 * @override
 	 */
-	protected getXmlString(): string {
+	protected getXmlString() {
 		return '<alpha></alpha>';
 	}
 }
 
 
-@TestRunner.testName('XPath AST Queries')
+class SingleVoidNode extends SingleSelfClosingNode {
+	/**
+	 * @override
+	 */
+	protected getXmlSyntaxRuleSet() {
+		return xml.parser.ruleSet.Html5.Loose;
+	}
+	
+	
+	/**
+	 * @override
+	 */
+	protected getXmlString() {
+		return '<meta>';
+	}
+}
+
+
+@TestRunner.testName('XPath AST Execution')
 export class TestRunner extends test.TestRunner {
 	constructor() {
 		super();
 		this.add(
 			new SingleSelfClosingNode(),
-			new SingleContainerNode()
+			new SingleContainerNode(),
+			new SingleVoidNode()
 		);
 	}
 }
