@@ -8,6 +8,11 @@ tsxml is a small, *not (yet) spec compliant* XML library that contains a liberal
 
 It supports all kinds of XML nodes, including comments, markup declaration openers (such as `<!DOCTYPE ...>`), processing instructions (`<?svg...`) and self closing (`<foo />`) and "void" (`<foo>`) nodes, meaning it's capable of parsing HTML and SVG, too.
 
+
+## Is it used somewhere?
+
+Yup, here: [vs-code-xml-format](https://github.com/FabianLauer/vs-code-xml-format).
+
 ## Status Quo
 
 ### Parser
