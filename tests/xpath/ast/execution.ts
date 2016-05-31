@@ -36,7 +36,7 @@ abstract class ExecutionTest<TResult extends xml.ast.Node> extends test.UnitTest
 	
 	private async executeXPathQuery(): Promise<void> {
 		await this.parseXml();
-		const nodeSet = new xml.xpath.ast.NodeSet<xml.ast.Node>().addNode(this.xmlDocument);
+		const nodeSet = new xml.xpath.ast.NodeSet<xml.ast.Node>().addNodes(...this.xmlDocument.childNodes);
 		this._xpathResult = <xml.xpath.ast.NodeSet<TResult>>xml.xpath.parser.Parser.parseXPathQueryToAst(this.getXPathString()).execute(nodeSet);
 	}
 	
