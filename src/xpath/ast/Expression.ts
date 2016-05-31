@@ -21,6 +21,14 @@ export class Expression extends ExecutableNode<xml.Node> {
 	}
 	
 	
+	/**
+	 * Returns the total number of parts in an expression.
+	 */
+	public getNumberOfParts(): number {
+		return this.parts.length;
+	}
+	
+	
 	protected executeConcrete(context: NodeSet<xml.Node>): NodeSet<xml.Node> {
 		const result = new NodeSet<xml.Node>();
 		this.getAllParts().forEach(part => result.merge(part.execute(context)));

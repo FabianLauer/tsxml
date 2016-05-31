@@ -18,7 +18,7 @@ export class WildcardSelector extends Selector<xml.Node> {
 	}
 	
 	
-	protected executeConcrete(context: NodeSet<xml.Node>): NodeSet<xml.Node> {
-		throw 'not implemented';
+	protected applyNodeIdentifier(context: NodeSet<xml.Node>): NodeSet<xml.Node> {
+		return context;
 	}
 }

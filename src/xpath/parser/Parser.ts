@@ -142,7 +142,7 @@ export class Parser {
 	 * Checks whether a token is alphabetic. The test is case insensitive.
 	 */
 	protected static isAlphabeticToken(token: string): boolean {
-		return /[a-z]/i.test(token[0]);
+		return typeof token === 'string' && /[a-z]/i.test(token[0]);
 	}
 	
 	
@@ -191,7 +191,12 @@ export class Parser {
 	protected parseAlphabeticSelector(): void {
 		const selector = new ast.NodeSelector();
 		this.getCurrentContainingExpression().addPart(selector);
-		this.advance();
+		/// TODO: Parse namespace prefixes!
+		selector.tagName = '';
+		while (Parser.isAlphabeticToken(this.getCurrentToken())) {
+			selector.tagName += this.getCurrentToken();
+			this.advance();
+		}
 	}
 	
 	

@@ -75,6 +75,16 @@ export abstract class Selector<TResult extends xml.Node> extends ExecutableNode<
 	}
 	
 	
+	protected executeConcrete(context: NodeSet<xml.Node>): NodeSet<TResult> {
+		context = this.applyContextSelector(context);
+		context = this.applyNodeIdentifier(context);
+		return <NodeSet<TResult>>this.applyPredicate(context);
+	}
+	
+	
+	protected abstract applyNodeIdentifier(context: NodeSet<xml.Node>): NodeSet<TResult>;
+	
+	
 	private context: ContextSelector;
 	
 	

@@ -4,7 +4,6 @@ import {ExecutableNode} from './ast/ExecutableNode';
 import {Expression} from './ast/Expression';
 import {Selector} from './ast/Selector';
 import {NodeSelector} from './ast/NodeSelector';
-import {RootNodeSelector} from './ast/RootNodeSelector';
 import {WildcardSelector} from './ast/WildcardSelector';
 import {WildcardSelectorType} from './ast/WildcardSelectorType';
 import {ComparisonOperator} from './ast/ComparisonOperator';
@@ -19,7 +18,6 @@ export {
 	Expression,
 	Selector,
 	NodeSelector,
-	RootNodeSelector,
 	WildcardSelector,
 	WildcardSelectorType,
 	ComparisonOperator,

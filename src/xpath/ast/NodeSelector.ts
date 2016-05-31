@@ -6,18 +6,22 @@ import {Predicate} from './Predicate';
 
 export class NodeSelector extends Selector<xml.SelfClosingNode | xml.ContainerNode<xml.Node>> {
 	/**
-	 * Creates a node selector object.
+	 * The namespace prefix to select.
 	 */
-	constructor() {
-		super();
-	}
+	public namespacePrefix: string;
+	
+	
+	/**
+	 * The tag name to select.
+	 */
+	public tagName: string;
 	
 	
 	/**
 	 * Returns the selector's context.
 	 * @override
 	 */
-	protected getContext(): ContextSelector {
+	public getContext(): ContextSelector {
 		return super.getContext();
 	}
 	
@@ -28,7 +32,7 @@ export class NodeSelector extends Selector<xml.SelfClosingNode | xml.ContainerNo
 	 * @override
 	 * @param context The new context for the selector.
 	 */
-	protected setContext(context: ContextSelector) {
+	public setContext(context: ContextSelector) {
 		super.setContext(context);
 		return this;
 	}
@@ -47,7 +51,7 @@ export class NodeSelector extends Selector<xml.SelfClosingNode | xml.ContainerNo
 	 * Returns the selector's predicate.
 	 * @override
 	 */
-	protected getPredicate(): Predicate {
+	public getPredicate(): Predicate {
 		return super.getPredicate();
 	}
 	
@@ -58,7 +62,7 @@ export class NodeSelector extends Selector<xml.SelfClosingNode | xml.ContainerNo
 	 * @override
 	 * @param predicate The new predicate for the selector.
 	 */
-	protected setPredicate(predicate: Predicate) {
+	public setPredicate(predicate: Predicate) {
 		super.setPredicate(predicate);
 		return this;
 	}
@@ -68,14 +72,12 @@ export class NodeSelector extends Selector<xml.SelfClosingNode | xml.ContainerNo
 	 * Returns whether the selector has a specified predicate.
 	 * @override
 	 */
-	protected hasSpecifiedPredicate(): boolean {
+	public hasSpecifiedPredicate(): boolean {
 		return super.hasSpecifiedPredicate();
 	}
 	
 	
-	protected executeConcrete(context: NodeSet<xml.Node>): NodeSet<xml.SelfClosingNode | xml.ContainerNode<xml.Node>> {
-		context = this.applyContextSelector(context);
-		/// TODO: implement this method completely
-		return this.applyPredicate(context);
+	protected applyNodeIdentifier(context: NodeSet<xml.Node>): NodeSet<xml.SelfClosingNode | xml.ContainerNode<xml.Node>> {
+		return context.filter(node => node.namespacePrefix === this.namespacePrefix && node.tagName === this.tagName);
 	}
 }
