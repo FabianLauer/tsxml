@@ -178,6 +178,9 @@ export class Parser {
 					this.parseAlphabeticSelector();
 				}
 				break;
+			case this.getCurrentToken() === '*':
+				this.parseWildcardSelector();
+				break;
 			default:
 				throw new Error(`unable to parse from column ${this.getCurrentTokenIndex()}`);
 				break;
@@ -197,6 +200,20 @@ export class Parser {
 			selector.tagName += this.getCurrentToken();
 			this.advance();
 		}
+	}
+	
+	
+	/**
+	 * Parses from the beginning of a wildcard selector.
+	 */
+	protected parseWildcardSelector(): void {
+		var type = ast.WildcardSelectorType.ElementNodes;
+		if (this.getCurrentToken() === '@') {
+			type = ast.WildcardSelectorType.Attributes;
+		}
+		const selector = new ast.WildcardSelector(type);
+		this.getCurrentContainingExpression().addPart(selector);
+		this.advance();
 	}
 	
 	

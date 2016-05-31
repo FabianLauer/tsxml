@@ -8,7 +8,7 @@ export class WildcardSelector extends Selector<xml.Node> {
 	 * Creates a wildcard selector node.
 	 * @param type The type of wildcard selector the created node represents.
 	 */
-	constructor(private type: WildcardSelectorType) {
+	constructor(public type: WildcardSelectorType) {
 		super();
 	}
 	
@@ -19,6 +19,11 @@ export class WildcardSelector extends Selector<xml.Node> {
 	
 	
 	protected applyNodeIdentifier(context: NodeSet<xml.Node>): NodeSet<xml.Node> {
+		/// TODO: Implement this method.
+		if (this.type & WildcardSelectorType.Attributes) {
+		}
+		if (!(this.type & WildcardSelectorType.ElementNodes)) {
+		}
 		return context;
 	}
 }
