@@ -194,10 +194,26 @@ export class Parser {
 	protected parseAlphabeticSelector(): void {
 		const selector = new ast.NodeSelector();
 		this.getCurrentContainingExpression().addPart(selector);
-		/// TODO: Parse namespace prefixes!
 		selector.tagName = '';
-		while (Parser.isAlphabeticToken(this.getCurrentToken())) {
-			selector.tagName += this.getCurrentToken();
+		let colonSeen = false;
+		while (true) {
+			const isColon = this.getCurrentToken() === ':';
+			if (!Parser.isAlphabeticToken(this.getCurrentToken()) && !isColon) {
+				break;
+			}
+			if (isColon && colonSeen) {
+				throw new Error('invalid selector: more than one colon is illegal');
+			}
+			if (isColon) {
+				if (!Parser.isAlphabeticToken(this.getNextToken())) {
+					throw new Error('invalid selector: namespace prefix must be followed by tag name');
+				}
+				selector.namespacePrefix = selector.tagName;
+				selector.tagName = '';
+				colonSeen = true;
+			} else {
+				selector.tagName += this.getCurrentToken();
+			}
 			this.advance();
 		}
 	}
