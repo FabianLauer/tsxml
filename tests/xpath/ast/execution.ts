@@ -103,6 +103,64 @@ class SingleVoidNode extends SingleSelfClosingNode {
 }
 
 
+class NestedSingleSelfClosingNode extends ExecutionTest<xml.ast.SelfClosingNode> {
+	protected getXmlString(): string {
+		return '<alpha><beta /></alpha>';
+	}
+	
+	
+	protected getXPathString(): string {
+		return 'beta';
+	}
+	
+	
+	protected async performTest() {
+		await this.prepareTest();
+		await this.assert(this.xpathResult.getNumberOfNodes() === 0, 'correct number of nodes');
+	}
+}
+
+
+class NestedSingleContainerNode extends NestedSingleSelfClosingNode {
+	protected getXmlString(): string {
+		return '<alpha><beta></beta></alpha>';
+	}
+	
+	
+	/**
+	 * @override
+	 */
+	protected async performTest() {
+		await this.prepareTest();
+		await this.assert(this.xpathResult.getNumberOfNodes() === 0, 'correct number of nodes');
+	}
+}
+
+
+class NestedSingleVoidNode extends NestedSingleSelfClosingNode {
+	/**
+	 * @override
+	 */
+	protected getXmlSyntaxRuleSet() {
+		return xml.parser.ruleSet.Html5.Loose;
+	}
+	
+	
+	/**
+	 * @override
+	 */
+	protected getXmlString(): string {
+		return '<head><meta></head>';
+	}
+	
+	
+	protected async performTest() {
+		await this.prepareTest();
+		await this.assert(this.xpathResult.getNumberOfNodes() === 0, 'correct number of nodes');
+	}
+}
+
+
 @TestRunner.testName('XPath AST Execution')
 export class TestRunner extends test.TestRunner {
 	constructor() {
@@ -110,7 +168,10 @@ export class TestRunner extends test.TestRunner {
 		this.add(
 			new SingleSelfClosingNode(),
 			new SingleContainerNode(),
-			new SingleVoidNode()
+			new SingleVoidNode(),
+			new NestedSingleSelfClosingNode(),
+			new NestedSingleContainerNode(),
+			new NestedSingleVoidNode()
 		);
 	}
 }
