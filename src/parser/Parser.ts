@@ -1076,12 +1076,12 @@ export class Parser {
 			return getAttrInfo();
 		}
 		this.advanceToNextToken();
-		if (Parser.isWhitespaceToken(this.getCurrentToken()) || this.getCurrentToken() === '"') {
+		if (Parser.isWhitespaceToken(this.getCurrentToken()) || this.getCurrentToken() === '"' || this.getCurrentToken() === '\'') {
 			// skip all whitespace after the equal sign
 			while (Parser.isWhitespaceToken(this.getCurrentToken())) {
 				this.advanceToNextToken();
 			}
-			if (this.getCurrentToken() === '"') {
+			if (this.getCurrentToken() === '"' || this.getCurrentToken() === '\'') {
 				valueQuoteCharacter = this.getCurrentToken();
 			} else {
 				return getAttrInfo();
