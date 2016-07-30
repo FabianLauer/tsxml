@@ -539,6 +539,18 @@ class SimpleNodeWithQuotedAndUnquotedAlphabeticAttributes2 extends test.UnitTest
 }
 
 
+class AttributeWithSingleQuotes extends test.UnitTest {
+	protected async performTest() {
+		const ast = await xml.Parser.parseStringToAst(`<test a='1'>`),
+			  node = ast.getChildAtIndex(0);
+		await this.assert(JSON.stringify(node.getAllAttributeNames()) === JSON.stringify([
+			'a'
+		]), `are all attribute names parsed and are there no excess attributes? (got ${JSON.stringify(node.getAllAttributeNames())})`);
+		await this.assert(node.getAttribute('a') === '1', `test first attribute value`);
+	}
+}
+
+
 class AttributesWithEscapedQuotes extends test.UnitTest {
 	protected async performTest() {
 		const ast = await xml.Parser.parseStringToAst(`<test a="1&quot;2" b="1&apos;2" c='1&quot;2' d='1&apos;2'>`),
@@ -617,6 +629,7 @@ export class TestRunner extends test.TestRunner {
 			//new SimpleNodeWithQuotedAndUnquotedAlphabeticAttributes(),
 			//new SimpleNodeWithQuotedAndUnquotedAlphabeticAttributes1(),
 			new SimpleNodeWithQuotedAndUnquotedAlphabeticAttributes2(),
+			new AttributeWithSingleQuotes(),
 			new AttributesWithEscapedQuotes(),
 			new AttributeWithBackslashes()
 		);
