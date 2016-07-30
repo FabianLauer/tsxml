@@ -986,7 +986,7 @@ export class Parser {
 		//     <alpha"FOO"/>
 		//           ^
 		if (!Parser.isWhitespaceToken(this.getCurrentToken()) && this.getCurrentToken() !== '/' && this.getCurrentToken() !== '>') {
-			if (!(allowSystemLiterals && (this.getCurrentToken() !== '"' || this.getCurrentToken() !== '\''))) {
+			if (!allowSystemLiterals && this.getCurrentToken() === '"') {
 				this.raiseError(this.createUnexpectedTokenSyntaxErrorAtCurrentToken('expected whitespace or end of opening tag'));
 			}
 		}
@@ -995,15 +995,12 @@ export class Parser {
 			this.advanceToNextToken();
 		}
 		// if there's no alphabetic token here, there are no attributes to be parsed
-		if (!Parser.isAlphabeticToken(this.getCurrentToken()) &&
-			!(allowSystemLiterals && (this.getCurrentToken() !== '"' || this.getCurrentToken() !== '\'')))
-		{
+		if (!Parser.isAlphabeticToken(this.getCurrentToken()) && (!allowSystemLiterals && this.getCurrentToken() !== '"')) {
 			return;
 		}
-		let i = 0;
 		// advance until there are no attributes and literals to be parsed
-		while (this.getCurrentToken() !== '>' && this.getCurrentToken() !== '/' && this.getCurrentToken() !== '?' && i++ < 10) {
-			if (this.getCurrentToken() === '"' || this.getCurrentToken() === '\'') {
+		while (this.getCurrentToken() !== '>' && this.getCurrentToken() !== '/' && this.getCurrentToken() !== '?') {
+			if (this.getCurrentToken() === '"') {
 				if (!allowSystemLiterals) {
 					this.raiseError(this.createUnexpectedTokenSyntaxErrorAtCurrentToken('system literal not allowed on this node'));
 				}
@@ -1035,11 +1032,8 @@ export class Parser {
 		const valueQuoteCharacter = this.getCurrentToken();
 		while (!this.isAtEndOfInput()) {
 			this.advanceToNextToken();
-			if (this.getCurrentToken() === valueQuoteCharacter && this.getPreviousToken() !== '\\') {
+			if (this.getCurrentToken() === valueQuoteCharacter) {
 				break;
-			}
-			if (this.getCurrentToken() === '\\' && this.getNextToken() === valueQuoteCharacter) {
-				continue;
 			}
 			value += this.getCurrentToken();
 		}
@@ -1082,28 +1076,23 @@ export class Parser {
 			return getAttrInfo();
 		}
 		this.advanceToNextToken();
-		if (Parser.isWhitespaceToken(this.getCurrentToken()) || this.getCurrentToken() === '"' || this.getCurrentToken() === '\'') {
+		if (Parser.isWhitespaceToken(this.getCurrentToken()) || this.getCurrentToken() === '"') {
 			// skip all whitespace after the equal sign
 			while (Parser.isWhitespaceToken(this.getCurrentToken())) {
 				this.advanceToNextToken();
 			}
-			if (this.getCurrentToken() === '"' || this.getCurrentToken() === '\'') {
+			if (this.getCurrentToken() === '"') {
 				valueQuoteCharacter = this.getCurrentToken();
 			} else {
 				return getAttrInfo();
 			}
-		} else {
-			
 		}
 		value = '';
 		while (!this.isAtEndOfInput()) {
 			this.advanceToNextToken();
-			if (this.getCurrentToken() === valueQuoteCharacter && this.getPreviousToken() !== '\\') {
+			if (this.getCurrentToken() === valueQuoteCharacter) {
 				this.advanceToNextToken();
 				break;
-			}
-			if (this.getCurrentToken() === '\\' && this.getNextToken() === valueQuoteCharacter) {
-				continue;
 			}
 			value += this.getCurrentToken();
 		}
