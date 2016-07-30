@@ -541,14 +541,15 @@ class SimpleNodeWithQuotedAndUnquotedAlphabeticAttributes2 extends test.UnitTest
 
 class AttributesWithEscapedQuotes extends test.UnitTest {
 	protected async performTest() {
-		const ast = await xml.Parser.parseStringToAst(`<test a="1&quot;2" b="1&apos;2" c='1&quot;2' d='1&apos;2'>`);
-		await this.assert(JSON.stringify(ast.getChildAtIndex(0).getAllAttributeNames()) === JSON.stringify([
+		const ast = await xml.Parser.parseStringToAst(`<test a="1&quot;2" b="1&apos;2" c='1&quot;2' d='1&apos;2'>`),
+			  node = ast.getChildAtIndex(0);
+		await this.assert(JSON.stringify(node.getAllAttributeNames()) === JSON.stringify([
 			'a', 'b', 'c', 'd'
-		]), `are all attribute names parsed and are there no excess attributes? (got ${JSON.stringify(ast.getChildAtIndex(0).getAllAttributeNames())})`);
-		await this.assert(ast.getChildAtIndex(0).getAttribute('a') === '1"2', `test escaped double quote in double quoted attribute value, got: ${ast.getChildAtIndex(0).getAttribute('a')}`);
-		await this.assert(ast.getChildAtIndex(0).getAttribute('b') === '1\'2', `test escaped single quote in double quoted attribute value, got: ${ast.getChildAtIndex(0).getAttribute('b')}`);
-		await this.assert(ast.getChildAtIndex(0).getAttribute('c') === '1"2', `test escaped double quote in single quoted attribute value, got: ${ast.getChildAtIndex(0).getAttribute('a')}`);
-		await this.assert(ast.getChildAtIndex(0).getAttribute('d') === '1\'2', `test escaped single quote in single quoted attribute value, got: ${ast.getChildAtIndex(0).getAttribute('b')}`);
+		]), `are all attribute names parsed and are there no excess attributes? (got ${JSON.stringify(node.getAllAttributeNames())})`);
+		await this.assert(node.getAttribute('a') === '1&quot;2', `test escaped double quote in double quoted attribute value, got: ${node.getAttribute('a')}`);
+		await this.assert(node.getAttribute('b') === '1&apos;2', `test escaped single quote in double quoted attribute value, got: ${node.getAttribute('b')}`);
+		await this.assert(node.getAttribute('c') === '1&quot;2', `test escaped double quote in single quoted attribute value, got: ${node.getAttribute('a')}`);
+		await this.assert(node.getAttribute('d') === '1&apos;2', `test escaped single quote in single quoted attribute value, got: ${node.getAttribute('b')}`);
 	}
 }
 
