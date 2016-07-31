@@ -420,7 +420,8 @@ export class Parser {
 		return Parser.isAlphabeticToken(token) ||
 			   Parser.isNumericToken(token) ||
 			   token[0] === '-' ||
-			   token[0] === '_';
+			   token[0] === '_' ||
+			   token[0] === '.';
 	}
 	
 	
@@ -657,6 +658,10 @@ export class Parser {
 		//     <alpha ...
 		//     ^      we're here
 		this.advanceToNextToken();
+		// check for illegal characters at the beginning of the tag name
+		if (this.getCurrentToken() === '.') {
+			this.raiseError(this.createSyntaxErrorAtCurrentToken(SyntaxErrorCode.InvalidTagName, `expected beginning of tag name, got '${this.getNextToken()}'`));
+		}
 		//     <alpha
 		//      ^      we're here
 		this.parseCompleteOpeningTagInto(node, true, false);
