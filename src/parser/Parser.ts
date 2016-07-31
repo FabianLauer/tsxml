@@ -660,7 +660,7 @@ export class Parser {
 		this.advanceToNextToken();
 		// check for illegal characters at the beginning of the tag name
 		if (this.getCurrentToken() === '.') {
-			this.raiseError(this.createSyntaxErrorAtCurrentToken(SyntaxErrorCode.InvalidTagName, `expected beginning of tag name, got '${this.getNextToken()}'`));
+			this.raiseError(this.createSyntaxErrorAtCurrentToken(SyntaxErrorCode.InvalidTagName, `expected beginning of tag name, got '${this.getCurrentToken()}'`));
 		}
 		//     <alpha
 		//      ^      we're here
