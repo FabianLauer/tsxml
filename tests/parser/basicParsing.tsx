@@ -112,6 +112,24 @@ class SimpleNodeTagNameStartingWithHyphen extends test.UnitTest {
 }
 
 
+class SimpleNodeWithPeriodInTagName extends test.UnitTest {
+	protected async performTest() {
+		const ast = await xml.Parser.parseStringToAst('<alpha.beta />');
+		await this.assert(ast.getChildAtIndex(0) instanceof xml.ast.SelfClosingNode, 'correct ast node type');
+		await this.assert(ast.getChildAtIndex(0).tagName === 'alpha.beta', 'ast node has correct tag name');
+	}
+}
+
+
+class SimpleNodeWithPeriodAtEndOfTagName extends test.UnitTest {
+	protected async performTest() {
+		const ast = await xml.Parser.parseStringToAst('<alpha. />');
+		await this.assert(ast.getChildAtIndex(0) instanceof xml.ast.SelfClosingNode, 'correct ast node type');
+		await this.assert(ast.getChildAtIndex(0).tagName === 'alpha.', 'ast node has correct tag name');
+	}
+}
+
+
 class SimpleNodeWithNamespacePrefix extends test.UnitTest {
 	protected async performTest() {
 		const ast = await xml.Parser.parseStringToAst('<test:alpha />');
@@ -595,6 +613,8 @@ export class TestRunner extends test.TestRunner {
 			new SimpleNodeWithHyphenInTagName(),
 			new SimpleNodeWithOnlyHyphensInTagName(),
 			new SimpleNodeTagNameStartingWithHyphen(),
+			new SimpleNodeWithPeriodInTagName(),
+			new SimpleNodeWithPeriodAtEndOfTagName(),
 			new SimpleNodeWithNamespacePrefix(),
 			new SimpleContainerNode(),
 			new SimpleContainerNodeWithAttribute(),

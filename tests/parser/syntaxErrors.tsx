@@ -14,7 +14,7 @@ abstract class SyntaxErrorTest extends test.UnitTest {
 	
 	protected async parse(stringToParse: string): Promise<void> {
 		try {
-			this._parsedDocument = await xml.Parser.parseStringToAst('</head>');
+			this._parsedDocument = await xml.Parser.parseStringToAst(stringToParse);
 		} catch(err) {
 			this._syntaxErrror = err;
 		}
@@ -25,6 +25,15 @@ abstract class SyntaxErrorTest extends test.UnitTest {
 	
 	
 	private _syntaxErrror: xml.SyntaxError;
+}
+
+
+class TagNameStartingWithPeriod extends SyntaxErrorTest {
+	protected async performTest() {
+		await this.parse('<.a />');
+		await this.assert(this.syntaxError instanceof xml.SyntaxError, 'exception is a SyntaxError object');
+		await this.assert(this.syntaxError.getErrorCode() === xml.SyntaxErrorCode.InvalidTagName, 'exception has correct code');
+	}
 }
 
 
@@ -84,6 +93,7 @@ export class TestRunner extends test.TestRunner {
 	constructor() {
 		super();
 		this.add(
+			new TagNameStartingWithPeriod(),
 			new ExcessCloseTagInRoot(),
 			new ExcessCloseTagAfterSelfCloseInRoot(),
 			new NestedExcessCloseTag(),
