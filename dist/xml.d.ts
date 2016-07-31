@@ -284,6 +284,7 @@ export declare enum SyntaxErrorCode {
     IllegalNamespacePrefix = 4,
     IllegalSelfClose = 5,
     ExcessCloseTag = 6,
+    InvalidTagName = 7,
 }
 
 
