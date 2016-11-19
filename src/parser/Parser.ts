@@ -536,8 +536,13 @@ export class Parser {
 		// assume that the current open angle bracket is text node content. In all other cases, assume that the current
 		// open angle bracket indicates
 		// the bginning of a new tag.
-		if (this.getNextToken() !== '!' && this.getNextToken() !== '?' &&
-			this.doesTokenOccurBeforeNextOccurenceOfOtherToken('<', '>', this.getCurrentTokenIndex() + 1)) {
+		if (
+			this.getNextToken() !== '!' &&
+			this.getNextToken() !== '?' &&
+			this.doesTokenOccurBeforeNextOccurenceOfOtherToken('<', '>', this.getCurrentTokenIndex() + 1) &&
+			!this.doesTokenOccurBeforeNextOccurenceOfOtherToken('"', '<', this.getCurrentTokenIndex() + 1) &&
+			!this.doesTokenOccurBeforeNextOccurenceOfOtherToken('\'', '<', this.getCurrentTokenIndex() + 1)
+		) {
 			this.parseIntoNewTextNode();
 		} else {
 			this.parseFromBeginningOfTag();
