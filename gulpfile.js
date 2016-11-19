@@ -2,6 +2,7 @@ const gulp = require('gulp'),
 	  fs = require('fs'),
 	  cp = require('child_process'),
 	  typescript = require('gulp-typescript'),
+	  sourcemaps = require('gulp-sourcemaps'),
 	  concat = require('gulp-concat'),
 	  replace = require('gulp-replace'),
 	  babel = require('gulp-babel'),
@@ -26,14 +27,16 @@ function removeDirectory(pathToDirectory) {
  * @param declarations Whether to compile a declaration file or not.
  */
 function compileTypeScript(files, declarations) {
-	const tsResult = gulp.src(files, { base: './' }).pipe(typescript({
-		target: 'es6',
-		module: 'commonjs',
-		experimentalDecorators: true,
-		noImplicitAny: true,
-		jsx: 'react',
-		declaration: !!declarations
-	}));
+	var tsResult = gulp.src(files, { base: './' })
+		.pipe(sourcemaps.init())
+		.pipe(typescript({
+			target: 'es6',
+			module: 'commonjs',
+			experimentalDecorators: true,
+			noImplicitAny: true,
+			jsx: 'react',
+			declaration: !!declarations
+		}));
 	
 	if (declarations) {
 		// declaration file merging
@@ -48,8 +51,9 @@ function compileTypeScript(files, declarations) {
 					// Write the declaration file into the build directory and we're done:
 					.pipe(gulp.dest('build/'));
 	} else {
-		// compiled JS files only
-		return tsResult.js.pipe(gulp.dest('build/'));
+		return tsResult.js
+			.pipe(sourcemaps.write())
+			.pipe(gulp.dest('build/'));
 	}
 }
 
@@ -103,7 +107,7 @@ gulp.task('compileTests', ['compileSources'], () => compileTypeScript([
 	'src/test/*.ts*',
 	'src/test.ts*',
 	'tests/**/*.ts*'
-], false));
+], false, true));
 
 
 // Compiles all files (except those in the /tests/ directory) to JavaScript and compiles a single

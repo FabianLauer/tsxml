@@ -10,6 +10,7 @@
     "gulp-browserify": "^0.5.1",
     "gulp-concat": "^2.6.0",
     "gulp-replace": "^0.5.4",
+    "gulp-sourcemaps": "^2.2.0",
     "gulp-typescript": "^2.13.0"
   }
 }
