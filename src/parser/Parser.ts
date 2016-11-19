@@ -587,7 +587,8 @@ export class Parser {
 
 
 	/**
-	 * Parses from the beginning of any kind of tag. The cursor is expected to point at the open angle bracket of the tag, such as:
+	 * Parses from the beginning of any kind of tag. The cursor is expected to point at the open angle bracket of the tag,
+	 * such as:
 	 *     <xsl:stylesheet ...
 	 *     ^
 	 * Comments and CDATA sections are also supported by this method. Depending on the kind of tag (MDO, PI, normal, etc),
@@ -596,9 +597,8 @@ export class Parser {
 	protected parseFromBeginningOfTag(): void {
 		// Find out if we're dealing with a "normal" node here or with a MDO (markup declaration opener), PI (processing
 		// instruction) or comment.
-		// We will not know whether the node is self closing, or if it has child nodes or text content, but
-		// we know just enough to delegate the node to a more dedicated parsing method depending on what the
-		// node actually is.
+		// We will not know whether the node is self closing, or if it has child nodes or text content, but we know just
+		// enough to delegate the node to a more dedicated parsing method.
 		switch (true) {
 			default:
 				this.raiseError(this.createUnexpectedTokenSyntaxErrorAtCurrentToken(`expected exclamation mark, question mark or alphabetic tag name`));
@@ -1014,7 +1014,13 @@ export class Parser {
 	}
 
 
-	protected parseAttributeListInto(node: Node, allowSystemLiterals: boolean): void {
+	/**
+	 * Parses a complete attribute list into a node.
+	 * @param node The node to parse the attribute list into.
+	 * @param allowLiterals Whether literals are allowed or not. When this is `false`, the method will raise a syntax
+	 *                      error if a literal is encountered.
+	 */
+	protected parseAttributeListInto(node: Node, allowLiterals: boolean): void {
 		// We are now at the first token after the opening tag name, which could be either whitespace, the end of the
 		// opening tag or the start of a system literal:
 		//     <alpha fibo="nacci"...
@@ -1032,7 +1038,7 @@ export class Parser {
 		//     <alpha"FOO"/>
 		//           ^
 		if (!Parser.isWhitespaceToken(this.getCurrentToken()) && this.getCurrentToken() !== '/' && this.getCurrentToken() !== '>') {
-			if (!allowSystemLiterals && this.getCurrentToken() === '"') {
+			if (!allowLiterals && this.getCurrentToken() === '"') {
 				this.raiseError(this.createUnexpectedTokenSyntaxErrorAtCurrentToken('expected whitespace or end of opening tag'));
 			}
 		}
@@ -1041,13 +1047,13 @@ export class Parser {
 			this.advanceToNextToken();
 		}
 		// if there's no alphabetic token here, there are no attributes to be parsed
-		if (!Parser.isAlphabeticToken(this.getCurrentToken()) && (!allowSystemLiterals && this.getCurrentToken() !== '"')) {
+		if (!Parser.isAlphabeticToken(this.getCurrentToken()) && (!allowLiterals && this.getCurrentToken() !== '"')) {
 			return;
 		}
 		// advance until there are no attributes and literals to be parsed
 		while (this.getCurrentToken() !== '>' && this.getCurrentToken() !== '/' && this.getCurrentToken() !== '?') {
 			if (this.getCurrentToken() === '"') {
-				if (!allowSystemLiterals) {
+				if (!allowLiterals) {
 					this.raiseError(this.createUnexpectedTokenSyntaxErrorAtCurrentToken('system literal not allowed on this node'));
 				}
 				(<ast.DeclarationOpenerNode>node).appendToSystemLiteralList(this.parseLiteral());
