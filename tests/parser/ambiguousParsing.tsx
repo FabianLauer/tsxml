@@ -83,6 +83,32 @@ class OpenAngleBracketInCDataSectionNodeContent extends test.UnitTest {
 }
 
 
+class OpenAngleBracketAsOnlyAttributeValue extends test.UnitTest {
+	protected async performTest() {
+		const attrValue = '<',
+			  ast = await xml.Parser.parseStringToAst(`<a attr="${attrValue}"></a>`);
+		const wrapperNode = ast.getChildAtIndex(0) as xml.ast.ContainerNode<xml.ast.CDataSectionNode>;
+		await this.assert(wrapperNode instanceof xml.ast.ContainerNode, 'correct outer ast node type');
+		await this.assert(wrapperNode.tagName === 'a', 'outer ast node has correct tag name');
+		await this.assert(wrapperNode.hasAttribute('attr'), 'outer ast node has desired attribute');
+		await this.assert(wrapperNode.getAttribute('attr') === attrValue, 'attribute value is correct');
+	}
+}
+
+
+class OpenAngleBracketInAttributeValue extends test.UnitTest {
+	protected async performTest() {
+		const attrValue = 'abc<def',
+			  ast = await xml.Parser.parseStringToAst(`<a attr="${attrValue}"></a>`);
+		const wrapperNode = ast.getChildAtIndex(0) as xml.ast.ContainerNode<xml.ast.CDataSectionNode>;
+		await this.assert(wrapperNode instanceof xml.ast.ContainerNode, 'correct outer ast node type');
+		await this.assert(wrapperNode.tagName === 'a', 'outer ast node has correct tag name');
+		await this.assert(wrapperNode.hasAttribute('attr'), 'outer ast node has desired attribute');
+		await this.assert(wrapperNode.getAttribute('attr') === attrValue, 'attribute value is correct');
+	}
+}
+
+
 @TestRunner.testName('Ambiguous Parsing')
 export class TestRunner extends test.TestRunner {
 	constructor() {
@@ -92,7 +118,9 @@ export class TestRunner extends test.TestRunner {
 			new OpenAngleBracketInTextNodeContent(),
 			new OpenAngleBracketInTextNodeContentInNestedNode(),
 			new OpenAngleBracketInCommentNodeContent(),
-			new OpenAngleBracketInCDataSectionNodeContent()
+			new OpenAngleBracketInCDataSectionNodeContent(),
+			new OpenAngleBracketAsOnlyAttributeValue(),
+			new OpenAngleBracketInAttributeValue()
 		);
 	}
 }
