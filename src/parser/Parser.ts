@@ -1,16 +1,16 @@
 import * as ast from '../ast';
-import {Node} from '../ast/Node';
-import {SelfClosingNode} from '../ast/SelfClosingNode';
-import {DocumentNode} from '../ast/DocumentNode';
-import {ContainerNode} from '../ast/ContainerNode';
-import {VoidNode} from '../ast/VoidNode';
-import {SyntaxErrorCode} from './SyntaxErrorCode';
-import {SyntaxError} from './SyntaxError';
-import {TagCloseMode} from './TagCloseMode';
-import {TagSyntaxRule} from './TagSyntaxRule';
-import {SyntaxRuleSet} from './SyntaxRuleSet';
-import {NodeFlags} from './NodeFlags';
-import {ITagNameInfo} from './ITagNameInfo';
+import { Node } from '../ast/Node';
+import { SelfClosingNode } from '../ast/SelfClosingNode';
+import { DocumentNode } from '../ast/DocumentNode';
+import { ContainerNode } from '../ast/ContainerNode';
+import { VoidNode } from '../ast/VoidNode';
+import { SyntaxErrorCode } from './SyntaxErrorCode';
+import { SyntaxError } from './SyntaxError';
+import { TagCloseMode } from './TagCloseMode';
+import { TagSyntaxRule } from './TagSyntaxRule';
+import { SyntaxRuleSet } from './SyntaxRuleSet';
+import { NodeFlags } from './NodeFlags';
+import { ITagNameInfo } from './ITagNameInfo';
 
 
 /**
@@ -36,8 +36,8 @@ export class Parser {
 	 * @param stringToParse The XML string to be parsed.
 	 */
 	constructor(private stringToParse: string) { }
-	
-	
+
+
 	/**
 	 * Creates a parser object, but does not begin parsing.
 	 * @param stringToParse The XML string to be parsed.
@@ -45,8 +45,8 @@ export class Parser {
 	public static createForXmlString(stringToParse: string): Parser {
 		return new Parser(stringToParse);
 	}
-	
-	
+
+
 	/**
 	 * Parses an XML string and returns the parser object that parsed the string.
 	 * @see Parser.parseStringToAst(...)
@@ -62,8 +62,8 @@ export class Parser {
 		parser.parseComplete();
 		return parser;
 	}
-	
-	
+
+
 	/**
 	 * Parses an XML string and returns a syntax tree.
 	 * @see Parser.parseString(...)
@@ -74,37 +74,37 @@ export class Parser {
 	public static async parseStringToAst(stringToParse: string, ruleSet?: SyntaxRuleSet | typeof SyntaxRuleSet): Promise<DocumentNode> {
 		return (await Parser.parseString(stringToParse, ruleSet)).getAst();
 	}
-	
-	
+
+
 	///
 	/// CONFIGURATION METHODS:
 	///
-	
-	
+
+
 	public getDefaultTagSyntaxRule(): TagSyntaxRule {
 		return this.defaultTagSyntaxRule;
 	}
-	
-	
+
+
 	/**
 	 * @chainable
 	 */
 	public setDefaultTagSyntaxRule(rule: TagSyntaxRule) {
 		this.defaultTagSyntaxRule = rule;
 	}
-	
-	
+
+
 	public getTagSyntaxRuleForTagName(tagName: string): TagSyntaxRule {
 		return this.tagSyntaxRules[tagName] || undefined;
 	}
-	
-	 
- 	public hasTagSyntaxRuleForTagName(tagName: string): boolean {
+
+
+	public hasTagSyntaxRuleForTagName(tagName: string): boolean {
 		const rule = this.getTagSyntaxRuleForTagName(tagName);
 		return typeof rule === 'object' && rule !== null;
 	}
-	
-	
+
+
 	/**
 	 * @chainable
 	 */
@@ -114,8 +114,8 @@ export class Parser {
 		});
 		return this;
 	}
-	
-	
+
+
 	/**
 	 * @chainable
 	 */
@@ -123,8 +123,8 @@ export class Parser {
 		rules.forEach(rule => this.addTagSyntaxRule(rule));
 		return this;
 	}
-	
-	
+
+
 	/**
 	 * @chainable
 	 */
@@ -132,8 +132,8 @@ export class Parser {
 		this.tagSyntaxRules[tagName] = undefined;
 		return this;
 	}
-	
-	
+
+
 	/**
 	 * @chainable
 	 */
@@ -141,8 +141,8 @@ export class Parser {
 		tagNames.forEach(tagName => this.removeTagSyntaxRuleForTagName(tagName));
 		return this;
 	}
-	
-	
+
+
 	/**
 	 * Applies all rules defined by a syntax rule set to the parser.
 	 * @chainable
@@ -155,21 +155,21 @@ export class Parser {
 		this.addTagSyntaxRules(...(<SyntaxRuleSet>ruleSet).getAllTagSyntaxRules());
 		return this;
 	}
-	
-	
+
+
 	///
 	/// PUBLIC GETTERS & REQUESTS:
 	///
-	
-	
+
+
 	/**
 	 * Returns the syntax tree object the parser creates.
 	 */
 	public getAst(): DocumentNode {
 		return this.ast;
 	}
-	
-	
+
+
 	/**
 	 * Parses the complete XML string passed to a parser instance.
 	 */
@@ -182,13 +182,13 @@ export class Parser {
 			this.parseFromCurrentToken();
 		}
 	}
-	
-	
+
+
 	///
 	/// INTERNAL GETTERS & REQUESTS:
 	///
-	
-	
+
+
 	/**
 	 * Returns the line the parser's cursor is currently on.
 	 */
@@ -202,8 +202,8 @@ export class Parser {
 			return undefined;
 		}
 	}
-	
-	
+
+
 	/**
 	 * Returns the column the parser's cursor is currently at.
 	 */
@@ -217,40 +217,40 @@ export class Parser {
 			return undefined;
 		}
 	}
-	
-	
+
+
 	/**
 	 * Returns the index of the current token in the XML source string.
 	 */
 	protected getCurrentTokenIndex(): number {
 		return this.currentTokenIndex;
 	}
-	
-	
+
+
 	/**
 	 * Returns whether the parser's cursor has reached the end of the XML source string.
 	 */
 	protected isAtEndOfInput(): boolean {
 		return this.getCurrentTokenIndex() >= this.stringToParse.length;
 	}
-	
-	
+
+
 	/**
 	 * Returns the token at a certain index in the XML source string.
 	 */
 	protected getTokenAtIndex(index: number): string {
 		return this.stringToParse[index];
 	}
-	
-	
+
+
 	/**
 	 * Return the token at the current cursor index.
 	 */
 	protected getCurrentToken(): string {
 		return this.getTokenAtIndex(this.getCurrentTokenIndex());
 	}
-	
-	
+
+
 	/**
 	 * Returns a range of tokens from the source XML string.
 	 * @param startIndex The index of the first token in the requested range.
@@ -260,8 +260,8 @@ export class Parser {
 		/// TODO: Prevent this from returning ranges that go "beyond" the end of the source string.
 		return this.stringToParse.slice(startIndex, endIndex);
 	}
-	
-	
+
+
 	/**
 	 * Returns a range of tokens from the source XML string.
 	 * @param startIndex The index of the first token in the requested range.
@@ -270,24 +270,24 @@ export class Parser {
 	protected getTokenRangeStartingAt(startIndex: number, length: number): string {
 		return this.stringToParse.slice(startIndex, startIndex + length);
 	}
-	
-	
+
+
 	/**
 	 * Returns the token that follows the token the cursor is currently at.
 	 */
 	protected getNextToken(): string {
 		return this.getTokenAtIndex(this.getCurrentTokenIndex() + 1);
 	}
-	
-	
+
+
 	/**
 	 * Returns the token that preceeds the token the cursor is currently at.
 	 */
 	protected getPreviousToken(): string {
 		return this.getTokenAtIndex(this.getCurrentTokenIndex() - 1);
 	}
-	
-	
+
+
 	/**
 	 * Finds the first occurence of a certain token after in the source XML string after a certain token index and
 	 * returns the index of the searched token.
@@ -297,8 +297,8 @@ export class Parser {
 	protected findFirstOccurenceOfTokenAfterIndex(token: string, startIndex: number): number {
 		return this.stringToParse.indexOf(token[0], startIndex);
 	}
-	
-	
+
+
 	/**
 	 * Checks if a certain token occurs before the next occurence of another token.
 	 * @param token The token to check if it occurs before `otherToken`.
@@ -307,14 +307,14 @@ export class Parser {
 	 */
 	protected doesTokenOccurBeforeNextOccurenceOfOtherToken(token: string, otherToken: string, startIndex: number): boolean {
 		const tokenIndex = this.findFirstOccurenceOfTokenAfterIndex(token, startIndex),
-			  otherTokenIndex = this.findFirstOccurenceOfTokenAfterIndex(otherToken, startIndex);
+			otherTokenIndex = this.findFirstOccurenceOfTokenAfterIndex(otherToken, startIndex);
 		if (tokenIndex < 0 || otherTokenIndex < 0) {
 			return false;
 		}
 		return tokenIndex < otherTokenIndex;
 	}
-	
-	
+
+
 	/**
 	 * Returns the container ast node the parser is currently parsing into, depending on the semantic context around the
 	 * cursor. At the start and end of each parsing run, this will return the outermost `DocumentNode` of the syntax tree.
@@ -322,43 +322,43 @@ export class Parser {
 	protected getCurrentContainerNode(): ContainerNode<any> {
 		return this.currentContainerNode;
 	}
-	
-	
+
+
 	protected descendInto(containerNode: ContainerNode<Node>): void {
 		this.currentContainerNode = containerNode;
 	}
-	
-	
+
+
 	protected ascend(): void {
 		if (!(this.currentContainerNode.parentNode instanceof ContainerNode)) {
 			this.raiseError(this.createSyntaxErrorAtCurrentToken(SyntaxErrorCode.Unknown, `can not ascend: current containing node has no parent node`));
 		}
 		this.currentContainerNode = this.currentContainerNode.parentNode;
 	}
-	
-	
+
+
 	///
 	/// SYNTAX ERROR HANDLING & FACTORY METHODS:
 	/// The following methods help creating and raising syntax errors.
 	///
-	
-	
+
+
 	protected createSyntaxError(errorCode: SyntaxErrorCode, line: number, column: number, message: string): SyntaxError {
 		return new SyntaxError(errorCode, line, column, this.stringToParse, message);
 	}
-	
-	
+
+
 	protected createSyntaxErrorAtCurrentToken(errorCode: SyntaxErrorCode, message: string): SyntaxError {
 		return this.createSyntaxError(errorCode, this.getCurrentLine(), this.getCurrentColumn(), message);
 	}
-	
-	
+
+
 	protected createUnexpectedTokenSyntaxErrorAtCurrentToken(message?: string): SyntaxError {
 		message = message || `token can not be parsed`;
 		return this.createSyntaxErrorAtCurrentToken(SyntaxErrorCode.UnexpectedToken, message)
 	}
-	
-	
+
+
 	/**
 	 * Raises an error. Use this method instead of throwing manually so errors can be logged or modified by the parser
 	 * before it is thrown.
@@ -368,30 +368,30 @@ export class Parser {
 	protected raiseError(error: Error): void {
 		throw error;
 	}
-	
-	
+
+
 	///
 	/// SYNTAX RULE LOOKUPS:
 	///
-	
-	
+
+
 	protected static isSingularCloseMode(closeMode: TagCloseMode): boolean {
 		return closeMode in TagCloseMode;
 	}
-	
-	
+
+
 	protected static createDefaultTagSyntaxRule(): TagSyntaxRule {
 		const rule = TagSyntaxRule.createForTagName(undefined);
 		rule.setCloseMode(TagCloseMode.Tag | TagCloseMode.SelfClose);
 		return rule;
 	}
-	
-	
+
+
 	protected getOverrideOrDefaultTagSyntaxRuleForTagName(tagName: string): TagSyntaxRule {
 		return this.getTagSyntaxRuleForTagName(tagName) || this.getDefaultTagSyntaxRule();
 	}
-	
-	
+
+
 	/**
 	 * Returns all tag close modes allowed for a certain tag name. The returned modes are either defined by tag syntax
 	 * rules or fall back to the default if no syntax rule for the given tag name exists.
@@ -399,94 +399,94 @@ export class Parser {
 	protected getAllowedTagCloseModesForTagName(tagName: string): TagCloseMode {
 		return this.getOverrideOrDefaultTagSyntaxRuleForTagName(tagName).getCloseMode();
 	}
-	
-	
+
+
 	protected isCloseModeAllowedForTagName(tagName: string, closeMode: TagCloseMode): boolean {
 		if (!Parser.isSingularCloseMode(closeMode)) {
 			throw new Error('Rule lookup failed: tag close mode must not be a combination of close modes.');
 		}
 		return (this.getAllowedTagCloseModesForTagName(tagName) & closeMode) === closeMode;
 	}
-	
-	
+
+
 	///
 	/// TOKEN IDENTIFICATION & CLASSIFICATION UTILITIES:
 	/// Methods that help identifying certain tokens.
 	///
-	
-	
+
+
 	protected static isAlphabeticToken(token: string): boolean {
 		return /[a-z]/i.test(token[0]);
 	}
-	
-	
+
+
 	protected static isNumericToken(token: string): boolean {
 		return /[0-9]/i.test(token[0]);
 	}
-	
-	
+
+
 	protected static isWhitespaceToken(token: string): boolean {
 		token = token[0];
 		return token === ' ' || token === '\t' || token === '\r' || token === '\n';
 	}
-	
-	
+
+
 	protected static isTokenLegalInTagNameOrTagNameNamespacePrefix(token: string): boolean {
 		return Parser.isAlphabeticToken(token) ||
-			   Parser.isNumericToken(token) ||
-			   token[0] === '-' ||
-			   token[0] === '_' ||
-			   token[0] === '.';
+			Parser.isNumericToken(token) ||
+			token[0] === '-' ||
+			token[0] === '_' ||
+			token[0] === '.';
 	}
-	
-	
+
+
 	protected static isTokenLegalInAttributeNameOrAttributeNameNameNamespacePrefix(token: string): boolean {
 		return Parser.isAlphabeticToken(token) ||
-			   Parser.isNumericToken(token) ||
-			   token[0] === '-' ||
-			   token[0] === '_';
+			Parser.isNumericToken(token) ||
+			token[0] === '-' ||
+			token[0] === '_';
 	}
-	
-	
+
+
 	///
 	/// TOKEN ITERATION METHODS:
 	/// These methods handle the iteration over the XML string that is being parsed. Only use
 	/// the methods provided here to iterate over, move along, look at (back or ahead) the XML
 	/// string, don't do this manually.
 	///
-	
-	
+
+
 	protected moveByNumberOfTokens(numberOfTokens: number): void {
 		this.currentTokenIndex += numberOfTokens;
 	}
-	
-	
+
+
 	protected goBackByNumberOfTokens(numberOfTokens: number): void {
 		this.moveByNumberOfTokens(0 - Math.abs(numberOfTokens));
 	}
-	
-	
+
+
 	protected goBackToPreviousToken(): void {
 		this.goBackByNumberOfTokens(1)
 	}
-	
-	
+
+
 	protected advanceByNumberOfTokens(numberOfTokens: number): void {
 		this.moveByNumberOfTokens(Math.abs(numberOfTokens));
 	}
-	
-	
+
+
 	protected advanceToNextToken(): void {
 		this.advanceByNumberOfTokens(1);
 	}
-	
-	
+
+
 	///
 	/// PARSING METHODS:
 	/// All methods that actually parse XML into AST nodes. 
 	///
-	
-	
+
+
 	protected parseFromCurrentToken(): void {
 		if (this.isAtEndOfInput()) {
 			return;
@@ -504,8 +504,8 @@ export class Parser {
 				break;
 		}
 	}
-	
-	
+
+
 	/**
 	 * Called when the parser is at an open angle bracket (`<`) and needs to decide how to parse upcoming tokens.
 	 * This method looks ahead to decide whether the open angle bracket is the beginning of an XML tag, or if it's the
@@ -537,15 +537,14 @@ export class Parser {
 		// open angle bracket indicates
 		// the bginning of a new tag.
 		if (this.getNextToken() !== '!' && this.getNextToken() !== '?' &&
-			this.doesTokenOccurBeforeNextOccurenceOfOtherToken('<', '>', this.getCurrentTokenIndex() + 1))
-		{
+			this.doesTokenOccurBeforeNextOccurenceOfOtherToken('<', '>', this.getCurrentTokenIndex() + 1)) {
 			this.parseIntoNewTextNode();
 		} else {
 			this.parseFromBeginningOfTag();
 		}
 	}
-	
-	
+
+
 	/**
 	 * Creates a new text node, appends it to the ast and parses all upcoming text into it. Stops parsing at the first
 	 * character that can not be considered text anymore.
@@ -585,8 +584,8 @@ export class Parser {
 			this.advanceToNextToken();
 		}
 	}
-	
-	
+
+
 	/**
 	 * Parses from the beginning of any kind of tag. The cursor is expected to point at the open angle bracket of the tag, such as:
 	 *     <xsl:stylesheet ...
@@ -665,8 +664,8 @@ export class Parser {
 				break;
 		}
 	}
-	
-	
+
+
 	protected parseFromBeginningOfNormalNode(): void {
 		// Validate that we actually have a "normal" node:
 		if (!Parser.isTokenLegalInTagNameOrTagNameNamespacePrefix(this.getNextToken())) {
@@ -688,23 +687,22 @@ export class Parser {
 		this.parseCompleteOpeningTagInto(node, true, false);
 		return;
 	}
-	
-	
+
+
 	protected findUnclosedNodeMatchingTagName(tagNameInfo: ITagNameInfo): ContainerNode<Node> {
 		var containerNode = this.getCurrentContainerNode();
 		do {
 			if (containerNode.parserFlags & NodeFlags.Closed ||
-			    containerNode.namespacePrefix !== tagNameInfo.namespacePrefix ||
-				containerNode.tagName !== tagNameInfo.tagName)
-			{
+				containerNode.namespacePrefix !== tagNameInfo.namespacePrefix ||
+				containerNode.tagName !== tagNameInfo.tagName) {
 				continue;
 			}
 			return containerNode;
 		} while ((containerNode = containerNode.parentNode) && containerNode.parentNode instanceof Node);
 	}
-	
-	
-	protected parseFromBeginningOfCloseTag(): void { 
+
+
+	protected parseFromBeginningOfCloseTag(): void {
 		// Validate that we actually have a close tag:
 		if (this.getTokenRangeStartingAt(this.getCurrentTokenIndex(), 2) !== '</') {
 			const message = `expected beginning of close tag (</...), got '${this.getTokenRangeStartingAt(this.getCurrentTokenIndex(), 2)}'`;
@@ -718,7 +716,7 @@ export class Parser {
 		//       ^      we're here
 		// we now parse the tag name and check if there are any unclosed container nodes with the exact same tag name
 		const tagNameInfo = this.parseTagName(),
-			  closedNode = this.findUnclosedNodeMatchingTagName(tagNameInfo);
+			closedNode = this.findUnclosedNodeMatchingTagName(tagNameInfo);
 		if (!(closedNode instanceof ContainerNode)) {
 			this.raiseError(this.createSyntaxErrorAtCurrentToken(SyntaxErrorCode.ExcessCloseTag, `close tag '${tagNameInfo.tagName}' has no open tag`));
 		}
@@ -729,8 +727,8 @@ export class Parser {
 		this.ascend();
 		return;
 	}
-	
-	
+
+
 	protected parseFromBeginningOfDeclarationOpenerNode(): void {
 		// Validate that we actually have an MDO node:
 		if (this.getTokenRangeStartingAt(this.getCurrentTokenIndex(), 2) !== '<!') {
@@ -748,8 +746,8 @@ export class Parser {
 		this.parseCompleteOpeningTagInto(mdoNode, false, true);
 		return;
 	}
-	
-	
+
+
 	protected parseFromBeginningOfProcessingInstructionNode(): void {
 		// Validate that we actually have a PI node:
 		if (this.getTokenRangeStartingAt(this.getCurrentTokenIndex(), 2) !== '<?') {
@@ -767,8 +765,8 @@ export class Parser {
 		this.parseCompleteOpeningTagInto(piNode, false, false);
 		return;
 	}
-	
-	
+
+
 	/**
 	 * Parses a CDATA section.
 	 * @see https://www.w3.org/TR/xml/#sec-cdata-sect
@@ -802,8 +800,8 @@ export class Parser {
 		//                    ^      we're now here
 		return;
 	}
-	
-	
+
+
 	protected parseFromBeginningOfCommentNode(): void {
 		// Validate that we actually have a comment node:
 		if (this.getTokenRangeStartingAt(this.getCurrentTokenIndex(), 4) !== '<!--') {
@@ -833,8 +831,8 @@ export class Parser {
 		//                                                       ^      we're now here
 		return;
 	}
-	
-	
+
+
 	protected static createContainerNodeFromOtherNode<TChildNode extends Node>(node: Node): ContainerNode<TChildNode> {
 		const containerNode = new ContainerNode<TChildNode>();
 		containerNode.namespacePrefix = node.namespacePrefix;
@@ -842,8 +840,8 @@ export class Parser {
 		node.getAllAttributeNames().forEach(attrName => containerNode.setAttribute(attrName, node.getAttribute(attrName)));
 		return containerNode;
 	}
-	
-	
+
+
 	protected static createVoidNodeFromOtherNode(node: Node): VoidNode {
 		const voidNode = new VoidNode();
 		voidNode.namespacePrefix = node.namespacePrefix;
@@ -851,8 +849,8 @@ export class Parser {
 		node.getAllAttributeNames().forEach(attrName => voidNode.setAttribute(attrName, node.getAttribute(attrName)));
 		return voidNode;
 	}
-	
-	
+
+
 	/**
 	 * Parses a complete opening tag with namespace prefix, tag name and attributes into a given node. This method will
 	 * decide whether the node it is parsing is a container node or a void node and upgrade the node passed into it in
@@ -916,7 +914,7 @@ export class Parser {
 			// processing instruction
 			case this.getCurrentToken() === '?':
 				this.advanceToNextToken();
-				// ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   FALL THROUGH   ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓
+			// ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   FALL THROUGH   ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓
 			// container node
 			case this.getCurrentToken() === '>':
 				this.parseEndOfNonSelfClosingOpeningTag(node, allowDescendingIntoNewContainerNode);
@@ -924,8 +922,8 @@ export class Parser {
 				break;
 		}
 	}
-	
-	
+
+
 	/**
 	 * Parses the end of opening tags that are not self closing. This method will decide whether the node it is parsing
 	 * is a container node or a void node and upgrade the node passed into it in param `node` to the respective ast node
@@ -952,8 +950,8 @@ export class Parser {
 			}
 		}
 	}
-	
-	
+
+
 	protected parseTagName(): ITagNameInfo {
 		// this will be set to `true` as soon as the first colon was seen
 		var colonSeen = false,
@@ -1003,8 +1001,8 @@ export class Parser {
 		tagNameInfo.tagName = nameStash;
 		return tagNameInfo;
 	}
-	
-	
+
+
 	/**
 	 * Parses a tag name into an AST node. Supports namespace prefixes.
 	 * @param node The AST node to parse the tag name into.
@@ -1014,8 +1012,8 @@ export class Parser {
 		node.namespacePrefix = tagNameInfo.namespacePrefix;
 		node.tagName = tagNameInfo.tagName;
 	}
-	
-	
+
+
 	protected parseAttributeListInto(node: Node, allowSystemLiterals: boolean): void {
 		// We are now at the first token after the opening tag name, which could be either whitespace, the end of the
 		// opening tag or the start of a system literal:
@@ -1069,8 +1067,8 @@ export class Parser {
 			}
 		}
 	}
-	
-	
+
+
 	protected parseLiteral(): string {
 		var value = '';
 		// skip all whitespace
@@ -1088,8 +1086,8 @@ export class Parser {
 		this.advanceToNextToken();
 		return value;
 	}
-	
-	
+
+
 	protected parseAttribute() {
 		var name = '',
 			value: string,
@@ -1156,23 +1154,23 @@ export class Parser {
 		}
 		return getAttrInfo();
 	}
-	
-	
-	
+
+
+
 	///
 	/// MISC METHODS & PROPERTIES:
 	///
-	
-	
-	
+
+
+
 	private getTokenMatrix() {
 		if (typeof this.tokenMatrix !== 'object' || this.tokenMatrix === null) {
 			this.createTokenMatrix();
 		}
 		return this.tokenMatrix;
 	}
-	
-	
+
+
 	private createTokenMatrix(): void {
 		var line = 1,
 			column = 0;
@@ -1187,22 +1185,22 @@ export class Parser {
 			}
 		}
 	}
-	
-	
+
+
 	private defaultTagSyntaxRule = Parser.createDefaultTagSyntaxRule();
-	
-	
-	private tagSyntaxRules: { [tagName: string]: TagSyntaxRule; } = { };
-	
-	
+
+
+	private tagSyntaxRules: { [tagName: string]: TagSyntaxRule; } = {};
+
+
 	private ast = new DocumentNode();
-	
-	
+
+
 	private tokenMatrix: { [tokenIndex: number]: { line: number, column: number } };
-	
-	
+
+
 	private currentContainerNode: ContainerNode<any> = this.getAst();
-	
-	
+
+
 	private currentTokenIndex = 0;
 }
