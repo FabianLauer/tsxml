@@ -8,6 +8,18 @@ const gulp = require('gulp'),
 	  babel = require('gulp-babel'),
 	  browserify = require('gulp-browserify');
 
+const sourceList = [
+	'src/index.ts*',
+	'src/ast.ts*',
+	'src/parser.ts*',
+	'src/Compiler.ts*',
+	'src/ast/*.ts*',
+	'src/parser/**/*.ts*',
+	'src/xpath/ast/*.ts*',
+	'src/xpath/parser/*.ts*',
+	'src/xpath/*.ts*'
+];
+
 
 function copyFile(pathToSourceFile, pathToCopiedFile) {
 	fs.createReadStream(pathToSourceFile)
@@ -69,14 +81,7 @@ gulp.task('cleanup', () => {
 
 
 // Compiles all files (except those in the /tests/ directory) to JavaScript.
-gulp.task('compileSources', () => compileTypeScript([
-	'src/index.ts*',
-	'src/ast.ts*',
-	'src/parser.ts*',
-	'src/Compiler.ts*',
-	'src/ast/*.ts*',
-	'src/parser/**/*.ts*'
-], false));
+gulp.task('compileSources', () => compileTypeScript(sourceList, false));
 
 
 // Compiles all files (except those in the /tests/ directory) to JavaScript.
@@ -87,14 +92,7 @@ gulp.task('compileExamples', ['compileSources'], () => compileTypeScript([
 
 // Compiles a single declaration file from all files (except those in the /tests/ directory) and
 // saves it in /build/xml.d.ts.
-gulp.task('compileDeclarationFile', () => compileTypeScript([
-	'src/index.ts*',
-	'src/ast.ts*',
-	'src/parser.ts*',
-	'src/Compiler.ts*',
-	'src/ast/*.ts*',
-	'src/parser/**/*.ts*'
-], true));
+gulp.task('compileDeclarationFile', () => compileTypeScript(sourceList, true));
 
 
 // Compiles all files (except those in the /tests/ directory) to JavaScript and compiles a single
