@@ -5,6 +5,8 @@
         "experimentalDecorators": true,
         "noImplicitAny": true,
         "emitDecoratorMetadata": true,
-        "jsx": "react"
+        "jsx": "react",
+        "outDir": "./build/",
+        "declaration": true
     }
 }
