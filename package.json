@@ -1,6 +1,11 @@
 {
   "name": "tsxml",
   "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FabianLauer/tsxml"
+  },
+  "license": "MIT",
   "main": "./build/src/index.js",
   "types": "./build/src/index.d.ts",
   "devDependencies": {
