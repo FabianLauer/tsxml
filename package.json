@@ -1,6 +1,8 @@
 {
   "name": "tsxml",
   "version": "0.1.0",
+  "main": "./build/src/index.js",
+  "types": "./build/src/index.d.ts",
   "devDependencies": {
     "babel-cli": "^6.4.5",
     "babel-plugin-transform-runtime": "^6.4.3",
