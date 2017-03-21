@@ -22,8 +22,8 @@ function colorize(literals: string[], placeholders: string[], color: string): st
 }
 
 
-function red(literals: string[], ...placeholders: string[]): string {
-	return colorize(literals, placeholders, FG_RED);
+function red(literals: TemplateStringsArray, ...placeholders: string[]): string {
+	return colorize(literals.concat([]), placeholders, FG_RED);
 }
 
 
@@ -32,8 +32,8 @@ function green(literals: string[], ...placeholders: string[]): string {
 }
 
 
-function yellow(literals: string[], ...placeholders: string[]): string {
-	return colorize(literals, placeholders, FG_YELLOW);
+function yellow(literals: TemplateStringsArray, ...placeholders: string[]): string {
+	return colorize(literals.concat([]), placeholders, FG_YELLOW);
 }
 
 
