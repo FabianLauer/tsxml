@@ -8,6 +8,13 @@ tsxml is a small, *not (yet) spec compliant* XML library that contains a liberal
 
 It supports all kinds of XML nodes, including comments, markup declaration openers (such as `<!DOCTYPE ...>`), processing instructions (`<?svg...`) and self closing (`<foo />`) and "void" (`<foo>`) nodes, meaning it's capable of parsing HTML and SVG, too.
 
+## Installing
+
+Installing from npm:
+
+```
+npm install tsxml
+```
 
 ## Is it used somewhere?
 
