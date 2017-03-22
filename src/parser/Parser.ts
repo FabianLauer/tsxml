@@ -22,10 +22,7 @@ import { ITagNameInfo } from './ITagNameInfo';
  * dependencies, less coupling is necessary, which leads to lower maintenance time. Also, we're saving a few CPU cycles
  * and some memory, although performance is not the primary factor for the decision against a dedicated tokenizer.
  * The public interface provided by the parser class encourages the use of static methods, such as
- * `parseStringToAst(...)`, instead of manually creating and handling parser objects (at least for now). Also, these
- * static methods enforce user code to await promises, even though parser code is not **yet** async, but it might become
- * async when (and if) incremental parsing and streams are implemented (incremental parsing might use generators and
- * allow async user code to interfere with the parser).
+ * `parseStringToAst(...)`, instead of manually creating and handling parser objects (at least for now).
  * SYNTAX RULES:
  * Parsers can accept some syntax rules, however by default they expect XML (no void tags, unclosed tags are handled as
  * if they were). To override default parsing rules, use the `addTagSyntaxRule(...)` (and similar) methods.
@@ -54,7 +51,7 @@ export class Parser {
 	 * @param ruleSet The sytnax rule set to apply to the parser. Optional. The parser falls back to default XML parsing
 	 *                rules when no other rules are provided.
 	 */
-	public static async parseString(stringToParse: string, ruleSet?: SyntaxRuleSet | typeof SyntaxRuleSet): Promise<Parser> {
+	public static parseString(stringToParse: string, ruleSet?: SyntaxRuleSet | typeof SyntaxRuleSet): Parser {
 		const parser = Parser.createForXmlString(stringToParse);
 		if (ruleSet instanceof SyntaxRuleSet || SyntaxRuleSet.isSyntaxRuleSetClass(<typeof SyntaxRuleSet>ruleSet)) {
 			parser.applySyntaxRuleSet(ruleSet);
@@ -71,8 +68,8 @@ export class Parser {
 	 * @param ruleSet The sytnax rule set to apply to the parser. Optional. The parser falls back to default XML parsing
 	 *                rules when no other rules are provided.
 	 */
-	public static async parseStringToAst(stringToParse: string, ruleSet?: SyntaxRuleSet | typeof SyntaxRuleSet): Promise<DocumentNode> {
-		return (await Parser.parseString(stringToParse, ruleSet)).getAst();
+	public static parseStringToAst(stringToParse: string, ruleSet?: SyntaxRuleSet | typeof SyntaxRuleSet): DocumentNode {
+		return Parser.parseString(stringToParse, ruleSet).getAst();
 	}
 
 
