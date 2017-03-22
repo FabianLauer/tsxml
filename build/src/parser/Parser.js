@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
 const ast = require("../ast");
 const Node_1 = require("../ast/Node");
 const SelfClosingNode_1 = require("../ast/SelfClosingNode");
@@ -29,10 +20,7 @@ const NodeFlags_1 = require("./NodeFlags");
  * dependencies, less coupling is necessary, which leads to lower maintenance time. Also, we're saving a few CPU cycles
  * and some memory, although performance is not the primary factor for the decision against a dedicated tokenizer.
  * The public interface provided by the parser class encourages the use of static methods, such as
- * `parseStringToAst(...)`, instead of manually creating and handling parser objects (at least for now). Also, these
- * static methods enforce user code to await promises, even though parser code is not **yet** async, but it might become
- * async when (and if) incremental parsing and streams are implemented (incremental parsing might use generators and
- * allow async user code to interfere with the parser).
+ * `parseStringToAst(...)`, instead of manually creating and handling parser objects (at least for now).
  * SYNTAX RULES:
  * Parsers can accept some syntax rules, however by default they expect XML (no void tags, unclosed tags are handled as
  * if they were). To override default parsing rules, use the `addTagSyntaxRule(...)` (and similar) methods.
@@ -65,14 +53,12 @@ class Parser {
      *                rules when no other rules are provided.
      */
     static parseString(stringToParse, ruleSet) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const parser = Parser.createForXmlString(stringToParse);
-            if (ruleSet instanceof SyntaxRuleSet_1.SyntaxRuleSet || SyntaxRuleSet_1.SyntaxRuleSet.isSyntaxRuleSetClass(ruleSet)) {
-                parser.applySyntaxRuleSet(ruleSet);
-            }
-            parser.parseComplete();
-            return parser;
-        });
+        const parser = Parser.createForXmlString(stringToParse);
+        if (ruleSet instanceof SyntaxRuleSet_1.SyntaxRuleSet || SyntaxRuleSet_1.SyntaxRuleSet.isSyntaxRuleSetClass(ruleSet)) {
+            parser.applySyntaxRuleSet(ruleSet);
+        }
+        parser.parseComplete();
+        return parser;
     }
     /**
      * Parses an XML string and returns a syntax tree.
@@ -82,9 +68,7 @@ class Parser {
      *                rules when no other rules are provided.
      */
     static parseStringToAst(stringToParse, ruleSet) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return (yield Parser.parseString(stringToParse, ruleSet)).getAst();
-        });
+        return Parser.parseString(stringToParse, ruleSet).getAst();
     }
     ///
     /// CONFIGURATION METHODS:

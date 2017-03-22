@@ -1,5 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * Defines all possible permissions and restrictions for one or more tags.
  */

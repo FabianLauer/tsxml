@@ -1,5 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 const TagCloseMode_1 = require("../TagCloseMode");
 const TagSyntaxRule_1 = require("../TagSyntaxRule");
 const SyntaxRuleSet_1 = require("../SyntaxRuleSet");

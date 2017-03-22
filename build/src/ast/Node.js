@@ -1,5 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 const NodeFlags_1 = require("../parser/NodeFlags");
 /**
  * Base class for all nodes.

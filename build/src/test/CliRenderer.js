@@ -1,5 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 const UnitTestState_1 = require("./UnitTestState");
 const UnitTest_1 = require("./UnitTest");
 const TestRunner_1 = require("./TestRunner");

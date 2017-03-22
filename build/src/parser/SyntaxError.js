@@ -1,5 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 const SyntaxErrorCode_1 = require("./SyntaxErrorCode");
 class SyntaxError extends Error {
     constructor(errorCode, line, column, source, message) {

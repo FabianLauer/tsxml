@@ -1,5 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 const AssertionResult_1 = require("./test/AssertionResult");
 exports.AssertionResult = AssertionResult_1.AssertionResult;
 const UnitTestState_1 = require("./test/UnitTestState");

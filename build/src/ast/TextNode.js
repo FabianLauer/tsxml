@@ -1,5 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 const Node_1 = require("./Node");
 /**
  * Base class for all nodes that may contain child elements.

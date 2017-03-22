@@ -1,5 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 const ContainerNode_1 = require("./ContainerNode");
 class DocumentNode extends ContainerNode_1.ContainerNode {
     /**

@@ -1,5 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 const ast = require("./ast");
 exports.ast = ast;
 const parser = require("./parser");

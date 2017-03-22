@@ -1,5 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 class AssertionResult {
     constructor(_unitTestID, _successful, _description) {
         this._unitTestID = _unitTestID;

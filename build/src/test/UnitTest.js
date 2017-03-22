@@ -7,7 +7,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-Object.defineProperty(exports, "__esModule", { value: true });
 const AssertionResult_1 = require("./AssertionResult");
 const UnitTestState_1 = require("./UnitTestState");
 const Event_1 = require("./Event");

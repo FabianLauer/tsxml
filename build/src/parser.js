@@ -1,5 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 const SyntaxErrorCode_1 = require("./parser/SyntaxErrorCode");
 exports.SyntaxErrorCode = SyntaxErrorCode_1.SyntaxErrorCode;
 const SyntaxError_1 = require("./parser/SyntaxError");

@@ -1,5 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 const Attribute_1 = require("./ast/Attribute");
 exports.Attribute = Attribute_1.Attribute;
 const Node_1 = require("./ast/Node");

@@ -1,5 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var SyntaxErrorCode;
 (function (SyntaxErrorCode) {
     SyntaxErrorCode[SyntaxErrorCode["Unknown"] = 0] = "Unknown";

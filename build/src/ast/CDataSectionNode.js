@@ -1,5 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 const TextNode_1 = require("./TextNode");
 class CDataSectionNode extends TextNode_1.TextNode {
     /**

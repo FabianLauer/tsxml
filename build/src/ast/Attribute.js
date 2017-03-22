@@ -1,5 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 class Attribute {
     static create(value) {
         return new (class extends Attribute {
