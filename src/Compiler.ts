@@ -15,7 +15,10 @@ export abstract class Compiler {
 	/**
 	 * Parses an XML string and returns the a syntax tree.
 	 */
-	public static parseXmlToAst(xmlString: string, ruleSet?: SyntaxRuleSet | typeof SyntaxRuleSet) {
+	public static parseXmlToAst(
+		xmlString: string,
+		ruleSet?: SyntaxRuleSet | typeof SyntaxRuleSet
+	) {
 		return Parser.parseStringToAst(xmlString, ruleSet);
 	}
 	
@@ -23,7 +26,11 @@ export abstract class Compiler {
 	/**
 	 * Parses an XML string to a syntax tree, then serializes it to formatted XML.
 	 */
-	public static formatXmlString(xmlString: string, formattingOptions?: IStringificationParams, ruleSet?: SyntaxRuleSet | typeof SyntaxRuleSet) {
+	public static formatXmlString(
+		xmlString: string,
+		formattingOptions?: IStringificationParams,
+		ruleSet?: SyntaxRuleSet | typeof SyntaxRuleSet
+	) {
 		return Parser.parseStringToAst(xmlString, ruleSet).toFormattedString(formattingOptions);
 	}
 }
