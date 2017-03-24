@@ -9,8 +9,7 @@
 			"cwd": "${workspaceRoot}",
 			"outFiles": [],
 			"runtimeArgs": [
-				"--use-strict",
-				"--es_staging"
+				"--use-strict"
 			],
 			"sourceMaps": true
 		}
