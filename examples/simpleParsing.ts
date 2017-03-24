@@ -1,7 +1,7 @@
 import * as xml from '../src/index';
 
 (async () => {
-	const parsedXml = await xml.Parser.parseStringToAst(`
+	const parsedXml = xml.Parser.parseStringToAst(`
 <!DOCTYPE html>
 <html>
 	<head>

@@ -30,5 +30,5 @@ process.on('unhandledRejection', (reason: any) => {
 			newlineChar: '\n',
 			attrParen: '"'
 		 };
-	process.stdout.write(await xml.Compiler.formatXmlString(sourceXml, formattingOptions, getSyntaxRuleSet(PATH_TO_FILE)));
+	process.stdout.write(xml.Compiler.formatXmlString(sourceXml, formattingOptions, getSyntaxRuleSet(PATH_TO_FILE)));
 })();

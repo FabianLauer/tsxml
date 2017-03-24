@@ -63,7 +63,7 @@ Syntax tree nodes support XML serialization with their `toString()` and `toForma
 
 Formatting can also be done in a somewhat more concise way:
 
-	console.log(await xml.Compiler.formatXmlString('<foo><bar /></foo>'));
+	console.log(xml.Compiler.formatXmlString('<foo><bar /></foo>'));
 	/*
 		...which will log:
 			<foo>
