@@ -1,5 +1,5 @@
-import {TextNode} from './TextNode';
-import {IStringificationParams} from './IStringificationParams';
+import { TextNode } from './TextNode';
+import { IStringificationParams } from './IStringificationParams';
 
 export class CDataSectionNode extends TextNode {
 	/**
@@ -8,8 +8,8 @@ export class CDataSectionNode extends TextNode {
 	protected stringify(params: IStringificationParams, nodeIndentDepth?: number): string {
 		return `${CDataSectionNode.generateIndentString(params.indentChar, nodeIndentDepth)}<![CDATA[${this.stringifyContent(params, nodeIndentDepth)}]]>${params.newlineChar}`;
 	}
-	
-	
+
+
 	/**
 	 * @override
 	 */
@@ -20,8 +20,8 @@ export class CDataSectionNode extends TextNode {
 			return super.stringifyMultiLineContent(params, nodeIndentDepth);
 		}
 	}
-	
-	
+
+
 	/**
 	 * @override
 	 */

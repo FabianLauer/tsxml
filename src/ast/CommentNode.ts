@@ -1,5 +1,5 @@
-import {TextNode} from './TextNode';
-import {IStringificationParams} from './IStringificationParams';
+import { TextNode } from './TextNode';
+import { IStringificationParams } from './IStringificationParams';
 
 export class CommentNode extends TextNode {
 	/**
@@ -8,8 +8,8 @@ export class CommentNode extends TextNode {
 	protected stringify(params: IStringificationParams, nodeIndentDepth?: number): string {
 		return `${CommentNode.generateIndentString(params.indentChar, nodeIndentDepth)}<!--${this.stringifyContent(params, nodeIndentDepth)}-->${params.newlineChar}`;
 	}
-	
-	
+
+
 	/**
 	 * @override
 	 */
@@ -20,8 +20,8 @@ export class CommentNode extends TextNode {
 			return ' ' + super.stringifyMultiLineContent(params, nodeIndentDepth) + ' ';
 		}
 	}
-	
-	
+
+
 	/**
 	 * @override
 	 */

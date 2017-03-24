@@ -54,7 +54,8 @@
 				"multiline": "never",
 				"singleline": "never"
 			}
-		]
+		],
+		"no-bitwise": false
 	},
 	"rulesDirectory": []
 }

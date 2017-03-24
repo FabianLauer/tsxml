@@ -1,6 +1,6 @@
-import {Node} from './Node';
-import {IAttribute} from './IAttribute';
-import {IStringificationParams} from './IStringificationParams';
+import { Node } from './Node';
+import { IAttribute } from './IAttribute';
+import { IStringificationParams } from './IStringificationParams';
 
 
 type ISystemLiteralAndAttribtueOrder = Array<string | number>;
@@ -10,28 +10,28 @@ export class DeclarationOpenerNode extends Node {
 	public getNumberOfSystemLiterals(): number {
 		return this.systemLiterals.length;
 	}
-	
-	
+
+
 	public getIndexOfSystemLiteral(literal: string): number {
 		return this.systemLiterals.indexOf(literal);
 	}
-	
-	
+
+
 	public getSystemLiteralAtIndex(literalIndex: number): string {
 		return this.systemLiterals[literalIndex];
 	}
-	
-	
+
+
 	public getAllSystemLiterals(): string[] {
 		return [].concat(this.systemLiterals);
 	}
-	
-	
+
+
 	public hasSystemLiteral(literal: string): boolean {
 		return this.getIndexOfSystemLiteral(literal) !== -1;
 	}
-	
-	
+
+
 	/**
 	 * @chainable
 	 */
@@ -40,8 +40,8 @@ export class DeclarationOpenerNode extends Node {
 		this.systemLiterals.splice(index, 0, literal);
 		return this;
 	}
-	
-	
+
+
 	/**
 	 * @chainable
 	 */
@@ -49,8 +49,8 @@ export class DeclarationOpenerNode extends Node {
 		this.insertIntoSystemLiteralList(literal, 0);
 		return this;
 	}
-	
-	
+
+
 	/**
 	 * @chainable
 	 */
@@ -58,8 +58,8 @@ export class DeclarationOpenerNode extends Node {
 		this.insertIntoSystemLiteralList(literal, this.getNumberOfSystemLiterals());
 		return this;
 	}
-	
-	
+
+
 	/**
 	 * @chainable
 	 */
@@ -68,8 +68,8 @@ export class DeclarationOpenerNode extends Node {
 		this.systemLiterals.splice(index, 1);
 		return this;
 	}
-	
-	
+
+
 	/**
 	 * @chainable
 	 */
@@ -81,8 +81,8 @@ export class DeclarationOpenerNode extends Node {
 		}
 		return this;
 	}
-	
-	
+
+
 	/**
 	 * @chainable
 	 * @override
@@ -92,8 +92,8 @@ export class DeclarationOpenerNode extends Node {
 		super.setAttribute<TValue>(attrName, value, namespaceName);
 		return this;
 	}
-	
-	
+
+
 	/**
 	 * @chainable
 	 * @override
@@ -103,8 +103,8 @@ export class DeclarationOpenerNode extends Node {
 		super.removeAttribute(attrName, namespaceName);
 		return this;
 	}
-	
-	
+
+
 	public isSystemLiteralListIdenticalTo(otherNode: DeclarationOpenerNode): boolean {
 		if (this.systemLiterals.length !== otherNode.systemLiterals.length) {
 			return false;
@@ -116,8 +116,8 @@ export class DeclarationOpenerNode extends Node {
 		}
 		return true;
 	}
-	
-	
+
+
 	/**
 	 * Checks whether a node is identical to another node by comparing tag names, attribute names and values and content.
 	 * @override
@@ -125,8 +125,8 @@ export class DeclarationOpenerNode extends Node {
 	public isIdenticalTo(otherNode: DeclarationOpenerNode): boolean {
 		return super.isIdenticalTo(otherNode) && this.isSystemLiteralListIdenticalTo(otherNode);
 	}
-	
-	
+
+
 	/**
 	 * @override
 	 */
@@ -134,8 +134,8 @@ export class DeclarationOpenerNode extends Node {
 		nodeIndentDepth = Math.max(nodeIndentDepth || 0, 0);
 		return `${Node.generateIndentString(params.indentChar, nodeIndentDepth)}<!${this.tagName}${this.stringifyAttributesAndSystemLiterals(params, nodeIndentDepth)}>${params.newlineChar}`;
 	}
-	
-	
+
+
 	protected stringifyAttributesAndSystemLiterals(params: IStringificationParams, nodeIndentDepth?: number): string {
 		return this.literalAndAttrOrder.map<string>(attrNameOrLiteralIndex => {
 			if (typeof attrNameOrLiteralIndex === 'string') {
@@ -145,38 +145,38 @@ export class DeclarationOpenerNode extends Node {
 			}
 		}).join('');
 	}
-	
-	
+
+
 	private appendSystemLiteralIndexToOrderList(literalIndex: number): void {
 		this.removeSystemLiteralIndexFromOrderList(literalIndex);
 		this.literalAndAttrOrder.push(literalIndex);
 	}
-	
-	
+
+
 	private removeSystemLiteralIndexFromOrderList(literalIndex: number): void {
 		const index = this.literalAndAttrOrder.indexOf(literalIndex);
 		if (index !== -1) {
 			this.literalAndAttrOrder.splice(index, 1);
 		}
 	}
-	
-	
+
+
 	private appendAttributeToOrderList(attrNameWithNamespace: string): void {
 		this.removeAttributeFromOrderList(attrNameWithNamespace);
 		this.literalAndAttrOrder.push(attrNameWithNamespace);
 	}
-	
-	
+
+
 	private removeAttributeFromOrderList(attrNameWithNamespace: string): void {
 		const index = this.literalAndAttrOrder.indexOf(attrNameWithNamespace);
 		if (index !== -1) {
 			this.literalAndAttrOrder.splice(index, 1);
 		}
 	}
-	
-	
+
+
 	private systemLiterals: string[] = [];
-	
-	
+
+
 	private literalAndAttrOrder: ISystemLiteralAndAttribtueOrder = [];
 }

@@ -1,5 +1,5 @@
-import {Node} from './Node';
-import {IStringificationParams} from './IStringificationParams';
+import { Node } from './Node';
+import { IStringificationParams } from './IStringificationParams';
 
 export class VoidNode extends Node {
 	/**

@@ -303,8 +303,8 @@ export class Parser {
 	 * @param startIndex The index at which to start searching for `token` and `otherToken`.
 	 */
 	protected doesTokenOccurBeforeNextOccurenceOfOtherToken(token: string, otherToken: string, startIndex: number): boolean {
-		const tokenIndex = this.findFirstOccurenceOfTokenAfterIndex(token, startIndex),
-			otherTokenIndex = this.findFirstOccurenceOfTokenAfterIndex(otherToken, startIndex);
+		const tokenIndex = this.findFirstOccurenceOfTokenAfterIndex(token, startIndex);
+		const otherTokenIndex = this.findFirstOccurenceOfTokenAfterIndex(otherToken, startIndex);
 		if (tokenIndex < 0 || otherTokenIndex < 0) {
 			return false;
 		}
@@ -717,8 +717,8 @@ export class Parser {
 		//     </alpha
 		//       ^      we're here
 		// we now parse the tag name and check if there are any unclosed container nodes with the exact same tag name
-		const tagNameInfo = this.parseTagName(),
-			closedNode = this.findUnclosedNodeMatchingTagName(tagNameInfo);
+		const tagNameInfo = this.parseTagName();
+		const closedNode = this.findUnclosedNodeMatchingTagName(tagNameInfo);
 		if (!(closedNode instanceof ContainerNode)) {
 			this.raiseError(this.createSyntaxErrorAtCurrentToken(SyntaxErrorCode.ExcessCloseTag, `close tag '${tagNameInfo.tagName}' has no open tag`));
 		}
@@ -956,12 +956,12 @@ export class Parser {
 
 	protected parseTagName(): ITagNameInfo {
 		// this will be set to `true` as soon as the first colon was seen
-		var colonSeen = false,
-			nameStash = '',
-			tagNameInfo: ITagNameInfo = {
-				namespacePrefix: undefined,
-				tagName: undefined
-			};
+		var colonSeen = false;
+		var nameStash = '';
+		var tagNameInfo: ITagNameInfo = {
+			namespacePrefix: undefined,
+			tagName: undefined
+		};
 		// we could now be in any of the following constructs:
 		//     <alpha ...
 		//      ^
@@ -1097,11 +1097,11 @@ export class Parser {
 
 
 	protected parseAttribute() {
-		var name = '',
-			value: string,
-			valueQuoteCharacter: string,
-			colonSeen = false,
-			getAttrInfo = () => ({ name, value });
+		var name = '';
+		var value: string;
+		var valueQuoteCharacter: string;
+		var colonSeen = false;
+		const getAttrInfo = () => ({ name, value });
 		// skip all whitespace
 		while (Parser.isWhitespaceToken(this.getCurrentToken())) {
 			this.advanceToNextToken();
@@ -1180,8 +1180,8 @@ export class Parser {
 
 
 	private createTokenMatrix(): void {
-		var line = 1,
-			column = 0;
+		var line = 1;
+		var column = 0;
 		this.tokenMatrix = new Array(this.stringToParse.length);
 		for (let i = 0; i < this.stringToParse.length; i++) {
 			column += 1;

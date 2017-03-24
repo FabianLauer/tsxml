@@ -1,4 +1,4 @@
-import {TagSyntaxRule} from './TagSyntaxRule';
+import { TagSyntaxRule } from './TagSyntaxRule';
 
 export class SyntaxRuleSet {
 	/**
@@ -7,23 +7,23 @@ export class SyntaxRuleSet {
 	public static createInstance(): SyntaxRuleSet {
 		return new this();
 	}
-	
-	
+
+
 	public static isSyntaxRuleSetClass(candidate: typeof SyntaxRuleSet): boolean {
 		return (typeof candidate === 'function' && candidate._syntaxRuleSetBrand_ === SyntaxRuleSet._syntaxRuleSetBrand_);
 	}
-	
-	
+
+
 	public hasTagSyntaxRule(rule: TagSyntaxRule): boolean {
 		return this.tagSyntaxRules.indexOf(rule) !== -1;
 	}
-	
-	
+
+
 	public getAllTagSyntaxRules(): TagSyntaxRule[] {
 		return [].concat(this.tagSyntaxRules);
 	}
-	
-	
+
+
 	/**
 	 * @chainable
 	 */
@@ -33,8 +33,8 @@ export class SyntaxRuleSet {
 		}
 		return this;
 	}
-	
-	
+
+
 	/**
 	 * @chainable
 	 */
@@ -42,10 +42,10 @@ export class SyntaxRuleSet {
 		rules.forEach(rule => this.addTagSyntaxRule(rule));
 		return this;
 	}
-	
-	
+
+
 	private static _syntaxRuleSetBrand_ = Math.random();
-	
-	
+
+
 	private tagSyntaxRules: TagSyntaxRule[] = [];
 }

@@ -1,6 +1,6 @@
-import {TagCloseMode} from '../TagCloseMode';
-import {TagSyntaxRule} from '../TagSyntaxRule';
-import {SyntaxRuleSet} from '../SyntaxRuleSet';
+import { TagCloseMode } from '../TagCloseMode';
+import { TagSyntaxRule } from '../TagSyntaxRule';
+import { SyntaxRuleSet } from '../SyntaxRuleSet';
 
 export class Html5 extends SyntaxRuleSet {
 	public static get Loose() {
@@ -10,8 +10,8 @@ export class Html5 extends SyntaxRuleSet {
 			}
 		}
 	}
-	
-	
+
+
 	public static get Strict() {
 		return <typeof Html5>class Html5Strict extends Html5 {
 			constructor() {
@@ -19,8 +19,8 @@ export class Html5 extends SyntaxRuleSet {
 			}
 		}
 	}
-	
-	
+
+
 	constructor(allowVoidElementsToSelfClose?: boolean) {
 		super();
 		if (typeof allowVoidElementsToSelfClose === 'undefined') {

@@ -1,7 +1,7 @@
-import {DocumentNode} from './ast/DocumentNode';
-import {IStringificationParams} from './ast/IStringificationParams';
-import {SyntaxRuleSet} from './parser/SyntaxRuleSet';
-import {Parser} from './parser/Parser';
+import { DocumentNode } from './ast/DocumentNode';
+import { IStringificationParams } from './ast/IStringificationParams';
+import { SyntaxRuleSet } from './parser/SyntaxRuleSet';
+import { Parser } from './parser/Parser';
 
 export abstract class Compiler {
 	/**
@@ -10,8 +10,8 @@ export abstract class Compiler {
 	public static parseXml(xmlString: string, ruleSet?: SyntaxRuleSet | typeof SyntaxRuleSet) {
 		return Parser.parseString(xmlString, ruleSet);
 	}
-	
-	
+
+
 	/**
 	 * Parses an XML string and returns the a syntax tree.
 	 */
@@ -21,8 +21,8 @@ export abstract class Compiler {
 	) {
 		return Parser.parseStringToAst(xmlString, ruleSet);
 	}
-	
-	
+
+
 	/**
 	 * Parses an XML string to a syntax tree, then serializes it to formatted XML.
 	 */
@@ -33,4 +33,4 @@ export abstract class Compiler {
 	) {
 		return Parser.parseStringToAst(xmlString, ruleSet).toFormattedString(formattingOptions);
 	}
-}
+};

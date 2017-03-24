@@ -1,7 +1,7 @@
-import {IAttribute} from './IAttribute';
-import {IStringificationParams} from './IStringificationParams';
-import {ContainerNode} from './ContainerNode';
-import {NodeFlags} from '../parser/NodeFlags';
+import { IAttribute } from './IAttribute';
+import { IStringificationParams } from './IStringificationParams';
+import { ContainerNode } from './ContainerNode';
+import { NodeFlags } from '../parser/NodeFlags';
 
 /**
  * Base class for all nodes.
@@ -10,8 +10,8 @@ export abstract class Node {
 	constructor() {
 		this.applyAttributePropertyBindings();
 	}
-	
-	
+
+
 	/**
 	 * The default formatting options for stringification.
 	 */
@@ -22,37 +22,37 @@ export abstract class Node {
 			newlineChar: '\n'
 		};
 	}
-	
-	
+
+
 	public parserFlags: NodeFlags = NodeFlags.None;
-	
-	
+
+
 	public namespacePrefix: string;
-	
-	
+
+
 	public tagName: string;
-	
-	
+
+
 	public get parentNode(): ContainerNode<any> {
 		return this._parentNode;
 	}
-	
-	
+
+
 	public getAllAttributeNames(): string[] {
 		return Object.keys(this.attrList);
 	}
-	
-	
+
+
 	public getNumberOfAttributes(): number {
 		return this.getAllAttributeNames().length;
 	}
-	
-	
+
+
 	public hasAttribute(attrName: string): boolean {
 		return this.getAllAttributeNames().indexOf(attrName) !== -1;
 	}
-	
-	
+
+
 	public getAttribute<TValue>(attrName: string, namespaceName?: string): IAttribute<TValue> {
 		if (typeof this.attrList !== 'object' || this.attrList === null) {
 			return undefined;
@@ -60,8 +60,8 @@ export abstract class Node {
 		attrName = Node.joinAttributeNameWithNamespacePrefix(attrName, namespaceName);
 		return this.attrList[attrName];
 	}
-	
-	
+
+
 	/**
 	 * @chainable
 	 */
@@ -71,8 +71,8 @@ export abstract class Node {
 		this.attrList[attrName] = value;
 		return this;
 	}
-	
-	
+
+
 	/**
 	 * @chainable
 	 */
@@ -81,8 +81,8 @@ export abstract class Node {
 		delete this.attrList[attrName];
 		return this;
 	}
-	
-	
+
+
 	public toFormattedString(stringificationParams?: IStringificationParams): string {
 		if (typeof stringificationParams === 'object' && stringificationParams !== null) {
 			stringificationParams = Node.mergeObjects(Node.defaultStringificationParams, stringificationParams);
@@ -91,8 +91,8 @@ export abstract class Node {
 		}
 		return this.stringify(stringificationParams);
 	}
-	
-	
+
+
 	public toString(): string {
 		return this.stringify({
 			indentChar: '',
@@ -100,14 +100,14 @@ export abstract class Node {
 			attrParen: '"'
 		});
 	}
-	
-	
+
+
 	public isTagNameAndNamespaceIdenticalTo(otherNode: Node): boolean {
 		return this.namespacePrefix === otherNode.namespacePrefix &&
-			   this.tagName === otherNode.tagName;
+			this.tagName === otherNode.tagName;
 	}
-	
-	
+
+
 	public isAttributeListIdenticalTo(otherNode: Node): boolean {
 		if (this.getNumberOfAttributes() !== otherNode.getNumberOfAttributes()) {
 			return false;
@@ -117,16 +117,16 @@ export abstract class Node {
 		});
 		return indexOfFirstNonIdenticalAttributeName === -1;
 	}
-	
-	
+
+
 	/**
 	 * Checks whether a node is identical to another node by comparing tag names, attribute names and values.
 	 */
 	public isIdenticalTo(otherNode: Node): boolean {
 		return this.constructor === otherNode.constructor && this.isTagNameAndNamespaceIdenticalTo(otherNode) && this.isAttributeListIdenticalTo(otherNode);
 	}
-	
-	
+
+
 	/**
 	 * Decorator.
 	 */
@@ -135,16 +135,16 @@ export abstract class Node {
 			target.addAttributeProxyProperty(propertyName, attributeName);
 		};
 	}
-	
-	
+
+
 	public getBoundAttributeNameForProperty(propertyName: string): string {
 		if (typeof this.attrPropertyBindings !== 'object' || this.attrPropertyBindings === null) {
 			return undefined;
 		}
 		return this.attrPropertyBindings[propertyName];
 	}
-	
-	
+
+
 	public getBoundPropertyNamesForAttribute(attributeName: string): string[] {
 		const propertyNames: string[] = [];
 		if (typeof this.attrPropertyBindings !== 'object' || this.attrPropertyBindings === null) {
@@ -157,26 +157,26 @@ export abstract class Node {
 		}
 		return propertyNames;
 	}
-	
-	
+
+
 	protected static joinAttributeNameWithNamespacePrefix(attrName: string, namespaceName: string): string {
 		if (typeof namespaceName !== 'undefined') {
 			attrName = namespaceName + ':' + attrName;
 		}
 		return attrName;
 	}
-	
-	
+
+
 	protected static changeParentNode(childNode: Node, newParentNode: ContainerNode<any>): void {
 		childNode._parentNode = newParentNode;
 	}
-	
-	
+
+
 	protected static removeParentNode(childNode: Node): void {
 		childNode._parentNode = undefined;
 	}
-	
-	
+
+
 	protected static generateIndentString(indentChar: string, indentDepth: number): string {
 		indentDepth = Math.max(indentDepth || 0, 0);
 		if (indentDepth === 0) {
@@ -188,14 +188,14 @@ export abstract class Node {
 		}
 		return indentString;
 	}
-	
-	
+
+
 	protected stringify(params: IStringificationParams, nodeIndentDepth?: number): string {
 		nodeIndentDepth = Math.max(nodeIndentDepth || 0, 0);
 		return `${Node.generateIndentString(params.indentChar, nodeIndentDepth)}<${this.tagName}${this.stringifyAttributes(nodeIndentDepth)} />${params.newlineChar}`;
 	}
-	
-	
+
+
 	protected stringifyAttributes(nodeIndentDepth: number): string {
 		var attrString = '';
 		for (let attrName in this.attrList) {
@@ -203,8 +203,8 @@ export abstract class Node {
 		}
 		return attrString;
 	}
-	
-	
+
+
 	protected stringifyAttribute(attrName: string, attrValue: any): string {
 		if (typeof attrValue !== 'undefined') {
 			return ` ${attrName}="${attrValue}"`;
@@ -212,22 +212,22 @@ export abstract class Node {
 			return ` ${attrName}`;
 		}
 	}
-	
-	
+
+
 	private static mergeObjects<TObject>(baseObject: TObject, overlayObject: TObject): TObject {
 		for (let key in overlayObject) {
 			(<any>baseObject)[key] = (<any>overlayObject)[key];
 		}
 		return baseObject;
 	}
-	
-	
+
+
 	private addAttributeProxyProperty(propertyName: string, attrName: string): void {
 		this.attrPropertyBindings = this.attrPropertyBindings || {};
 		this.attrPropertyBindings[propertyName] = attrName;
 	}
-	
-	
+
+
 	private applyAttributePropertyBindings(): void {
 		if (typeof this.attrPropertyBindings !== 'object' || this.attrPropertyBindings === null) {
 			return;
@@ -236,8 +236,8 @@ export abstract class Node {
 			this.applyAttributePropertyBinding(propertyName, this.attrPropertyBindings[propertyName]);
 		}
 	}
-	
-	
+
+
 	private applyAttributePropertyBinding(propertyName: string, attributeName: string): void {
 		const value = (<any>this)[propertyName];
 		Object.defineProperty(this, propertyName, {
@@ -246,13 +246,13 @@ export abstract class Node {
 		});
 		this.setAttribute(attributeName, value);
 	}
-	
-	
+
+
 	private attrPropertyBindings: { [propertyName: string]: string; };
-	
-	
+
+
 	private _parentNode: ContainerNode<any>;
-	
-	
-	private attrList: { [attrName: string]:  IAttribute<any>; } = { };
+
+
+	private attrList: { [attrName: string]: IAttribute<any>; } = {};
 }

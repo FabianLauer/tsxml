@@ -4,17 +4,17 @@ export abstract class Attribute<TValue> {
 			protected value = value;
 		});
 	}
-	
-	
+
+
 	public valueOf(): TValue {
 		return this.value;
 	}
-	
-	
+
+
 	public toString(): string {
 		return this.value + '';
 	}
-	
-	
+
+
 	protected value: TValue;
 }
