@@ -1,6 +1,7 @@
 {
     "exclude": [
-        "./build/**"
+        "./build/**",
+        "node_modules/**"
     ],
     "compilerOptions": {
         "target": "es6",
