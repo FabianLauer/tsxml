@@ -7,7 +7,7 @@ abstract class FileTest extends test.UnitTest {
 	protected abstract getFullPathToFile(): string;
 	
 	protected async performTest() {
-		const documentNode = await xml.Parser.parseStringToAst(await this.getSourceAsString(), this.getSyntaxRuleSet());
+		const documentNode = xml.Parser.parseStringToAst(await this.getSourceAsString(), this.getSyntaxRuleSet());
 		if (typeof (await this.getCompactExpectationAsString()) === 'string' && (await this.getCompactExpectationAsString()).length > 0) {
 			const serializedXml = FileTest.makeComparableString(documentNode.toString());
 			await this.assert(serializedXml === (await this.getCompactExpectationAsString()),
