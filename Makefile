@@ -10,9 +10,9 @@ build:
 	@rm ./build/src/test.js || true
 	@rm ./build/src/test.d.ts || true
 
-	./node_modules/.bin/browserify build/src/index.js > build/index.js
+	#./node_modules/.bin/browserify build/src/index.js > build/index.js
 
-	@find ./build/src/ -name "*.js" -type f -delete
+	#@find ./build/src/ -name "*.js" -type f -delete
 	
 	mv ./build/src/* ./build/
 	rm -rf ./build/src/
