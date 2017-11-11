@@ -4,8 +4,17 @@
         "node_modules/**"
     ],
     "compilerOptions": {
-        "target": "es6",
+        "target": "es5",
         "module": "commonjs",
+        "lib": [
+            "dom",
+            "dom.iterable",
+            "es5",
+            "es6",
+            "es7",
+            "es2015",
+            "es2015.iterable"
+        ],
         "experimentalDecorators": true,
         "noImplicitAny": true,
         "emitDecoratorMetadata": true,

@@ -1,140 +1,154 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
-const Node_1 = require("./Node");
-class DeclarationOpenerNode extends Node_1.Node {
-    constructor() {
-        super(...arguments);
-        this.systemLiterals = [];
-        this.literalAndAttrOrder = [];
+var Node_1 = require("./Node");
+var DeclarationOpenerNode = /** @class */ (function (_super) {
+    __extends(DeclarationOpenerNode, _super);
+    function DeclarationOpenerNode() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.systemLiterals = [];
+        _this.literalAndAttrOrder = [];
+        return _this;
     }
-    getNumberOfSystemLiterals() {
+    DeclarationOpenerNode.prototype.getNumberOfSystemLiterals = function () {
         return this.systemLiterals.length;
-    }
-    getIndexOfSystemLiteral(literal) {
+    };
+    DeclarationOpenerNode.prototype.getIndexOfSystemLiteral = function (literal) {
         return this.systemLiterals.indexOf(literal);
-    }
-    getSystemLiteralAtIndex(literalIndex) {
+    };
+    DeclarationOpenerNode.prototype.getSystemLiteralAtIndex = function (literalIndex) {
         return this.systemLiterals[literalIndex];
-    }
-    getAllSystemLiterals() {
+    };
+    DeclarationOpenerNode.prototype.getAllSystemLiterals = function () {
         return [].concat(this.systemLiterals);
-    }
-    hasSystemLiteral(literal) {
+    };
+    DeclarationOpenerNode.prototype.hasSystemLiteral = function (literal) {
         return this.getIndexOfSystemLiteral(literal) !== -1;
-    }
+    };
     /**
      * @chainable
      */
-    insertIntoSystemLiteralList(literal, index) {
+    DeclarationOpenerNode.prototype.insertIntoSystemLiteralList = function (literal, index) {
         this.appendSystemLiteralIndexToOrderList(index);
         this.systemLiterals.splice(index, 0, literal);
         return this;
-    }
+    };
     /**
      * @chainable
      */
-    prependToSystemLiteralList(literal) {
+    DeclarationOpenerNode.prototype.prependToSystemLiteralList = function (literal) {
         this.insertIntoSystemLiteralList(literal, 0);
         return this;
-    }
+    };
     /**
      * @chainable
      */
-    appendToSystemLiteralList(literal) {
+    DeclarationOpenerNode.prototype.appendToSystemLiteralList = function (literal) {
         this.insertIntoSystemLiteralList(literal, this.getNumberOfSystemLiterals());
         return this;
-    }
+    };
     /**
      * @chainable
      */
-    removeSystemLiteralAtIndex(index) {
+    DeclarationOpenerNode.prototype.removeSystemLiteralAtIndex = function (index) {
         this.removeSystemLiteralIndexFromOrderList(index);
         this.systemLiterals.splice(index, 1);
         return this;
-    }
+    };
     /**
      * @chainable
      */
-    removeSystemLiteral(literal) {
-        let index = this.getIndexOfSystemLiteral(literal);
+    DeclarationOpenerNode.prototype.removeSystemLiteral = function (literal) {
+        var index = this.getIndexOfSystemLiteral(literal);
         while (index !== -1) {
             this.systemLiterals.splice(index, 1);
             index = this.getIndexOfSystemLiteral(literal);
         }
         return this;
-    }
+    };
     /**
      * @chainable
      * @override
      */
-    setAttribute(attrName, value, namespaceName) {
+    DeclarationOpenerNode.prototype.setAttribute = function (attrName, value, namespaceName) {
         this.appendAttributeToOrderList(Node_1.Node.joinAttributeNameWithNamespacePrefix(attrName, namespaceName));
-        super.setAttribute(attrName, value, namespaceName);
+        _super.prototype.setAttribute.call(this, attrName, value, namespaceName);
         return this;
-    }
+    };
     /**
      * @chainable
      * @override
      */
-    removeAttribute(attrName, namespaceName) {
+    DeclarationOpenerNode.prototype.removeAttribute = function (attrName, namespaceName) {
         this.removeAttributeFromOrderList(Node_1.Node.joinAttributeNameWithNamespacePrefix(attrName, namespaceName));
-        super.removeAttribute(attrName, namespaceName);
+        _super.prototype.removeAttribute.call(this, attrName, namespaceName);
         return this;
-    }
-    isSystemLiteralListIdenticalTo(otherNode) {
+    };
+    DeclarationOpenerNode.prototype.isSystemLiteralListIdenticalTo = function (otherNode) {
         if (this.systemLiterals.length !== otherNode.systemLiterals.length) {
             return false;
         }
-        for (let i = 0; i < this.systemLiterals.length; i++) {
+        for (var i = 0; i < this.systemLiterals.length; i++) {
             if (this.systemLiterals[i] !== otherNode.systemLiterals[i]) {
                 return false;
             }
         }
         return true;
-    }
+    };
     /**
      * Checks whether a node is identical to another node by comparing tag names, attribute names and values and content.
      * @override
      */
-    isIdenticalTo(otherNode) {
-        return super.isIdenticalTo(otherNode) && this.isSystemLiteralListIdenticalTo(otherNode);
-    }
+    DeclarationOpenerNode.prototype.isIdenticalTo = function (otherNode) {
+        return _super.prototype.isIdenticalTo.call(this, otherNode) && this.isSystemLiteralListIdenticalTo(otherNode);
+    };
     /**
      * @override
      */
-    stringify(params, nodeIndentDepth) {
+    DeclarationOpenerNode.prototype.stringify = function (params, nodeIndentDepth) {
         nodeIndentDepth = Math.max(nodeIndentDepth || 0, 0);
-        return `${Node_1.Node.generateIndentString(params.indentChar, nodeIndentDepth)}<!${this.tagName}${this.stringifyAttributesAndSystemLiterals(params, nodeIndentDepth)}>${params.newlineChar}`;
-    }
-    stringifyAttributesAndSystemLiterals(params, nodeIndentDepth) {
-        return this.literalAndAttrOrder.map(attrNameOrLiteralIndex => {
+        return Node_1.Node.generateIndentString(params.indentChar, nodeIndentDepth) + "<!" + this.tagName + this.stringifyAttributesAndSystemLiterals(params, nodeIndentDepth) + ">" + params.newlineChar;
+    };
+    DeclarationOpenerNode.prototype.stringifyAttributesAndSystemLiterals = function (params, nodeIndentDepth) {
+        var _this = this;
+        return this.literalAndAttrOrder.map(function (attrNameOrLiteralIndex) {
             if (typeof attrNameOrLiteralIndex === 'string') {
-                return this.stringifyAttribute(attrNameOrLiteralIndex, this.getAttribute(attrNameOrLiteralIndex));
+                return _this.stringifyAttribute(attrNameOrLiteralIndex, _this.getAttribute(attrNameOrLiteralIndex));
             }
             else {
-                return ` "${this.getSystemLiteralAtIndex(attrNameOrLiteralIndex)}"`;
+                return " \"" + _this.getSystemLiteralAtIndex(attrNameOrLiteralIndex) + "\"";
             }
         }).join('');
-    }
-    appendSystemLiteralIndexToOrderList(literalIndex) {
+    };
+    DeclarationOpenerNode.prototype.appendSystemLiteralIndexToOrderList = function (literalIndex) {
         this.removeSystemLiteralIndexFromOrderList(literalIndex);
         this.literalAndAttrOrder.push(literalIndex);
-    }
-    removeSystemLiteralIndexFromOrderList(literalIndex) {
-        const index = this.literalAndAttrOrder.indexOf(literalIndex);
+    };
+    DeclarationOpenerNode.prototype.removeSystemLiteralIndexFromOrderList = function (literalIndex) {
+        var index = this.literalAndAttrOrder.indexOf(literalIndex);
         if (index !== -1) {
             this.literalAndAttrOrder.splice(index, 1);
         }
-    }
-    appendAttributeToOrderList(attrNameWithNamespace) {
+    };
+    DeclarationOpenerNode.prototype.appendAttributeToOrderList = function (attrNameWithNamespace) {
         this.removeAttributeFromOrderList(attrNameWithNamespace);
         this.literalAndAttrOrder.push(attrNameWithNamespace);
-    }
-    removeAttributeFromOrderList(attrNameWithNamespace) {
-        const index = this.literalAndAttrOrder.indexOf(attrNameWithNamespace);
+    };
+    DeclarationOpenerNode.prototype.removeAttributeFromOrderList = function (attrNameWithNamespace) {
+        var index = this.literalAndAttrOrder.indexOf(attrNameWithNamespace);
         if (index !== -1) {
             this.literalAndAttrOrder.splice(index, 1);
         }
-    }
-}
+    };
+    return DeclarationOpenerNode;
+}(Node_1.Node));
 exports.DeclarationOpenerNode = DeclarationOpenerNode;

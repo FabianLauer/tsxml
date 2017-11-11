@@ -10,8 +10,9 @@ export class Event<THandler extends Function> {
 	
 	
 	public once(handler: THandler): void {
-		this.bind(<any>(() => {
-			this.unbind(handler);
+		const self = this;
+		this.bind(<any>(function () {
+			self.unbind(handler);
 			handler.apply(null, arguments);
 		}));
 	}
