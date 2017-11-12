@@ -84,5 +84,12 @@ If you don't need all of this, you might want to check out these:
 - [segmentio's xml-parser](https://github.com/segmentio/xml-parser)
 
 
+## How to build?
+
+```
+make build
+```
+
+
 ## License
 MIT. See LICENSE file.
