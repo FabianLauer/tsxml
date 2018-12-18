@@ -464,7 +464,7 @@ export class Parser {
 
 
 	protected goBackToPreviousToken(): void {
-		this.goBackByNumberOfTokens(1)
+		this.goBackByNumberOfTokens(1);
 	}
 
 
