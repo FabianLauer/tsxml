@@ -18,7 +18,7 @@ npm install tsxml
 
 ## Is it used somewhere?
 
-Yup, here: [vs-code-xml-format](https://github.com/FabianLauer/vs-code-xml-format).
+Yup, in [vs-code-xml-format](https://github.com/FabianLauer/vs-code-xml-format) and [Microsoft Azure Data Studio](https://github.com/microsoft/azuredatastudio/blob/9f77c74b9fbd3953fa66b3598d5744bdd86d31fe/extensions/xml-language-features/src/extension.ts#L7).
 
 ## Status Quo
 
